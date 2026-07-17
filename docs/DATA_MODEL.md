@@ -14,7 +14,7 @@
 - `actor_verifications` — документы и статусы;
 - `active_actor_preferences` — последний активный профиль.
 
-Ключевой принцип: `user_account` отвечает за вход, `actor_profile` — от чьего имени пользователь действует.
+Ключевой принцип: `user_account` отвечает за вход, `actor_profile` — от чьего имени пользователь действует. Каждый человек имеет player profile, даже когда активен trainer или organization actor.
 
 ## 2. Организация, площадки и административный кабинет
 
@@ -89,24 +89,58 @@ updated_at
 
 - `games`;
 - `trainings`;
-- `training_groups`;
 - `tournaments`;
 - `seasons`;
 - `season_game_days`;
 - `tours`.
 
-## 4. Участие
+`training_groups` не входят в MVP и не должны создаваться новыми сценариями.
+
+## 4. Мои игроки и приглашения
+
+Источник истины: `docs/PLAYER_DIRECTORY.yaml`.
+
+- `actor_player_links` — односторонняя связь активного actor с сохранённым player profile;
+- `player_link_events` — аудит добавления, удаления и источника связи;
+- `event_invitation_batches` — массовая операция приглашения выбранных игроков;
+- `event_invitations` — приглашение конкретного игрока в конкретную сущность;
+- `invitation_delivery_attempts` — push, email, in-app и повторные попытки.
+
+`actor_player_links` содержит:
+
+```text
+id
+owner_actor_id
+player_profile_id
+source
+added_by_user_id
+created_at
+removed_at
+```
+
+Правила:
+
+- связь не взаимная и не требует подтверждения;
+- связь не является дружбой, ученичеством, партнёрством или участием;
+- сохранение игрока не раскрывает закрытые данные;
+- удаление связи не удаляет прошлые события, сообщения, платежи и результаты;
+- приглашение всегда относится к конкретной сущности;
+- принятая заявка или приглашение создаёт либо изменяет `participation`.
+
+## 5. Участие
 
 - `participations` — единый статус участия;
 - `participation_requests`;
 - `waitlist_entries`;
-- `invitations`;
+- `invitations` — legacy alias, новые реализации используют `event_invitations`;
 - `check_ins`;
 - `attendance_records`.
 
 `participations` хранит user и actor-контекст, но личная спортивная статистика всегда связывается с player profile человека.
 
-## 5. Одноразовые игры и игровые дни
+Добавление в `Мои игроки` не создаёт participation. Приглашённый игрок до принятия не считается подтверждённым участником и не получает доступ к чату события.
+
+## 6. Одноразовые игры и игровые дни
 
 - `game_format_configs`;
 - `game_courts`;
@@ -120,7 +154,7 @@ updated_at
 
 Количество кортов хранится у конкретной игры или `season_game_day`, а не у формата сезона.
 
-## 6. Соревновательный движок
+## 7. Соревновательный движок
 
 - `competition_configs` — формат и версия правил;
 - `competition_participants` — игрок, пара или команда;
@@ -144,17 +178,23 @@ updated_at
 - override содержит причину, acting_user_id и acting_actor_id;
 - полный placement 32 хранит 5 раундов, 80 матчей и место 1–32 для каждой команды.
 
-## 7. Тренировки
+## 8. Тренировки
 
 - `training_programs`;
-- `training_group_members`;
-- `training_group_schedules`;
-- `subscriptions` / `passes`;
+- `training_templates` — повторяемые настройки без постоянного членства;
+- `training_visibility_rules` — private, public, invite_then_public;
+- `training_enrollment_rules` — open, request, invitation_only;
+- `training_public_open_schedules` — момент открытия оставшихся мест;
+- `training_invitation_batches` — выбранные игроки и результат отправки;
 - `attendance_records`;
 - `trainer_notes`;
 - `training_materials`.
 
-## 8. Туры
+Тренировка является отдельным событием. Для повторения используется template или дублирование. Постоянная социальная группа, group membership и отдельный group chat не создаются.
+
+Если позднее появятся пакеты посещений, они должны быть финансовым продуктом, применимым к набору тренировок, а не причиной создавать социальную группу.
+
+## 9. Туры
 
 - `tour_program_days`;
 - `tour_packages`;
@@ -167,20 +207,29 @@ updated_at
 
 Неформальная поездка может не использовать коммерческие packages, но остаётся той же сущностью `tour`.
 
-## 9. Деньги
+## 10. Деньги
+
+Источник истины: `docs/FINANCE_ARCHITECTURE.yaml`.
 
 - `orders`;
 - `order_items`;
 - `payments`;
 - `payment_transactions`;
 - `refunds`;
+- `seller_accounts`;
 - `payout_accounts`;
 - `payouts`;
+- `platform_fees`;
+- `provider_fees`;
+- `receipts`;
+- `financial_ledger_entries`;
 - `financial_reports`.
 
-Платёж не является статусом участия. Order связывает участие / бронирование и конкретную цену на момент создания.
+Платёж не является статусом участия. Order связывает участие / бронирование и конкретную цену на момент создания. Один order содержит одного seller actor.
 
-## 10. Коммуникация
+## 11. Коммуникация
+
+Источник истины: `docs/ENTITY_SECTIONS.yaml`.
 
 - `conversations`;
 - `conversation_contexts`;
@@ -191,9 +240,11 @@ updated_at
 - `notifications`;
 - `notification_actions`.
 
+Каждая опубликованная игра, тренировка, турнир, сезон и тур имеет один основной conversation context. Подтверждённые участники и организаторы получают доступ согласно политике. Отдельные социальные group conversations не создаются.
+
 Чат содержит контекстную ссылку на сущность. Уведомление содержит `action_id` и параметры перехода.
 
-## 11. Статистика
+## 12. Статистика
 
 - `player_rating_events`;
 - `player_stat_snapshots`;
@@ -201,9 +252,9 @@ updated_at
 - `organization_stat_snapshots`;
 - `analytics_jobs`.
 
-Снапшоты ускоряют чтение, но источником истины остаются результаты, посещаемость и транзакции.
+Снапшоты ускоряют чтение, но источником истины остаются результаты, посещаемость и транзакции. Статистика не рассчитывается по членству в несуществующей группе.
 
-## 12. Контроль и безопасность
+## 13. Контроль и безопасность
 
 - `audit_log`;
 - `moderation_reports`;
@@ -214,4 +265,4 @@ updated_at
 
 Для административных действий audit event дополнительно хранит `organization_id`, `membership_id`, роль на момент действия, `acting_user_id`, `acting_actor_id`, `action_id`, объект, diff, причину и correlation ID.
 
-RLS проверяет не только user_id, но actor ownership, entity relationship, organization membership и конкретный permission.
+RLS проверяет не только user_id, но actor ownership, entity relationship, organization membership и конкретный permission. Player directory не является основанием для доступа к закрытым данным игрока.

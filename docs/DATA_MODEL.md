@@ -1,74 +1,177 @@
 # Модель данных
 
-Рекомендуемая база — PostgreSQL/Supabase.
+Рекомендуемая база — PostgreSQL / Supabase с Row Level Security. Названия ниже концептуальные и могут уточняться при реализации.
 
-## Идентичность и роли
+## 1. Аккаунт и профили
 
-- users
-- profiles
-- organizations
-- organization_members
-- organizer_permissions
+- `user_accounts` — auth user, email, статус;
+- `auth_identities` — Google, email и будущие провайдеры;
+- `actor_profiles` — общий реестр player, trainer, organization;
+- `player_profiles` — личные спортивные поля;
+- `trainer_profiles` — профессиональные поля и проверка;
+- `organizations` — компании, клубы и проекты;
+- `organization_memberships` — user / actor, роль, статус;
+- `actor_verifications` — документы и статусы;
+- `active_actor_preferences` — последний активный профиль.
 
-## Места и профессиональные сущности
+Ключевой принцип: `user_account` отвечает за вход, `actor_profile` — от чьего имени пользователь действует.
 
-- clubs
-- venues
-- courts
-- coaches
+## 2. Площадки и профессиональные сущности
 
-## Активности
+- `clubs`;
+- `venues`;
+- `courts`;
+- `venue_opening_hours`;
+- `court_blocks`;
+- `court_bookings`;
+- `trainer_specializations`;
+- `trainer_venue_links`.
 
-- games
-- trainings
-- tournaments
-- seasons
-- tours
+## 3. Общая основа сущностей
 
-## Сезоны и игровые дни
+Возможны отдельные таблицы сущностей, но общие поля должны быть одинаковыми:
 
-- season_members
-- season_game_days
-- game_day_courts
-- game_day_participants
-- rotation_rounds
-- rotation_assignments
+```text
+id
+created_by_user_id
+created_by_actor_id
+status
+visibility
+title
+description
+starts_at
+ends_at
+timezone
+venue_id
+created_at
+updated_at
+```
 
-Ключевой принцип: количество кортов хранится у `season_game_days`, а не у формата сезона.
+Основные таблицы:
 
-## Соревнования
+- `games`;
+- `trainings`;
+- `training_groups`;
+- `tournaments`;
+- `seasons`;
+- `season_game_days`;
+- `tours`.
 
-- competition_formats
-- teams
-- team_members
-- rounds
-- matches
-- match_participants
-- results
-- standings
-- placements
-- ranking_rules
+## 4. Участие
 
-Формат полного распределения мест 1–32 хранит 5 раундов, 80 матчей и итоговый placement для каждой команды.
+- `participations` — единый статус участия;
+- `participation_requests`;
+- `waitlist_entries`;
+- `invitations`;
+- `check_ins`;
+- `attendance_records`.
 
-## Регистрации и деньги
+`participations` хранит user и actor-контекст, но личная спортивная статистика всегда связывается с player profile человека.
 
-- registrations
-- waitlist_entries
-- payments
-- refunds
-- payouts
+## 5. Одноразовые игры и игровые дни
 
-## Коммуникация
+- `game_format_configs`;
+- `game_courts`;
+- `game_rounds`;
+- `round_assignments`;
+- `round_results`;
+- `game_day_participants`;
+- `game_day_courts`.
 
-- conversations
-- conversation_members
-- messages
-- notifications
+Для ротации пяти игроков `round_assignments` хранит корт, раунд, игрока, команду / партнёра и статус отдыха.
 
-Каждый чат содержит контекстную ссылку на игру, сезон, тренировку, клуб или тур.
+Количество кортов хранится у конкретной игры или `season_game_day`, а не у формата сезона.
 
-## Контроль
+## 6. Соревновательный движок
 
-- audit_log
-- moderation_reports
+- `competition_configs` — формат и версия правил;
+- `competition_participants` — игрок, пара или команда;
+- `teams`;
+- `team_members`;
+- `competition_rounds`;
+- `pairing_versions`;
+- `matches`;
+- `match_sides`;
+- `result_events`;
+- `standings_snapshots`;
+- `placements`;
+- `tiebreak_rules`;
+- `competition_overrides`.
+
+### Важные правила
+
+- итоговые таблицы рассчитываются из `result_events`;
+- исправление создаёт новое событие, а не переписывает историю;
+- опубликованная жеребьёвка имеет версию;
+- override содержит причину, acting_user_id и acting_actor_id;
+- полный placement 32 хранит 5 раундов, 80 матчей и место 1–32 для каждой команды.
+
+## 7. Тренировки
+
+- `training_programs`;
+- `training_group_members`;
+- `training_group_schedules`;
+- `subscriptions` / `passes`;
+- `attendance_records`;
+- `trainer_notes`;
+- `training_materials`.
+
+## 8. Туры
+
+- `tour_program_days`;
+- `tour_packages`;
+- `tour_accommodation_options`;
+- `tour_bookings`;
+- `booking_travelers`;
+- `tour_documents`;
+- `tour_staff`;
+- `tour_transport_options`.
+
+Неформальная поездка может не использовать коммерческие packages, но остаётся той же сущностью `tour`.
+
+## 9. Деньги
+
+- `orders`;
+- `order_items`;
+- `payments`;
+- `payment_transactions`;
+- `refunds`;
+- `payout_accounts`;
+- `payouts`;
+- `financial_reports`.
+
+Платёж не является статусом участия. Order связывает участие / бронирование и конкретную цену на момент создания.
+
+## 10. Коммуникация
+
+- `conversations`;
+- `conversation_contexts`;
+- `conversation_members`;
+- `messages`;
+- `message_attachments`;
+- `announcements`;
+- `notifications`;
+- `notification_actions`.
+
+Чат содержит контекстную ссылку на сущность. Уведомление содержит `action_id` и параметры перехода.
+
+## 11. Статистика
+
+- `player_rating_events`;
+- `player_stat_snapshots`;
+- `trainer_stat_snapshots`;
+- `organization_stat_snapshots`;
+- `analytics_jobs`.
+
+Снапшоты ускоряют чтение, но источником истины остаются результаты, посещаемость и транзакции.
+
+## 12. Контроль и безопасность
+
+- `audit_log`;
+- `moderation_reports`;
+- `blocked_users`;
+- `device_sessions`;
+- `data_export_requests`;
+- `account_deletion_requests`.
+
+RLS проверяет не только user_id, но actor ownership, entity relationship и organization membership.

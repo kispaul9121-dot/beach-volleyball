@@ -5,7 +5,7 @@ source_of_truth_for:
   - actor-owned player lists
   - player picker
   - event invitations
-  - invitation-first publication
+  - event visibility and enrollment
 
 principles:
   - Игрок — единственное пользовательское понятие для людей, участвующих в спортивных событиях.
@@ -102,20 +102,21 @@ invitation_model:
     - При заполненной вместимости применяется лист ожидания или понятный отказ согласно политике события.
     - Отозванное приглашение не удаляет игрока из `Мои игроки`.
 
-visibility_and_fill:
+visibility_and_enrollment:
   visibility_modes:
     private:
       catalog_visibility: hidden
-      entry: invitation_or_private_link
+      discovery: invitation_or_private_link
     public:
-      catalog_visibility: visible
-      entry: open_or_request
-    invite_then_public:
-      catalog_visibility: hidden_until_open
-      entry: invitations_first
-      open_remaining_spots:
-        modes: [manual, scheduled]
-        trigger_fields: [open_at, remaining_spots]
+      catalog_visibility: visible_in_events_all
+      discovery: events_catalog
+  rules:
+    - Видимость выбирается для всей сущности, а не для отдельных свободных мест.
+    - Приглашения можно отправлять и для публичной, и для непубличной сущности.
+    - Публичная сущность целиком появляется в `События → Все` после публикации.
+    - Непубличная сущность не появляется в `События → Все`, но доступна по приглашению или приватной ссылке.
+    - Смена видимости не удаляет приглашения, заявки, подтверждённые участия и платежи.
+    - Способ набора настраивается отдельно от видимости.
   enrollment_modes:
     - open
     - request

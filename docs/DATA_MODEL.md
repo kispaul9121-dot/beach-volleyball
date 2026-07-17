@@ -182,9 +182,9 @@ removed_at
 
 - `training_programs`;
 - `training_templates` — повторяемые настройки без постоянного членства;
-- `training_visibility_rules` — private, public, invite_then_public;
-- `training_enrollment_rules` — open, request, invitation_only;
-- `training_public_open_schedules` — момент открытия оставшихся мест;
+- `training_visibility_rules` — private или public для всей тренировки;
+- `training_enrollment_rules` — open, request, invitation_only независимо от видимости;
+- `training_visibility_events` — аудит публикации, скрытия и повторного открытия всей тренировки;
 - `training_invitation_batches` — выбранные игроки и результат отправки;
 - `attendance_records`;
 - `trainer_notes`;

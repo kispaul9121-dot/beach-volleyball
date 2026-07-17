@@ -1,0 +1,36 @@
+flowchart LR
+  Home["Главная"]
+  Play["Играть"]
+  Chats["Чаты"]
+  Clubs["Клубы"]
+  Profile["Профиль"]
+
+  Home -->|"Ближайшее событие"| Entity["Канонический экран сущности"]
+  Home -->|"Календарь"| Calendar["Мой календарь"]
+
+  Play --> Games["Игры"]
+  Play --> Trainings["Тренировки"]
+  Play --> Tournaments["Турниры"]
+  Play --> Seasons["Сезоны"]
+  Play --> CreateGame["Создание игры"]
+
+  Profile --> Calendar
+  Profile --> MyGames["Мои игры"]
+  Profile --> MyCompetitions["Мои турниры и сезоны"]
+  Profile --> MyTrainings["Мои тренировки"]
+  Profile --> MyTrips["Мои туры и поездки"]
+
+  MyGames --> Participating["Участвую"]
+  MyGames --> Created["Созданные"]
+  Participating --> GameDetails["Детали игры"]
+  Created --> CreateGame
+  Created --> GameManage["Управление игрой"]
+
+  Chats --> Chat["Чат"]
+  Chat -->|"Открыть событие"| Entity
+
+  Clubs --> ClubList["Клубы"]
+  Clubs --> Courts["Корты"]
+  Clubs --> Coaches["Тренеры"]
+  Clubs --> Tours["Туры"]
+  Tours --> TourDetails["Детали тура"]

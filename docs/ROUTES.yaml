@@ -1,0 +1,100 @@
+version: 1
+
+routes:
+  - path: /
+    screen: home.main
+    navigator: tab
+
+  - path: /play
+    screen: play.main
+    navigator: tab
+
+  - path: /chats
+    screen: chats.main
+    navigator: tab
+
+  - path: /clubs
+    screen: clubs.main
+    navigator: tab
+
+  - path: /profile
+    screen: profile.main
+    navigator: tab
+
+  - path: /profile/calendar
+    screen: profile.calendar
+    navigator: profile_stack
+    parent: /profile
+    back_fallback: /profile
+
+  - path: /profile/games
+    screen: profile.my_games
+    navigator: profile_stack
+    parent: /profile
+    back_fallback: /profile
+
+  - path: /profile/competitions
+    screen: profile.competitions
+    navigator: profile_stack
+    parent: /profile
+    back_fallback: /profile
+
+  - path: /profile/trainings
+    screen: profile.trainings
+    navigator: profile_stack
+    parent: /profile
+    back_fallback: /profile
+
+  - path: /profile/trips
+    screen: profile.trips
+    navigator: profile_stack
+    parent: /profile
+    back_fallback: /profile
+
+  - path: /games/create
+    screen: game.create
+    navigator: modal_stack
+    accepts_query:
+      - returnTo
+    back_fallback: /play?category=games
+
+  - path: /games/:gameId
+    screen: game.details
+    navigator: entity_stack
+    back_fallback: /play?category=games
+
+  - path: /games/:gameId/manage
+    screen: game.manage
+    navigator: entity_stack
+    permission: game_organizer
+    back_fallback: /profile/games?tab=created
+
+  - path: /trainings/:trainingId
+    screen: training.details
+    navigator: entity_stack
+    back_fallback: /play?category=trainings
+
+  - path: /tournaments/:tournamentId
+    screen: tournament.details
+    navigator: entity_stack
+    back_fallback: /play?category=tournaments
+
+  - path: /seasons/:seasonId
+    screen: season.details
+    navigator: entity_stack
+    back_fallback: /play?category=seasons
+
+  - path: /tours/:tourId
+    screen: tour.details
+    navigator: entity_stack
+    back_fallback: /clubs?category=tours
+
+  - path: /clubs/:clubId
+    screen: club.details
+    navigator: entity_stack
+    back_fallback: /clubs
+
+  - path: /chats/:chatId
+    screen: chat.details
+    navigator: chats_stack
+    back_fallback: /chats

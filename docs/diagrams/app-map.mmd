@@ -1,36 +1,85 @@
 flowchart LR
-  Home["Главная"]
-  Play["Играть"]
-  Chats["Чаты"]
-  Clubs["Клубы"]
-  Profile["Профиль"]
+  Auth["Вход и регистрация"] --> Onboarding["Выбор профилей"]
+  Onboarding --> PlayerActor["Игрок"]
+  Onboarding --> TrainerActor["Тренер"]
+  Onboarding --> OrgActor["Организация"]
 
-  Home -->|"Ближайшее событие"| Entity["Канонический экран сущности"]
-  Home -->|"Календарь"| Calendar["Мой календарь"]
+  PlayerActor --> Switcher["Активный профиль"]
+  TrainerActor --> Switcher
+  OrgActor --> Switcher
 
-  Play --> Games["Игры"]
-  Play --> Trainings["Тренировки"]
-  Play --> Tournaments["Турниры"]
-  Play --> Seasons["Сезоны"]
-  Play --> CreateGame["Создание игры"]
+  Switcher --> Home["Главная"]
+  Switcher --> Play["Играть"]
+  Switcher --> Chats["Чаты"]
+  Switcher --> Clubs["Клубы"]
+  Switcher --> Profile["Профиль"]
 
-  Profile --> Calendar
+  Home --> Managed["Управляю"]
+  Home --> Upcoming["Мои ближайшие"]
+  Play --> Managed
+  Play --> Upcoming
+  Play --> Catalog["Публичный каталог"]
+  Catalog --> Entity["Канонический экран сущности"]
+  Upcoming --> Entity
+  Managed --> Manage["Кабинет управления"]
+  Entity -->|"Есть права"| Manage
+
+  Profile --> Calendar["Мой календарь"]
   Profile --> MyGames["Мои игры"]
   Profile --> MyCompetitions["Мои турниры и сезоны"]
   Profile --> MyTrainings["Мои тренировки"]
-  Profile --> MyTrips["Мои туры и поездки"]
+  Profile --> MyTours["Мои туры"]
+  Profile --> Statistics["Статистика"]
+  Profile --> Payments["Платежи"]
+  Profile --> Settings["Настройки"]
+  Profile --> Actors["Мои профили"]
+  Actors --> Switcher
 
-  MyGames --> Participating["Участвую"]
-  MyGames --> Created["Созданные"]
-  Participating --> GameDetails["Детали игры"]
-  Created --> CreateGame
-  Created --> GameManage["Управление игрой"]
+  MyGames --> GameDetails["Детали игры"]
+  MyGames --> GameCreate["Создание игры"]
+  MyGames --> GameManage["Управление игрой"]
+  GameDetails --> GameManage
+
+  MyCompetitions --> TournamentDetails["Детали турнира"]
+  MyCompetitions --> TournamentCreate["Создание турнира"]
+  MyCompetitions --> TournamentManage["Управление турниром"]
+  TournamentDetails --> Match["Матч"]
+  TournamentDetails --> TournamentManage
+
+  MyCompetitions --> SeasonDetails["Детали сезона"]
+  MyCompetitions --> SeasonCreate["Создание сезона"]
+  MyCompetitions --> SeasonManage["Управление сезоном"]
+  SeasonDetails --> GameDay["Игровой день"]
+  SeasonManage --> GameDayManage["Управление игровым днём"]
+
+  MyTrainings --> TrainingDetails["Детали тренировки"]
+  MyTrainings --> TrainingCreate["Создание тренировки"]
+  MyTrainings --> TrainingManage["Управление тренировкой"]
+  MyTrainings --> TrainingGroup["Тренировочная группа"]
+
+  MyTours --> TourDetails["Детали тура"]
+  MyTours --> TourCreate["Создание тура"]
+  MyTours --> TourManage["Управление туром"]
 
   Chats --> Chat["Чат"]
-  Chat -->|"Открыть событие"| Entity
+  Chat -->|"Открыть контекст"| Entity
+  Calendar --> Entity
+  Calendar --> Manage
 
-  Clubs --> ClubList["Клубы"]
-  Clubs --> Courts["Корты"]
-  Clubs --> Coaches["Тренеры"]
-  Clubs --> Tours["Туры"]
-  Tours --> TourDetails["Детали тура"]
+  Clubs --> ClubDetails["Детали клуба"]
+  Clubs --> Venue["Площадка"]
+  Clubs --> TrainerPublic["Публичный профиль тренера"]
+  Clubs --> TourDetails
+  ClubDetails --> ClubManage["Управление клубом"]
+
+  TournamentManage --> Formats["Соревновательный движок"]
+  Formats --> Elimination["Плей-офф"]
+  Formats --> RoundRobin["Круговой"]
+  Formats --> Groups["Группы + плей-офф"]
+  Formats --> Swiss["Швейцарский"]
+  Formats --> Placement["Полное распределение"]
+
+  GameManage --> GameFormats["Форматы игровой сессии"]
+  GameDayManage --> GameFormats
+  GameFormats --> Standard2x2["2×2"]
+  GameFormats --> RotationFive["Ротация пяти игроков"]

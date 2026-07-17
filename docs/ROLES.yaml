@@ -2,6 +2,15 @@ version: 2
 
 note: Пользовательские профили описаны в ACTORS.yaml. Этот файл описывает разрешения внутри сущностей и организаций.
 
+capability_aliases:
+  trainer_or_organization:
+    replacement: can_create_training
+    behavior:
+      player: only_peer_practice
+      trainer: professional_training_and_groups
+      organization: professional_training_with_assigned_trainer
+    note: Имя сохранено в маршрутах временно; реализация должна проверять режим через CAPABILITIES.yaml.
+
 system_roles:
   authenticated_user:
     can:

@@ -1,6 +1,122 @@
-version: 1
+version: 2
+
+action_rules:
+  - every tappable control must have an action_id
+  - destination screen must exist or be a declared system action
+  - actions that mutate data require permission and confirmation when destructive
+  - create actions pass actorId and returnTo
+  - contextual entity cards use the same canonical detail route
 
 actions:
+  # Authentication
+  - id: auth.continue_google
+    label: Продолжить с Google
+    source: auth.welcome
+    destination: system.oauth_google
+    success: onboarding.profile_selection_or_home
+    permission: signed_out
+
+  - id: auth.open_email_registration
+    label: Зарегистрироваться по email
+    source: auth.welcome
+    destination: auth.email_registration
+    permission: signed_out
+
+  - id: auth.open_sign_in
+    label: Войти
+    source: auth.welcome
+    destination: auth.sign_in
+    permission: signed_out
+
+  - id: auth.submit_email_registration
+    label: Создать аккаунт
+    source: auth.email_registration
+    destination: system.create_account
+    success: auth.verify_email
+    permission: signed_out
+
+  - id: auth.submit_sign_in
+    label: Войти
+    source: auth.sign_in
+    destination: system.sign_in
+    success: onboarding.profile_selection_or_home
+    permission: signed_out
+
+  - id: auth.open_reset_password
+    label: Забыли пароль?
+    source: auth.sign_in
+    destination: auth.reset_password
+    permission: signed_out
+
+  - id: auth.resend_verification
+    label: Отправить письмо ещё раз
+    source: auth.verify_email
+    destination: system.resend_email_verification
+    permission: pending_email_verification
+
+  # Onboarding and actor profiles
+  - id: onboarding.save_profile_selection
+    label: Продолжить
+    source: onboarding.profile_selection
+    destination: onboarding.player
+    permission: authenticated
+
+  - id: onboarding.save_player
+    label: Сохранить профиль игрока
+    source: onboarding.player
+    destination: dynamic.next_selected_profile_or_permissions
+    permission: authenticated
+
+  - id: onboarding.save_trainer
+    label: Сохранить профиль тренера
+    source: onboarding.trainer
+    destination: dynamic.next_selected_profile_or_permissions
+    permission: authenticated
+
+  - id: onboarding.save_organization
+    label: Сохранить организацию
+    source: onboarding.organization
+    destination: onboarding.permissions
+    permission: authenticated
+
+  - id: onboarding.skip_optional_profile
+    label: Заполнить позже
+    source: dynamic.onboarding_optional_profile
+    destination: dynamic.next_selected_profile_or_permissions
+    permission: authenticated
+
+  - id: global.open_actor_switcher
+    label: Аватар активного профиля
+    source: global.header
+    destination: actor.switcher
+    permission: authenticated
+
+  - id: actor.switch
+    label: Переключить профиль
+    source: actor.switcher
+    destination: system.switch_active_actor
+    success: system.refresh_current_screen
+    permission: actor_owner_or_member
+
+  - id: actor.add
+    label: Добавить профиль
+    source: actor.switcher
+    destination: onboarding.profile_selection
+    permission: authenticated
+
+  - id: actor.manage
+    label: Управление профилями
+    source: actor.switcher
+    destination: profile.actor_profiles
+    permission: authenticated
+
+  # Global navigation and profile sections
+  - id: nav.open_notifications
+    label: Уведомления
+    source: global.header
+    destination: global.notifications
+    permission: authenticated
+
   - id: nav.open_profile_calendar
     label: Мой календарь
     source: profile.main
@@ -13,13 +129,92 @@ actions:
     destination: profile.my_games
     permission: authenticated
 
+  - id: nav.open_profile_competitions
+    label: Мои турниры и сезоны
+    source: profile.main
+    destination: profile.competitions
+    permission: authenticated
+
+  - id: nav.open_profile_trainings
+    label: Мои тренировки
+    source: profile.main
+    destination: profile.trainings
+    permission: authenticated
+
+  - id: nav.open_profile_trips
+    label: Мои туры и поездки
+    source: profile.main
+    destination: profile.trips
+    permission: authenticated
+
+  - id: nav.open_profile_statistics
+    label: Статистика
+    source: profile.main
+    destination: profile.statistics
+    permission: authenticated
+
+  - id: nav.open_profile_payments
+    label: Платежи
+    source: profile.main
+    destination: profile.payments
+    permission: authenticated
+
+  - id: nav.open_profile_settings
+    label: Настройки
+    source: profile.main
+    destination: profile.settings
+    permission: authenticated
+
+  # Home and Play visibility
+  - id: home.open_managed_entity
+    label: Управлять
+    source: home.main
+    destination: dynamic.entity_manage
+    permission: entity_manager
+
+  - id: home.open_participating_entity
+    label: Открыть
+    source: home.main
+    destination: dynamic.entity_details
+    permission: authenticated
+
+  - id: play.open_managed_filter
+    label: Управляю
+    source: play.main
+    destination: system.local_filter
+    context:
+      managed: true
+    permission: authenticated
+
+  - id: play.open_my_upcoming_filter
+    label: Мои ближайшие
+    source: play.main
+    destination: system.local_filter
+    context:
+      relationship: participant_or_manager
+    permission: authenticated
+
+  - id: play.open_entity
+    label: Открыть событие
+    source: play.main
+    destination: dynamic.entity_details
+    permission: public
+
+  - id: global.open_create_menu
+    label: Создать
+    source: dynamic.global_or_section_header
+    destination: system.create_menu
+    permission: authenticated
+
+  # Game list and creation
   - id: my_games.create
     label: Создать игру
     source: profile.my_games
     destination: game.create
     permission: authenticated
     context:
-      return_to: /profile/games?tab=created
+      returnTo: /profile/games?tab=created
+      actorId: active_actor
 
   - id: play.create_game
     label: Создать игру
@@ -27,7 +222,26 @@ actions:
     destination: game.create
     permission: authenticated
     context:
-      return_to: /play?category=games
+      returnTo: /play?category=games&managed=true
+      actorId: active_actor
+
+  - id: create.choose_actor
+    label: Создать как
+    source: dynamic.create_wizard
+    destination: actor.switcher
+    permission: authenticated
+
+  - id: create.save_draft
+    label: Сохранить черновик
+    source: dynamic.create_wizard
+    destination: system.save_draft
+    permission: draft_owner
+
+  - id: create.publish
+    label: Опубликовать
+    source: dynamic.create_wizard
+    destination: system.validate_and_publish
+    permission: draft_owner
 
   - id: my_games.open_participating_game
     label: Открыть игру
@@ -39,7 +253,7 @@ actions:
     label: Управлять
     source: profile.my_games
     destination: game.manage
-    permission: game_organizer
+    permission: entity_manager
 
   - id: my_games.continue_draft
     label: Продолжить создание
@@ -47,24 +261,271 @@ actions:
     destination: game.create
     permission: draft_owner
 
-  - id: game.join
+  # Participation actions shared by entities
+  - id: entity.join
     label: Присоединиться
-    source: game.details
-    destination: system.registration
+    source: dynamic.entity_details
+    destination: system.create_participation
     permission: authenticated
 
-  - id: game.open_chat
-    label: Открыть чат
-    source: game.details
-    destination: chat.details
-    permission: game_member
+  - id: entity.request_to_join
+    label: Подать заявку
+    source: dynamic.entity_details
+    destination: system.submit_participation_request
+    permission: authenticated
 
-  - id: chat.open_context
-    label: Открыть событие
-    source: chat.details
-    destination: dynamic.context_entity
+  - id: entity.join_waitlist
+    label: В лист ожидания
+    source: dynamic.entity_details
+    destination: system.join_waitlist
+    permission: authenticated
+
+  - id: entity.cancel_participation
+    label: Отменить участие
+    source: dynamic.entity_details
+    destination: system.cancel_participation_confirmation
+    permission: participant_cancel_allowed
+
+  - id: entity.open_payment
+    label: Оплатить
+    source: dynamic.entity_details
+    destination: payment.checkout
+    permission: payment_owner
+
+  - id: entity.open_chat
+    label: Открыть чат
+    source: dynamic.entity_details
+    destination: chat.details
     permission: conversation_member
 
+  - id: entity.manage
+    label: Управлять
+    source: dynamic.entity_details
+    destination: dynamic.entity_manage
+    permission: entity_manager
+
+  - id: entity.share
+    label: Поделиться
+    source: dynamic.entity_details
+    destination: system.share_sheet
+    permission: public
+
+  - id: entity.add_to_calendar
+    label: Добавить в календарь
+    source: dynamic.entity_details
+    destination: system.calendar_export
+    permission: authenticated
+
+  # Organizer common actions
+  - id: manage.open_participants
+    label: Участники
+    source: dynamic.entity_manage
+    destination: system.manage_tab
+    context: {tab: participants}
+    permission: entity_manager
+
+  - id: manage.approve_request
+    label: Подтвердить заявку
+    source: dynamic.entity_manage
+    destination: system.approve_participation
+    permission: participant_manager
+
+  - id: manage.reject_request
+    label: Отклонить заявку
+    source: dynamic.entity_manage
+    destination: system.reject_participation
+    permission: participant_manager
+
+  - id: manage.promote_waitlist
+    label: Пригласить из листа ожидания
+    source: dynamic.entity_manage
+    destination: system.promote_waitlisted_participant
+    permission: participant_manager
+
+  - id: manage.notify_participants
+    label: Сообщить участникам
+    source: dynamic.entity_manage
+    destination: system.compose_entity_notification
+    permission: entity_manager
+
+  - id: manage.cancel_entity
+    label: Отменить событие
+    source: dynamic.entity_manage
+    destination: system.cancel_entity_confirmation
+    permission: creator_owner
+
+  # Tournament and season creation
+  - id: competitions.create_tournament
+    label: Создать турнир
+    source: profile.competitions
+    destination: tournament.create
+    permission: authenticated
+    context:
+      actorId: active_actor
+      returnTo: /profile/competitions?tab=organized&type=tournament
+
+  - id: competitions.create_season
+    label: Создать сезон
+    source: profile.competitions
+    destination: season.create
+    permission: authenticated
+    context:
+      actorId: active_actor
+      returnTo: /profile/competitions?tab=organized&type=season
+
+  - id: competitions.open_entity
+    label: Открыть
+    source: profile.competitions
+    destination: dynamic.competition_details
+    permission: authenticated
+
+  - id: competitions.manage_entity
+    label: Управлять
+    source: profile.competitions
+    destination: dynamic.competition_manage
+    permission: entity_manager
+
+  - id: tournament.choose_format
+    label: Выбрать формат
+    source: tournament.create
+    destination: system.competition_format_picker
+    permission: draft_owner
+
+  - id: tournament.generate_draw
+    label: Сформировать жеребьёвку
+    source: tournament.manage
+    destination: system.generate_draw
+    permission: competition_manager
+
+  - id: tournament.review_pairings
+    label: Проверить пары
+    source: tournament.manage
+    destination: system.pairing_review
+    permission: competition_manager
+
+  - id: tournament.publish_round
+    label: Опубликовать раунд
+    source: tournament.manage
+    destination: system.publish_round_confirmation
+    permission: competition_manager
+
+  - id: tournament.generate_next_round
+    label: Следующий раунд
+    source: tournament.manage
+    destination: system.validate_and_generate_next_round
+    permission: competition_manager
+
+  - id: tournament.open_match
+    label: Открыть матч
+    source: tournament.details
+    destination: competition.match
+    permission: public
+
+  - id: match.enter_result
+    label: Внести результат
+    source: competition.match
+    destination: system.result_editor
+    permission: result_editor
+
+  - id: match.confirm_result
+    label: Подтвердить результат
+    source: competition.match
+    destination: system.confirm_result
+    permission: participant_or_result_editor
+
+  - id: season.create_game_day
+    label: Добавить игровой день
+    source: season.manage
+    destination: system.create_game_day
+    permission: entity_manager
+
+  - id: season.open_game_day
+    label: Открыть игровой день
+    source: season.details
+    destination: season.game_day
+    permission: public
+
+  - id: season.manage_game_day
+    label: Управлять игровым днём
+    source: season.manage
+    destination: season.game_day_manage
+    permission: entity_manager
+
+  - id: game_day.generate_rounds
+    label: Сформировать раунды
+    source: season.game_day_manage
+    destination: system.generate_game_format_rounds
+    permission: entity_manager
+
+  # Trainings
+  - id: trainings.create
+    label: Создать тренировку
+    source: profile.trainings
+    destination: training.create
+    permission: trainer_or_organization
+    context:
+      actorId: active_actor
+      returnTo: /profile/trainings?tab=created
+
+  - id: trainings.open
+    label: Открыть тренировку
+    source: profile.trainings
+    destination: training.details
+    permission: authenticated
+
+  - id: trainings.manage
+    label: Управлять тренировкой
+    source: profile.trainings
+    destination: training.manage
+    permission: entity_manager
+
+  - id: training.open_attendance
+    label: Посещаемость
+    source: training.manage
+    destination: training.attendance
+    permission: training_manager
+
+  - id: training.mark_attendance
+    label: Отметить посещение
+    source: training.attendance
+    destination: system.update_attendance
+    permission: training_manager
+
+  - id: training.open_group
+    label: Открыть группу
+    source: profile.trainings
+    destination: training.group
+    permission: group_member_or_manager
+
+  # Tours
+  - id: trips.create
+    label: Создать тур или поездку
+    source: profile.trips
+    destination: tour.create
+    permission: authenticated
+    context:
+      actorId: active_actor
+      returnTo: /profile/trips?tab=organized
+
+  - id: tour.choose_mode
+    label: Формат тура
+    source: tour.create
+    destination: system.tour_mode_picker
+    permission: draft_owner
+
+  - id: tour.open_booking
+    label: Забронировать
+    source: tour.details
+    destination: tour.booking
+    permission: authenticated
+
+  - id: tour.manage
+    label: Управлять туром
+    source: tour.details
+    destination: tour.manage
+    permission: entity_manager
+
+  # Calendar
   - id: calendar.open_event
     label: Открыть событие
     source: profile.calendar
@@ -77,14 +538,89 @@ actions:
     destination: system.local_state
     permission: authenticated
 
+  - id: calendar.change_scope
+    label: Все профили / Активный профиль
+    source: profile.calendar
+    destination: system.local_filter
+    permission: multiple_actor_profiles
+
   - id: calendar.open_filters
     label: Фильтры календаря
     source: profile.calendar
     destination: system.bottom_sheet
     permission: authenticated
 
-  - id: club.open_tour
-    label: Открыть тур
-    source: clubs.main
-    destination: tour.details
-    permission: public
+  # Chat
+  - id: chat.open_context
+    label: Открыть событие
+    source: chat.details
+    destination: dynamic.context_entity
+    permission: conversation_member
+
+  - id: chat.open_members
+    label: Участники чата
+    source: chat.details
+    destination: system.chat_members_sheet
+    permission: conversation_member
+
+  - id: chat.send_message
+    label: Отправить
+    source: chat.details
+    destination: system.send_message
+    permission: conversation_can_write
+
+  # Statistics and payments
+  - id: statistics.change_period
+    label: Период
+    source: profile.statistics
+    destination: system.local_filter
+    permission: authenticated
+
+  - id: statistics.open_source_entity
+    label: Открыть событие
+    source: profile.statistics
+    destination: dynamic.entity_details
+    permission: authenticated
+
+  - id: payments.open_details
+    label: Детали платежа
+    source: profile.payments
+    destination: payment.details
+    permission: payment_owner_or_finance_manager
+
+  - id: payments.request_refund
+    label: Запросить возврат
+    source: payment.details
+    destination: system.refund_request
+    permission: payment_owner
+
+  - id: payments.issue_refund
+    label: Сделать возврат
+    source: payment.details
+    destination: system.issue_refund_confirmation
+    permission: finance_manager
+
+  # Settings
+  - id: settings.open_actor_profiles
+    label: Профили и роли
+    source: profile.settings
+    destination: profile.actor_profiles
+    permission: authenticated
+
+  - id: settings.connect_payouts
+    label: Подключить выплаты
+    source: profile.settings
+    destination: system.payout_onboarding
+    permission: actor_owner_or_finance_manager
+
+  - id: settings.sign_out
+    label: Выйти
+    source: profile.settings
+    destination: system.sign_out_confirmation
+    permission: authenticated
+
+  - id: settings.delete_account
+    label: Удалить аккаунт
+    source: profile.settings
+    destination: system.delete_account_confirmation
+    permission: account_owner

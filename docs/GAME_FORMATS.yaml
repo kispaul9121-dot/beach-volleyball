@@ -1,0 +1,87 @@
+version: 2
+
+formats:
+  standard_2x2:
+    title: 2×2
+    participant_unit: individual_or_fixed_pair
+    players_on_court: 4
+    team_size: 2
+    configuration:
+      sets: configurable
+      points_per_set: configurable
+      fixed_pairs: configurable
+      rating_effect: configurable
+
+  standard_4x4:
+    title: 4×4
+    participant_unit: individual_or_fixed_team
+    players_on_court: 8
+    team_size: 4
+    configuration:
+      sets: configurable
+      points_per_set: configurable
+      substitutions: configurable
+      rating_effect: configurable
+
+  rotation_five:
+    title: Ротация пяти игроков
+    participant_unit: individual
+    court_group_size: 5
+    players_on_court: 4
+    resting_players_per_court: 1
+    canonical_round_count: 5
+    capacity_formula: court_count_times_5
+    purpose: За пять раундов каждый игрок один раз отдыхает и по одному разу играет в паре с каждым другим игроком своей пятёрки.
+    invariants:
+      - each_group_contains_exactly_5_players
+      - each_round_contains_4_active_and_1_resting_player
+      - each_player_rests_exactly_once_in_5_rounds
+      - each_player_partners_each_other_player_exactly_once
+      - no_player_appears_on_two_courts_in_same_round
+    per_game_configuration:
+      - court_count
+      - points_per_round
+      - scoring_model
+      - initial_grouping
+      - movement_between_courts
+      - rating_effect
+    movement_between_courts:
+      values:
+        - none
+        - ranking_based_after_cycle
+        - organizer_manual
+      note: Переход между кортами — настройка экземпляра, а не отдельный формат.
+    results:
+      supported_models:
+        individual_points: Очки каждого игрока суммируются по раундам.
+        wins_and_point_difference: Победы, затем разница очков.
+        custom_season_points: Правило сезона.
+    generated_views:
+      participant:
+        - current_court
+        - current_partner
+        - opponents
+        - resting_round
+        - personal_points
+      organizer:
+        - all_courts
+        - all_rounds
+        - conflicts
+        - missing_results
+        - regenerate_before_publish
+
+  fixed_team_match:
+    title: Матч фиксированных команд
+    participant_unit: pair_or_team
+    configuration:
+      best_of_sets: configurable
+      points_per_set: configurable
+      deciding_set_points: configurable
+      side_change_rules: configurable
+
+format_engine_rules:
+  - game_format controls one playable session, not the tournament progression.
+  - tournament and season formats may schedule matches that use standard_2x2 or another compatible game format.
+  - rotation_five may be used by a one-off game or by a season game day.
+  - published lineups cannot be silently regenerated.
+  - every lineup change after publication creates a notification and audit record.

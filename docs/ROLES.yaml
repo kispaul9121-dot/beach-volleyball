@@ -1,0 +1,50 @@
+version: 1
+
+roles:
+  player:
+    can:
+      - browse_public_activities
+      - join_game
+      - create_one_off_game
+      - create_private_trip
+      - participate_in_tournament
+      - participate_in_season
+
+  coach:
+    inherits: player
+    can:
+      - create_training
+      - manage_training_groups
+      - organize_public_tour_if_verified
+
+  private_organizer:
+    inherits: player
+    can:
+      - create_game
+      - create_tournament
+      - create_season
+      - manage_participants
+      - manage_results
+
+  club_manager:
+    can:
+      - manage_club
+      - manage_venues_and_courts
+      - create_game
+      - create_training
+      - create_tournament
+      - create_season
+      - create_public_tour
+      - accept_payments
+
+  company_manager:
+    can:
+      - create_public_tour
+      - manage_tour_bookings
+      - accept_payments
+
+  moderator:
+    can:
+      - review_reports
+      - restrict_content
+      - inspect_audit_log

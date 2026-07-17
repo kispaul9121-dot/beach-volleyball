@@ -124,11 +124,11 @@ screens:
     back_fallback: null
 
   - id: play.main
-    title: Играть
+    title: События
     route: /play
     section: play
     spec: docs/screens/play/main.md
-    purpose: Публичный каталог плюс быстрый доступ к сущностям активного профиля.
+    purpose: Каталог, участия и управление событиями через вкладки Все, Участвую и Управляю.
     variants: [player, trainer, organization]
     back_fallback: null
 
@@ -137,7 +137,7 @@ screens:
     route: /chats
     section: chats
     spec: docs/screens/chats/main.md
-    purpose: Чаты событий, групп, клубов, туров и личные сообщения.
+    purpose: Чаты игр, тренировок, турниров, сезонов, клубов, туров и личные сообщения.
     variants: [player, trainer, organization]
     back_fallback: null
 
@@ -238,7 +238,16 @@ screens:
     route: /profile/trainings
     section: profile
     spec: docs/screens/profile/my-trainings.md
-    purpose: Записи игрока, занятия и группы тренера или организации.
+    purpose: Записи игрока и управляемые тренировки тренера или организации.
+    back_fallback: /profile
+
+  - id: profile.players
+    title: Мои игроки
+    route: /profile/players
+    section: profile
+    spec: docs/screens/profile/my-players.md
+    purpose: Односторонний список игроков активного профиля и быстрый выбор для приглашений.
+    variants: [player, trainer, organization]
     back_fallback: /profile
 
   - id: profile.trips
@@ -317,7 +326,7 @@ screens:
     route: /trainings/create
     section: shared
     spec: docs/screens/shared/training-create.md
-    purpose: Создание разовой тренировки или занятия группы.
+    purpose: Создание тренировки, приглашение игроков и настройка публичности.
     permission: trainer_or_organization
     back_fallback: /profile/trainings
 
@@ -330,14 +339,6 @@ screens:
     permission: entity_manager
     back_fallback: /profile/trainings?tab=created
 
-  - id: training.group
-    title: Тренировочная группа
-    route: /training-groups/:groupId
-    section: shared
-    spec: docs/screens/shared/training-group.md
-    purpose: Участники, абонементы, расписание и прогресс группы.
-    permission: group_member_or_manager
-    back_fallback: /profile/trainings
 
   - id: training.attendance
     title: Посещаемость

@@ -148,6 +148,13 @@ routes:
     accepts_query: [tab, status, actorId]
     back_fallback: /profile
 
+  - path: /profile/players
+    screen: profile.players
+    navigator: profile_stack
+    parent: /profile
+    accepts_query: [mode, entityType, entityId, actorId]
+    back_fallback: /profile
+
   - path: /profile/trips
     screen: profile.trips
     navigator: profile_stack
@@ -202,7 +209,7 @@ routes:
     screen: training.create
     navigator: modal_stack
     permission: trainer_or_organization
-    accepts_query: [returnTo, actorId, draftId, groupId]
+    accepts_query: [returnTo, actorId, draftId, templateId]
     back_fallback: /profile/trainings
 
   - path: /trainings/:trainingId
@@ -218,12 +225,6 @@ routes:
     accepts_query: [tab]
     back_fallback: /profile/trainings?tab=created
 
-  - path: /training-groups/:groupId
-    screen: training.group
-    navigator: entity_stack
-    permission: group_member_or_manager
-    accepts_query: [tab]
-    back_fallback: /profile/trainings
 
   - path: /trainings/:trainingId/attendance
     screen: training.attendance

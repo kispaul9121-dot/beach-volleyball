@@ -141,6 +141,12 @@ actions:
     destination: profile.trainings
     permission: authenticated
 
+  - id: nav.open_profile_players
+    label: Мои игроки
+    source: profile.main
+    destination: profile.players
+    permission: authenticated
+
   - id: nav.open_profile_trips
     label: Мои туры и поездки
     source: profile.main
@@ -260,6 +266,43 @@ actions:
     source: profile.my_games
     destination: game.create
     permission: draft_owner
+
+  # Player directory and event invitations
+  - id: players.add
+    label: Добавить игрока
+    source: profile.players
+    destination: system.player_search
+    permission: authenticated
+
+  - id: players.remove
+    label: Удалить из моих игроков
+    source: profile.players
+    destination: system.remove_saved_player_confirmation
+    permission: saved_player_list_owner
+
+  - id: players.open_public_profile
+    label: Открыть профиль игрока
+    source: profile.players
+    destination: dynamic.player_public_profile
+    permission: authenticated
+
+  - id: players.open_picker
+    label: Добавить игроков
+    source: dynamic.entity_create_or_manage
+    destination: system.player_picker
+    permission: entity_inviter
+
+  - id: players.send_invitations
+    label: Отправить приглашения
+    source: system.player_picker
+    destination: system.create_event_invitations
+    permission: entity_inviter
+
+  - id: players.add_as_confirmed
+    label: Добавить как подтверждённого
+    source: system.player_picker
+    destination: system.add_confirmed_participant_with_audit
+    permission: participant_manager
 
   # Participation actions shared by entities
   - id: entity.join
@@ -491,11 +534,6 @@ actions:
     destination: system.update_attendance
     permission: training_manager
 
-  - id: training.open_group
-    label: Открыть группу
-    source: profile.trainings
-    destination: training.group
-    permission: group_member_or_manager
 
   # Tours
   - id: trips.create

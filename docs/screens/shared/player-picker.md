@@ -46,7 +46,7 @@
 - заголовок `Добавить игроков`;
 - название и дата события;
 - строка `Свободно N мест`, когда вместимость ограничена;
-- поиск по текущему источнику.
+- поиск по текущему источнику — `players.picker_search`.
 
 ## Источники
 
@@ -130,6 +130,7 @@
 
 - `players.close_picker`;
 - `players.picker_change_source`;
+- `players.picker_search`;
 - `players.picker_toggle_player`;
 - `players.send_invitations`;
 - `players.add_as_confirmed`.

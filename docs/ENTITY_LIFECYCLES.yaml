@@ -1,0 +1,132 @@
+version: 2
+
+entity_lifecycles:
+  common:
+    statuses:
+      - draft
+      - scheduled
+      - registration_open
+      - registration_closed
+      - in_progress
+      - completed
+      - cancelled
+      - archived
+    transitions:
+      draft: [scheduled, registration_open, cancelled]
+      scheduled: [registration_open, in_progress, cancelled]
+      registration_open: [registration_closed, in_progress, cancelled]
+      registration_closed: [registration_open, in_progress, cancelled]
+      in_progress: [completed, cancelled]
+      completed: [archived]
+      cancelled: [archived]
+    rules:
+      - published entities cannot return to draft
+      - cancellation requires reason
+      - completion requires required results or an organizer override
+
+  tournament:
+    additional_statuses:
+      - format_setup
+      - draw_ready
+      - live_round
+    required_for_start:
+      - competition_format
+      - confirmed_participants
+      - seeding_or_draw
+      - schedule
+    required_for_complete:
+      - all_required_matches_resolved
+      - final_places_calculated
+
+  season:
+    additional_statuses:
+      - between_game_days
+    required_for_complete:
+      - all_required_game_days_completed_or_cancelled
+      - standings_finalized
+
+  tour:
+    additional_statuses:
+      - booking_open
+      - booking_closed
+      - departed
+      - returned
+    transitions_extension:
+      booking_open: [booking_closed, cancelled]
+      booking_closed: [departed, booking_open, cancelled]
+      departed: [returned]
+      returned: [completed]
+
+participation_lifecycle:
+  statuses:
+    - invited
+    - requested
+    - waitlisted
+    - approved
+    - payment_required
+    - confirmed
+    - checked_in
+    - participated
+    - no_show
+    - declined
+    - cancelled_by_participant
+    - removed_by_organizer
+    - refunded
+  typical_paths:
+    open_free:
+      - requested
+      - confirmed
+      - checked_in
+      - participated
+    approval_paid:
+      - requested
+      - approved
+      - payment_required
+      - confirmed
+      - checked_in
+      - participated
+    full_capacity:
+      - requested
+      - waitlisted
+      - approved
+      - payment_required
+      - confirmed
+  rules:
+    - membership in chat depends on participation status and chat policy
+    - cancellation may trigger waitlist promotion
+    - payment status must not be inferred only from participation status
+
+payment_lifecycle:
+  statuses:
+    - not_required
+    - pending
+    - authorized
+    - paid
+    - partially_refunded
+    - refunded
+    - failed
+    - expired
+  rules:
+    - payment records are separate from participation records
+    - refunds create immutable transaction records
+    - organizer views aggregate balances, participant views only own payments
+
+round_lifecycle:
+  statuses:
+    - draft
+    - published
+    - in_progress
+    - results_pending
+    - completed
+    - rolled_back
+  transitions:
+    draft: [published]
+    published: [in_progress, rolled_back]
+    in_progress: [results_pending, completed]
+    results_pending: [completed, in_progress]
+    completed: [rolled_back]
+    rolled_back: [draft]
+  rules:
+    - publishing sends participant notifications
+    - rollback requires organizer permission and reason
+    - next round generation requires completed previous round unless format explicitly allows parallel rounds

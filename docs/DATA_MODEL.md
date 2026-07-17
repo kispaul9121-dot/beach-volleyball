@@ -16,16 +16,54 @@
 
 Ключевой принцип: `user_account` отвечает за вход, `actor_profile` — от чьего имени пользователь действует.
 
-## 2. Площадки и профессиональные сущности
+## 2. Организация, площадки и административный кабинет
+
+### Организация и права
+
+- `organizations` — публичные и юридические поля организации;
+- `organization_settings` — операционные значения по умолчанию, уведомления и политики;
+- `organization_memberships` — сотрудник, роль, статус и срок доступа;
+- `organization_role_permissions` — серверная матрица разрешений;
+- `organization_staff_assignments` — назначение сотрудника на площадку, сущность или функцию;
+- `organization_invitations` — приглашения сотрудников;
+- `organization_ownership_transfers` — процесс передачи владения;
+- `organization_documents` — проверка и срок действия документов.
+
+`actor_profile` организации определяет контекст бренда, но доступ сотрудника всегда проверяется через активный `organization_membership` и permission.
+
+### Площадки и ресурсы
 
 - `clubs`;
 - `venues`;
 - `courts`;
 - `venue_opening_hours`;
+- `venue_availability_rules`;
+- `court_availability_rules`;
 - `court_blocks`;
+- `venue_maintenance_windows`;
 - `court_bookings`;
 - `trainer_specializations`;
 - `trainer_venue_links`.
+
+Регулярное правило доступности задаёт базовое расписание. Конкретная блокировка или обслуживание имеет приоритет и может создавать конфликт с опубликованными событиями.
+
+### Операционные задачи
+
+- `organization_tasks` — рабочая задача, severity, срок, ответственный, статус и deep link;
+- `organization_task_events` — история создания, назначения, snooze, выполнения и устаревания;
+- `organization_task_sources` — связь задачи с заявкой, платежом, результатом, кортом, сотрудником или документом.
+
+Задача создаётся из доменного события и не закрывается простым просмотром. Она становится `resolved` после выполнения либо `obsolete`, когда источник потерял актуальность.
+
+### Клиенты и коммуникация организации
+
+- `organization_client_links` — разрешённая связь пользователя с организацией;
+- `organization_client_tags` — внутренние операционные теги без чувствительных спортивных данных;
+- `organization_announcements` — массовые сообщения и аудит аудитории;
+- `organization_message_templates` — шаблоны уведомлений;
+- `organization_exports` — история экспорта персональных и финансовых данных.
+
+Организация не получает право на всю личную спортивную статистику пользователя. Доступ определяется контекстом участия, согласием и ролью сотрудника.
 
 ## 3. Общая основа сущностей
 
@@ -174,4 +212,6 @@ updated_at
 - `data_export_requests`;
 - `account_deletion_requests`.
 
-RLS проверяет не только user_id, но actor ownership, entity relationship и organization membership.
+Для административных действий audit event дополнительно хранит `organization_id`, `membership_id`, роль на момент действия, `acting_user_id`, `acting_actor_id`, `action_id`, объект, diff, причину и correlation ID.
+
+RLS проверяет не только user_id, но actor ownership, entity relationship, organization membership и конкретный permission.

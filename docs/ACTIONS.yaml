@@ -1,0 +1,90 @@
+version: 1
+
+actions:
+  - id: nav.open_profile_calendar
+    label: Мой календарь
+    source: profile.main
+    destination: profile.calendar
+    permission: authenticated
+
+  - id: nav.open_profile_my_games
+    label: Мои игры
+    source: profile.main
+    destination: profile.my_games
+    permission: authenticated
+
+  - id: my_games.create
+    label: Создать игру
+    source: profile.my_games
+    destination: game.create
+    permission: authenticated
+    context:
+      return_to: /profile/games?tab=created
+
+  - id: play.create_game
+    label: Создать игру
+    source: play.main
+    destination: game.create
+    permission: authenticated
+    context:
+      return_to: /play?category=games
+
+  - id: my_games.open_participating_game
+    label: Открыть игру
+    source: profile.my_games
+    destination: game.details
+    permission: game_participant
+
+  - id: my_games.manage_created_game
+    label: Управлять
+    source: profile.my_games
+    destination: game.manage
+    permission: game_organizer
+
+  - id: my_games.continue_draft
+    label: Продолжить создание
+    source: profile.my_games
+    destination: game.create
+    permission: draft_owner
+
+  - id: game.join
+    label: Присоединиться
+    source: game.details
+    destination: system.registration
+    permission: authenticated
+
+  - id: game.open_chat
+    label: Открыть чат
+    source: game.details
+    destination: chat.details
+    permission: game_member
+
+  - id: chat.open_context
+    label: Открыть событие
+    source: chat.details
+    destination: dynamic.context_entity
+    permission: conversation_member
+
+  - id: calendar.open_event
+    label: Открыть событие
+    source: profile.calendar
+    destination: dynamic.calendar_entity
+    permission: authenticated
+
+  - id: calendar.change_view
+    label: День / Неделя / Месяц
+    source: profile.calendar
+    destination: system.local_state
+    permission: authenticated
+
+  - id: calendar.open_filters
+    label: Фильтры календаря
+    source: profile.calendar
+    destination: system.bottom_sheet
+    permission: authenticated
+
+  - id: club.open_tour
+    label: Открыть тур
+    source: clubs.main
+    destination: tour.details
+    permission: public

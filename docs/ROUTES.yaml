@@ -83,6 +83,14 @@ routes:
     access: authenticated
     back_fallback: system://dismiss
 
+  - path: system://player-picker
+    screen: player.picker
+    navigator: modal_stack
+    access: authenticated
+    permission: entity_inviter
+    accepts_query: [entityType, entityId, draftId, actorId, returnTo]
+    back_fallback: system://dismiss
+
   # Bottom tabs
   - path: /
     screen: home.main

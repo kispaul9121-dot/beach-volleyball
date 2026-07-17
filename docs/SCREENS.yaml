@@ -9,6 +9,7 @@ bottom_tabs:
 
 global_overlays:
   - actor.switcher
+  - player.picker
   - global.notifications
   - global.create_menu
   - global.search_filters
@@ -103,6 +104,16 @@ screens:
     section: global
     spec: docs/screens/profile/actor-switcher.md
     purpose: Смена активного профиля без повторного входа.
+    back_fallback: system://dismiss
+
+  - id: player.picker
+    title: Добавить игроков
+    route: system://player-picker
+    section: global
+    spec: docs/screens/shared/player-picker.md
+    purpose: Множественный выбор и приглашение игроков в конкретное событие.
+    variants: [create_context, manage_context]
+    permission: entity_inviter
     back_fallback: system://dismiss
 
   - id: global.notifications

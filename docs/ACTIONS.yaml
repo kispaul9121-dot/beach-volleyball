@@ -289,18 +289,42 @@ actions:
   - id: players.open_picker
     label: Добавить игроков
     source: dynamic.entity_create_or_manage
-    destination: system.player_picker
+    destination: player.picker
+    permission: entity_inviter
+
+  - id: players.close_picker
+    label: Закрыть выбор игроков
+    source: player.picker
+    destination: system.dismiss_modal
+    permission: entity_inviter
+
+  - id: players.picker_change_source
+    label: Мои игроки / Недавние / Поиск
+    source: player.picker
+    destination: system.local_filter
+    permission: entity_inviter
+
+  - id: players.picker_toggle_player
+    label: Выбрать игрока
+    source: player.picker
+    destination: system.local_state
+    permission: entity_inviter
+
+  - id: players.picker_search
+    label: Поиск игроков
+    source: player.picker
+    destination: system.local_search
     permission: entity_inviter
 
   - id: players.send_invitations
     label: Отправить приглашения
-    source: system.player_picker
+    source: player.picker
     destination: system.create_event_invitations
     permission: entity_inviter
 
   - id: players.add_as_confirmed
     label: Добавить как подтверждённого
-    source: system.player_picker
+    source: player.picker
     destination: system.add_confirmed_participant_with_audit
     permission: participant_manager
 

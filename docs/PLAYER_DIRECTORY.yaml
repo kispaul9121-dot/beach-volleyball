@@ -53,7 +53,11 @@ sources:
     description: Поиск по публичным player-профилям с учётом блокировок и приватности.
 
 player_picker:
-  presentation: full_screen_modal_or_bottom_sheet
+  screen_id: player.picker
+  route: system://player-picker
+  presentation: full_screen_modal
+  hide_global_bottom_tabs: true
+  return_to_required: true
   title: Добавить игроков
   multi_select: true
   sources: [saved, recent, search]
@@ -64,6 +68,8 @@ player_picker:
     - copy_invitation_link
   rules:
     - Один picker используется для игры, тренировки, турнира, сезона и тура.
+    - Глобальная нижняя навигация скрыта только внутри picker.
+    - Picker нельзя открыть без entity или draft context и returnTo.
     - Выбор игрока не меняет участие до выполнения явного действия.
     - `add_as_confirmed` доступно только менеджеру события и требует аудита причины или подтверждённой офлайн-договорённости.
     - Заблокированные пользователи не показываются и не могут быть приглашены.

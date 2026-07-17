@@ -1,0 +1,161 @@
+version: 1
+
+bottom_tabs:
+  - home
+  - play
+  - chats
+  - clubs
+  - profile
+
+screens:
+  - id: home.main
+    title: Главная
+    route: /
+    section: home
+    spec: docs/screens/home/main.md
+    purpose: Персональная сводка ближайших действий и событий.
+    back_fallback: null
+
+  - id: play.main
+    title: Играть
+    route: /play
+    section: play
+    spec: docs/screens/play/main.md
+    purpose: Публичный каталог игр, тренировок, турниров и сезонов.
+    back_fallback: null
+
+  - id: chats.main
+    title: Чаты
+    route: /chats
+    section: chats
+    spec: docs/screens/chats/main.md
+    purpose: Список чатов по событиям, клубам, турам и личным сообщениям.
+    back_fallback: null
+
+  - id: chat.details
+    title: Чат
+    route: /chats/:chatId
+    section: chats
+    spec: docs/screens/chats/details.md
+    purpose: Общение и переход к связанной сущности.
+    back_fallback: /chats
+
+  - id: clubs.main
+    title: Клубы
+    route: /clubs
+    section: clubs
+    spec: docs/screens/clubs/main.md
+    purpose: Каталог клубов, кортов, тренеров и публичных туров.
+    back_fallback: null
+
+  - id: club.details
+    title: Клуб
+    route: /clubs/:clubId
+    section: clubs
+    spec: docs/screens/clubs/details.md
+    purpose: Страница клуба с расписанием, услугами и активностями.
+    back_fallback: /clubs
+
+  - id: profile.main
+    title: Профиль
+    route: /profile
+    section: profile
+    spec: docs/screens/profile/main.md
+    purpose: Личный спортивный профиль и вход в личные разделы.
+    back_fallback: null
+
+  - id: profile.calendar
+    title: Мой календарь
+    route: /profile/calendar
+    section: profile
+    spec: docs/screens/profile/my-calendar.md
+    purpose: Интерактивный спортивный календарь пользователя.
+    back_fallback: /profile
+
+  - id: profile.my_games
+    title: Мои игры
+    route: /profile/games
+    section: profile
+    spec: docs/screens/profile/my-games.md
+    purpose: Участие в одноразовых играх и управление созданными играми.
+    back_fallback: /profile
+
+  - id: profile.competitions
+    title: Мои турниры и сезоны
+    route: /profile/competitions
+    section: profile
+    spec: docs/screens/profile/my-competitions.md
+    purpose: Турниры и долгие сезоны пользователя.
+    back_fallback: /profile
+
+  - id: profile.trainings
+    title: Мои тренировки
+    route: /profile/trainings
+    section: profile
+    spec: docs/screens/profile/my-trainings.md
+    purpose: Тренировки пользователя и тренера.
+    back_fallback: /profile
+
+  - id: profile.trips
+    title: Мои туры и поездки
+    route: /profile/trips
+    section: profile
+    spec: docs/screens/profile/my-trips.md
+    purpose: Личные и организованные поездки пользователя.
+    back_fallback: /profile
+
+  - id: game.details
+    title: Игра
+    route: /games/:gameId
+    section: shared
+    spec: docs/screens/shared/game-details.md
+    purpose: Канонический экран одноразовой игры.
+    back_fallback: /play?category=games
+
+  - id: game.create
+    title: Создание игры
+    route: /games/create
+    section: shared
+    spec: docs/screens/shared/game-create.md
+    purpose: Единый мастер создания игры из всех точек входа.
+    back_fallback: /play?category=games
+
+  - id: game.manage
+    title: Управление игрой
+    route: /games/:gameId/manage
+    section: shared
+    spec: docs/screens/shared/game-manage.md
+    purpose: Кабинет организатора одноразовой игры.
+    back_fallback: /profile/games?tab=created
+
+  - id: training.details
+    title: Тренировка
+    route: /trainings/:trainingId
+    section: shared
+    spec: docs/screens/shared/training-details.md
+    purpose: Канонический экран тренировки.
+    back_fallback: /play?category=trainings
+
+  - id: tournament.details
+    title: Турнир
+    route: /tournaments/:tournamentId
+    section: shared
+    spec: docs/screens/shared/tournament-details.md
+    purpose: Канонический экран турнира.
+    back_fallback: /play?category=tournaments
+
+  - id: season.details
+    title: Сезон
+    route: /seasons/:seasonId
+    section: shared
+    spec: docs/screens/shared/season-details.md
+    purpose: Канонический экран сезона и его игровых дней.
+    back_fallback: /play?category=seasons
+
+  - id: tour.details
+    title: Тур
+    route: /tours/:tourId
+    section: shared
+    spec: docs/screens/shared/tour-details.md
+    purpose: Канонический экран тура или спортивного лагеря.
+    back_fallback: /clubs?category=tours

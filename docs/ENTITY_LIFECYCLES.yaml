@@ -1,4 +1,4 @@
-version: 2
+version: 3
 
 entity_lifecycles:
   common:
@@ -23,6 +23,7 @@ entity_lifecycles:
       - published entities cannot return to draft
       - cancellation requires reason
       - completion requires required results or an organizer override
+      - published game, training, tournament, season and tour have one event chat context
 
   tournament:
     additional_statuses:
@@ -69,10 +70,23 @@ participation_lifecycle:
     - participated
     - no_show
     - declined
+    - invitation_expired
+    - invitation_revoked
     - cancelled_by_participant
     - removed_by_organizer
     - refunded
   typical_paths:
+    invited_free:
+      - invited
+      - confirmed
+      - checked_in
+      - participated
+    invited_paid:
+      - invited
+      - payment_required
+      - confirmed
+      - checked_in
+      - participated
     open_free:
       - requested
       - confirmed
@@ -92,9 +106,29 @@ participation_lifecycle:
       - payment_required
       - confirmed
   rules:
-    - membership in chat depends on participation status and chat policy
+    - saving a player in My Players does not create participation
+    - invitation always belongs to a concrete entity
+    - invited and requested users do not enter event chat before confirmation
+    - confirmed participants enter event chat according to chat policy
+    - cancellation or removal recalculates chat access
     - cancellation may trigger waitlist promotion
     - payment status must not be inferred only from participation status
+    - organizer direct confirmation requires permission and audit when the player did not accept in app
+
+invitation_lifecycle:
+  statuses:
+    - invited
+    - accepted
+    - declined
+    - expired
+    - revoked
+  transitions:
+    invited: [accepted, declined, expired, revoked]
+  rules:
+    - accepted invitation creates or advances participation only when capacity and eligibility allow
+    - paid event acceptance may result in payment_required instead of confirmed
+    - full capacity follows waitlist or rejection policy
+    - revoked or declined invitation does not remove the player from My Players
 
 payment_lifecycle:
   statuses:
@@ -127,6 +161,6 @@ round_lifecycle:
     completed: [rolled_back]
     rolled_back: [draft]
   rules:
-    - publishing sends participant notifications
+    - publishing sends participant notifications and a system message to the event chat
     - rollback requires organizer permission and reason
     - next round generation requires completed previous round unless format explicitly allows parallel rounds

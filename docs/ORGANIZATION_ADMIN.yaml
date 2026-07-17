@@ -1,9 +1,9 @@
-version: 1
+version: 2
 
 scope: organization_admin
 source_of_truth_for:
-  - club.manage shell
-  - organization admin navigation
+  - club.manage screen
+  - organization dashboard composition
   - organization admin permissions
   - organization admin actions
   - organization operational tasks
@@ -13,103 +13,107 @@ shell:
   route: /clubs/:clubId/manage
   active_actor_required: organization
   membership_required: true
-  route_model:
-    type: query_tab
-    parameter: tab
-    default: overview
-    examples:
-      - /clubs/:clubId/manage?tab=overview
-      - /clubs/:clubId/manage?tab=calendar
-      - /clubs/:clubId/manage?tab=activities
-      - /clubs/:clubId/manage?tab=people
-      - /clubs/:clubId/manage?tab=venues
   navigation:
-    hide_global_bottom_tabs: true
-    mobile_primary_tabs:
-      - overview
-      - calendar
-      - activities
-      - people
-      - more
-    desktop_mode: sidebar
-    preserve_tab_state: true
-    restore_last_tab_per_organization: true
-    max_depth_before_new_stack_screen: 2
+    preserve_global_bottom_tabs: true
+    global_bottom_tabs: [home, play, chats, clubs, profile]
+    active_global_tab: clubs
+    create_secondary_bottom_navigation: false
+    internal_sections_are_content_navigation: true
+    preserve_filters_per_organization: true
+    max_visible_dashboard_sections: 4
   header:
     - organization_logo
     - organization_name
-    - current_membership_role
-    - global_search
-    - notifications
+    - actor_type
     - actor_switcher
-    - create_menu
+    - notifications
 
-views:
-  overview:
-    title: Обзор
-    spec: docs/screens/clubs/manage-overview.md
-    purpose: Операционная сводка и очередь следующих действий.
-    required_permission: organization_dashboard_view
+approved_mobile_dashboard:
+  order:
+    - today_summary
+    - attention_tasks
+    - upcoming_activities
+    - primary_create_action
+  today_summary:
+    title: Сегодня
+    metrics:
+      - events_count
+      - occupied_courts_count
+      - pending_requests_count
+      - unpaid_orders_count
+    max_metrics: 4
+    behavior: tap_metric_opens_filtered_destination
+  attention_tasks:
+    title: Требуют внимания
+    max_items: 3
+    show_all_action: true
+    item_fields:
+      - severity_icon
+      - short_title
+      - entity_or_context
+      - time_or_deadline
+      - chevron
+    rule: one_primary_destination_per_item
+  upcoming_activities:
+    title: Ближайшие активности
+    max_items: 2
+    show_all_action: true
+    item_fields:
+      - entity_type
+      - title
+      - starts_at
+      - venue_or_court
+      - capacity
+      - status
+  primary_action:
+    label: Создать
+    destination: system.create_menu
+    rule: exactly_one_large_primary_button
+
+content_destinations:
   calendar:
-    title: Календарь
+    title: Календарь организации
+    route: /profile/calendar?scope=active_profile
     spec: docs/screens/clubs/manage-calendar.md
-    purpose: Единое расписание событий, кортов, сотрудников и блокировок.
     required_permission: organization_calendar_view
   activities:
-    title: Активности
+    title: Активности организации
+    route: /play?managed=true&actorId=:organizationActorId
     spec: docs/screens/clubs/manage-activities.md
-    purpose: Игры, тренировки, турниры, сезоны и туры организации.
     required_permission: organization_entities_view
   people:
     title: Люди
+    route: /clubs/:clubId/manage?section=people
     spec: docs/screens/clubs/manage-people.md
-    purpose: Участники, клиенты, тренеры и сотрудники.
     required_permission: organization_people_view
-  more:
-    title: Ещё
-    spec: docs/screens/clubs/manage-more.md
-    purpose: Точка входа в специализированные административные модули.
-    required_permission: organization_member
-
-specialized_views:
   venues:
     title: Площадки и корты
-    tab: venues
+    route: /clubs/:clubId/manage?section=venues
     spec: docs/screens/clubs/manage-venues.md
     required_permission: venues_view
   staff:
     title: Сотрудники и права
-    tab: staff
+    route: /clubs/:clubId/manage?section=staff
     spec: docs/screens/clubs/manage-staff.md
     required_permission: staff_view
   finance:
     title: Финансы
-    tab: finance
+    route: /clubs/:clubId/manage?section=finance
     spec: docs/screens/clubs/manage-finance.md
     required_permission: finance_view
   settings:
     title: Настройки организации
-    tab: settings
+    route: /clubs/:clubId/manage?section=settings
     spec: docs/screens/clubs/manage-settings.md
     required_permission: organization_settings_view
   audit:
     title: Аудит
-    tab: audit
+    route: /clubs/:clubId/manage?section=audit
     spec: docs/screens/clubs/manage-audit.md
     required_permission: audit_view
-  announcements:
-    title: Объявления
-    tab: announcements
-    spec: docs/screens/clubs/manage-more.md
-    required_permission: announcements_manage
-  statistics:
-    title: Статистика организации
-    tab: statistics
-    spec: docs/screens/profile/statistics.md
-    required_permission: organization_analytics_view
   public_profile:
     title: Публичная страница
-    tab: public-profile
+    route: /clubs/:clubId
     spec: docs/screens/clubs/details.md
     required_permission: organization_profile_edit
 
@@ -121,7 +125,6 @@ operational_task_model:
     - result_missing
     - result_disputed
     - court_conflict_detected
-    - venue_block_created
     - staff_assignment_missing
     - payout_failed
     - document_expiring
@@ -140,10 +143,10 @@ operational_task_model:
   severity_order: [critical, high, normal, low]
   statuses: [open, snoozed, resolved, obsolete]
   rules:
-    - Задача исчезает только после выполнения или потери актуальности, а не после просмотра.
-    - На Обзоре показывается максимум семь задач, остальные открываются отдельным списком.
-    - Каждая задача ведёт прямо к месту исправления, а не просто к корню кабинета.
-    - Повторяющиеся однотипные задачи могут группироваться, но должны раскрываться до отдельных источников.
+    - Задача исчезает после выполнения или потери актуальности, а не после просмотра.
+    - На первом экране показывается максимум три задачи.
+    - Ссылка «Все» открывает полный отфильтрованный список.
+    - Каждая задача ведёт прямо к месту исправления.
 
 role_permissions:
   owner:
@@ -187,7 +190,6 @@ role_permissions:
       - venues_view
     constraints:
       - assigned_trainings_and_groups_only
-      - participant_health_or_private_notes_only_when_explicitly_granted
   finance:
     grants:
       - organization_dashboard_view
@@ -209,66 +211,48 @@ role_permissions:
       - read_only
 
 scoped_actions:
-  - id: organization_admin.open_tab
-    destination: system.organization_admin_tab
+  - id: organization_admin.switch_actor
+    destination: actor.switcher
+    permission: actor_owner_or_member
+  - id: organization_admin.open_notifications
+    destination: global.notifications
     permission: organization_member
   - id: organization_admin.open_task
     destination: dynamic.task_deep_link
     permission: organization_member
+  - id: organization_admin.open_all_tasks
+    destination: system.organization_task_list
+    permission: organization_member
+  - id: organization_admin.open_all_activities
+    destination: play.main
+    context: {managed: true, actorId: active_actor}
+    permission: organization_entities_view
+  - id: organization_admin.open_calendar
+    destination: profile.calendar
+    context: {scope: active_profile, actorId: active_actor}
+    permission: organization_calendar_view
   - id: organization_admin.create_entity
     destination: system.create_menu
     permission: organization_entity_creator
   - id: organization_admin.open_entity_manage
     destination: dynamic.entity_manage
     permission: assigned_entity_manager
-  - id: organization_admin.open_venue
-    destination: system.organization_admin_tab
-    context: {tab: venues}
+  - id: organization_admin.open_venues
+    destination: system.organization_admin_section
+    context: {section: venues}
     permission: venues_view
-  - id: organization_admin.create_venue
-    destination: system.venue_editor
-    permission: venues_manage
-  - id: organization_admin.edit_venue
-    destination: system.venue_editor
-    permission: venues_manage
-  - id: organization_admin.create_court
-    destination: system.court_editor
-    permission: venues_manage
-  - id: organization_admin.block_court_time
-    destination: system.court_block_editor
-    permission: venues_manage
-  - id: organization_admin.invite_staff
-    destination: system.organization_staff_invite
-    permission: staff_manage
-  - id: organization_admin.change_staff_role
-    destination: system.organization_membership_editor
-    permission: staff_manage
-  - id: organization_admin.revoke_staff_access
-    destination: system.revoke_membership_confirmation
-    permission: staff_manage
-  - id: organization_admin.open_client
-    destination: system.organization_client_profile
-    permission: organization_people_view
-  - id: organization_admin.send_announcement
-    destination: system.organization_announcement_composer
-    permission: announcements_manage
+  - id: organization_admin.open_staff
+    destination: system.organization_admin_section
+    context: {section: staff}
+    permission: staff_view
   - id: organization_admin.open_finance
-    destination: system.organization_admin_tab
-    context: {tab: finance}
-    permission: finance_view
-  - id: organization_admin.export_financial_report
-    destination: system.financial_report_export
+    destination: system.organization_admin_section
+    context: {section: finance}
     permission: finance_view
   - id: organization_admin.open_settings
-    destination: system.organization_admin_tab
-    context: {tab: settings}
+    destination: system.organization_admin_section
+    context: {section: settings}
     permission: organization_settings_view
-  - id: organization_admin.transfer_ownership
-    destination: system.organization_ownership_transfer
-    permission: organization_owner
-  - id: organization_admin.open_audit_event
-    destination: system.audit_event_details
-    permission: audit_view
 
 shared_states:
   - loading
@@ -282,19 +266,20 @@ shared_states:
 
 actor_switch_behavior:
   same_organization_access:
-    result: keep_current_view_and_recalculate_permissions
-  switched_to_player_or_trainer_without_membership:
-    result: show_public_club_page_with_explanation
+    result: keep_screen_and_recalculate_permissions
+  switched_to_other_profile:
+    result: leave_organization_dashboard_and_open_equivalent_global_tab
   unsaved_form:
     result: ask_save_discard_or_cancel
   lost_permission_while_open:
     result: close_sensitive_editor_and_show_permission_changed
 
 implementation_rules:
-  - Не строить один длинный экран со всеми административными разделами.
-  - На мобильном в первичной навигации одновременно показывать ровно пять пунктов.
-  - Любая карточка операционной проблемы показывает одно следующее действие.
-  - Финансы, настройки и аудит не входят в первичные пять вкладок, но доступны максимум за два нажатия.
-  - Права проверяются на сервере для каждой операции, скрытие кнопки не является защитой.
-  - Публичная страница организации и внутренний кабинет используют разные источники отображения и разные разрешения.
-  - Изменения сотрудников, финансов, площадок и критичных настроек создают audit event.
+  - Глобальная нижняя навигация всегда остаётся Главная, Играть, Чаты, Клубы, Профиль.
+  - Не создавать второе нижнее меню для административного кабинета.
+  - Первый экран кабинета содержит только сводку, максимум три проблемы, максимум две ближайшие активности и одну кнопку «Создать».
+  - Календарь и список активностей переиспользуют глобальные разделы с фильтром активной организации.
+  - Площадки, сотрудники, финансы и настройки открываются как отдельные stack-экраны или разделы, а не одновременно на первом экране.
+  - Любая карточка проблемы показывает одно следующее действие.
+  - Права проверяются на сервере для каждой операции.
+  - Критические изменения создают audit event.

@@ -1,26 +1,26 @@
-version: 2
+version: 3
 
 scope: organization_admin
 source_of_truth_for:
   - club.manage screen
   - organization dashboard composition
-  - organization admin permissions
-  - organization admin actions
+  - organization permissions
+  - organization actions
   - organization operational tasks
 
-shell:
+screen:
   screen_id: club.manage
   route: /clubs/:clubId/manage
   active_actor_required: organization
   membership_required: true
   navigation:
     preserve_global_bottom_tabs: true
-    global_bottom_tabs: [home, play, chats, clubs, profile]
+    visible_labels: [Главная, События, Чаты, Клубы, Профиль]
+    internal_ids: [home, play, chats, clubs, profile]
     active_global_tab: clubs
     create_secondary_bottom_navigation: false
-    internal_sections_are_content_navigation: true
+    create_separate_admin_shell: false
     preserve_filters_per_organization: true
-    max_visible_dashboard_sections: 4
   header:
     - organization_logo
     - organization_name
@@ -70,6 +70,28 @@ approved_mobile_dashboard:
     destination: system.create_menu
     rule: exactly_one_large_primary_button
 
+shared_events_destination:
+  route: /play
+  visible_name: События
+  screen_id: play.main
+  organization_context:
+    actorId: active_organization_actor
+    default_scope: managed
+    default_tab: managed
+  user_tabs:
+    - all
+    - participating
+    - managed
+  visible_labels:
+    all: Все
+    participating: Участвую
+    managed: Управляю
+  rules:
+    - Организация по умолчанию открывает вкладку Управляю.
+    - Ссылка «Все активности» ведёт в События → Управляю с actorId организации.
+    - Публичный каталог остаётся доступен через События → Все.
+    - Не создавать отдельный список активностей только для административного режима.
+
 content_destinations:
   calendar:
     title: Календарь организации
@@ -77,9 +99,9 @@ content_destinations:
     spec: docs/screens/clubs/manage-calendar.md
     required_permission: organization_calendar_view
   activities:
-    title: Активности организации
-    route: /play?managed=true&actorId=:organizationActorId
-    spec: docs/screens/clubs/manage-activities.md
+    title: События организации
+    route: /play?tab=managed&actorId=:organizationActorId
+    spec: docs/screens/play/main.md
     required_permission: organization_entities_view
   people:
     title: Люди
@@ -225,7 +247,7 @@ scoped_actions:
     permission: organization_member
   - id: organization_admin.open_all_activities
     destination: play.main
-    context: {managed: true, actorId: active_actor}
+    context: {tab: managed, actorId: active_actor}
     permission: organization_entities_view
   - id: organization_admin.open_calendar
     destination: profile.calendar
@@ -275,11 +297,13 @@ actor_switch_behavior:
     result: close_sensitive_editor_and_show_permission_changed
 
 implementation_rules:
-  - Глобальная нижняя навигация всегда остаётся Главная, Играть, Чаты, Клубы, Профиль.
-  - Не создавать второе нижнее меню для административного кабинета.
-  - Первый экран кабинета содержит только сводку, максимум три проблемы, максимум две ближайшие активности и одну кнопку «Создать».
-  - Календарь и список активностей переиспользуют глобальные разделы с фильтром активной организации.
-  - Площадки, сотрудники, финансы и настройки открываются как отдельные stack-экраны или разделы, а не одновременно на первом экране.
+  - Глобальная нижняя навигация всегда остаётся Главная, События, Чаты, Клубы, Профиль.
+  - Внутренний id второй вкладки и маршрут остаются play и /play.
+  - Не создавать второе нижнее меню или отдельную административную оболочку.
+  - Первый экран организации содержит только сводку, максимум три проблемы, максимум две ближайшие активности и одну кнопку «Создать».
+  - Все события организации открываются в общем разделе События через вкладку Управляю.
+  - Календарь переиспользует глобальный календарь с фильтром активной организации.
+  - Площадки, сотрудники, финансы и настройки открываются как отдельные stack-экраны.
   - Любая карточка проблемы показывает одно следующее действие.
   - Права проверяются на сервере для каждой операции.
   - Критические изменения создают audit event.

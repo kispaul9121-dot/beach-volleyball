@@ -2,7 +2,8 @@ version: 2
 
 principles:
   - Любой активный профиль может быть участником публичной сущности, если правила допускают участие.
-  - Любой активный профиль может создать социальную сущность, но коммерческие и профессиональные функции требуют дополнительных настроек.
+  - Любой активный профиль может создать социальную версию основной сущности.
+  - Коммерческие, профессиональные и организационные функции требуют соответствующего профиля и настроек.
   - Ограничивать нужно конкретную возможность, а не полностью запрещать тип сущности.
 
 capabilities:
@@ -12,8 +13,12 @@ capabilities:
         allowed: true
         modes: [social, private, public]
       training:
-        allowed: false
-        reason: Тренировка требует профиля тренера или организации с назначенным тренером.
+        allowed: true
+        modes: [peer_practice]
+        restrictions:
+          - cannot_claim_verified_trainer
+          - cannot_create_recurring_professional_group
+          - cannot_sell_coaching_service_without_trainer_actor
       tournament:
         allowed: true
         modes: [social, amateur]
@@ -31,6 +36,7 @@ capabilities:
       trainer_badge: false
       staff_management: false
       venue_inventory: false
+      recurring_training_groups: false
 
   trainer:
     inherits: player
@@ -40,7 +46,7 @@ capabilities:
         modes: [social, coached]
       training:
         allowed: true
-        modes: [single_session, recurring_group, camp_session]
+        modes: [peer_practice, single_session, recurring_group, camp_session]
       tournament:
         allowed: true
         modes: [social, amateur, coached]
@@ -66,7 +72,7 @@ capabilities:
         modes: [social, public, branded, commercial]
       training:
         allowed: true
-        modes: [single_session, recurring_group, camp_session]
+        modes: [peer_practice, single_session, recurring_group, camp_session]
       tournament:
         allowed: true
         modes: [social, amateur, branded, commercial]
@@ -115,3 +121,13 @@ participant_view:
     player: Организатор — частное лицо
     trainer: Организатор — тренер
     organization: Организатор — клуб или компания
+
+training_label_rules:
+  player_peer_practice:
+    public_label: Совместная практика
+    creator_label: Организатор — игрок
+    prohibited_labels: [Тренировка с тренером, Профессиональный тренер]
+  trainer_session:
+    public_label: Тренировка
+  organization_session:
+    public_label: Тренировка клуба

@@ -8,6 +8,7 @@ on:
       - "docs/**"
       - "scripts/validate_architecture.py"
       - "scripts/validate_navigation.py"
+      - "scripts/validate_design_system.py"
       - "scripts/generate_screen_readiness.py"
       - "scripts/requirements.txt"
       - ".github/workflows/validate-architecture.yml"
@@ -21,6 +22,7 @@ on:
       - "docs/**"
       - "scripts/validate_architecture.py"
       - "scripts/validate_navigation.py"
+      - "scripts/validate_design_system.py"
       - "scripts/generate_screen_readiness.py"
       - "scripts/requirements.txt"
       - ".github/workflows/validate-architecture.yml"
@@ -51,6 +53,9 @@ jobs:
 
       - name: Validate navigation graph and immutable bottom tabs
         run: python scripts/validate_navigation.py
+
+      - name: Validate dark-first cross-platform design system
+        run: python scripts/validate_design_system.py
 
       - name: Verify screen readiness table is current
         run: python scripts/generate_screen_readiness.py --check

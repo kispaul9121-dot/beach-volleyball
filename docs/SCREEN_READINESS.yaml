@@ -586,7 +586,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 37 пунктов.
+      evidence: Есть структурный раздел и 39 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: home.open_managed_entity, home.open_participating_entity; действия описаны в spec.'
@@ -601,10 +601,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: calendar, notifications, payments.'
+      evidence: 'Связи: calendar, chat, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 50 непустых строк, 7 заголовков.'
+      evidence: 'Spec существует: 60 непустых строк, 8 заголовков.'
 - id: play.main
   title: События
   section: play

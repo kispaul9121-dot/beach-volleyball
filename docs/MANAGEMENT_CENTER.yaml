@@ -1,0 +1,87 @@
+version: 1
+scope: event_management_entry
+source_of_truth_for:
+- capability-aware event opening from catalogs
+- create and manage menu
+- management center
+- return paths from entity management
+principles:
+- Profile never embeds an Участвую / Управляю switch
+- a user with current manage permission opens the management screen directly from a catalog card
+- a user without manage permission opens the public detail screen
+- server authorization is authoritative; client capability hints are never sufficient
+- public detail and management remain separate screen modes and routes
+catalog_tap:
+  action_ids:
+  - games.open_entity
+  - camps.open_camp
+  resolver: dynamic.catalog_entity_entry
+  requires:
+  - entityType
+  - entityId
+  - activeActorId
+  - canManageHint
+  decision:
+    authorized_manager: dynamic.entity_manage
+    other_user: dynamic.entity_details
+  permission_check: server_revalidate_before_manage_screen_data
+  revoked_permission_fallback: dynamic.entity_details_with_permission_changed_notice
+create_menu:
+  overlay: system.create_menu
+  entry_action: global.open_create_menu
+  sections:
+    create:
+    - game
+    - training
+    - tournament
+    - camp
+    management:
+    - all_events
+    - drafts
+    - requests_and_participants
+    - payments
+  management_destination: management.center
+center:
+  screen: management.center
+  route: /manage
+  tabs:
+  - active
+  - completed
+  tab_labels:
+    active: Активные
+    completed: Завершённые
+  type_filters:
+  - all
+  - games
+  - trainings
+  - tournaments
+  - camps
+  active_includes:
+  - drafts
+  - published
+  - requires_action
+  - registration_open
+  - in_progress
+  - cancelled_not_archived
+  card_fields:
+  - actor_profile
+  - type
+  - title
+  - date
+  - publication_status
+  - capacity
+  - requests
+  - unpaid
+  - next_management_action
+  card_action: management.open_entity
+  create_action: management.open_create_menu
+return_policy:
+  game: /manage?tab=active&type=games
+  training: /manage?tab=active&type=trainings
+  tournament: /manage?tab=active&type=tournaments
+  camp: /manage?tab=active&type=camps
+  restore:
+  - tab
+  - type
+  - filters
+  - scroll_position

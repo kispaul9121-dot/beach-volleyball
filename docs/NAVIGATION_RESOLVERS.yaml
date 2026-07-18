@@ -57,6 +57,25 @@ dynamic_destinations:
   - venue.details
   - trainer.public_profile
   - player.public_profile
+- id: dynamic.catalog_entity_entry
+  requires_context:
+  - entityType
+  - entityId
+  - activeActorId
+  - canManageHint
+  decision:
+    authorized_after_server_check: dynamic.entity_manage
+    not_authorized: dynamic.entity_details
+    permission_revoked: dynamic.entity_details
+  resolves_to:
+  - game.details
+  - training.details
+  - tournament.details
+  - tour.details
+  - game.manage
+  - training.manage
+  - tournament.manage
+  - tour.manage
 - id: dynamic.entity_manage
   requires_context:
   - entityType

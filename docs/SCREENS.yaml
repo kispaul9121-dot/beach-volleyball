@@ -114,12 +114,35 @@ screens:
   route: /
   section: home
   spec: docs/screens/home/main.md
-  purpose: Живая профильная страница active actor с переключателем Участвую / Управляю и входами во всю личную активность.
+  purpose: 'Личный профиль active actor: компактные связи, ближайшие участия и переход ко всей личной активности
+    без управления событиями.'
   variants:
   - player
   - trainer
   - organization
   back_fallback: null
+- id: profile.activity
+  title: Вся моя активность
+  route: /activity
+  section: home
+  spec: docs/screens/profile/activity.md
+  purpose: 'Единая личная лента участий: Предстоящие / Прошедшие с фильтрами по типу.'
+  variants:
+  - player
+  - trainer_as_player
+  back_fallback: /
+- id: management.center
+  title: Центр управления
+  route: /manage
+  section: management
+  spec: docs/screens/shared/management-center.md
+  purpose: Единый список управляемых игр, тренировок, турниров и кэмпов с переходом в кабинет конкретной сущности.
+  variants:
+  - player
+  - trainer
+  - organization
+  permission: authenticated_with_manageable_entities_or_create_capability
+  back_fallback: /
 - id: play.main
   title: Игры
   route: /play
@@ -248,21 +271,21 @@ screens:
   route: /profile/games
   section: home
   spec: docs/screens/profile/my-games.md
-  purpose: 'Личный список игр из Профиля: Предстоящие / Прошедшие или Активные / Завершённые.'
+  purpose: 'Совместимый фильтр личной активности по играм: Предстоящие / Прошедшие; управление здесь не показывается.'
   back_fallback: /
 - id: profile.competitions
   title: Мои турниры
   route: /profile/competitions
   section: home
   spec: docs/screens/profile/my-competitions.md
-  purpose: 'Личный список турниров из Профиля: Заявлен / Прошедшие или Активные / Завершённые.'
+  purpose: 'Совместимый фильтр личной активности по турнирам: Заявлен / Прошедшие; управление здесь не показывается.'
   back_fallback: /
 - id: profile.trainings
   title: Мои тренировки
   route: /profile/trainings
   section: home
   spec: docs/screens/profile/my-trainings.md
-  purpose: 'Личный список тренировок из Профиля: Записан / Прошедшие или Активные / Завершённые.'
+  purpose: 'Совместимый фильтр личной активности по тренировкам: Записан / Прошедшие; управление здесь не показывается.'
   back_fallback: /
 - id: profile.players
   title: Мои игроки
@@ -280,7 +303,7 @@ screens:
   route: /profile/trips
   section: home
   spec: docs/screens/profile/my-trips.md
-  purpose: 'Мои кэмпы: Записан / Прошедшие или управляемые Активные / Завершённые.'
+  purpose: 'Совместимый фильтр личной активности по кэмпам: Записан / Прошедшие; управление здесь не показывается.'
   back_fallback: /
 - id: profile.statistics
   title: Статистика

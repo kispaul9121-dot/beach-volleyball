@@ -20,7 +20,7 @@ bottom_tab:
   - browse
   - search
   - filter
-  - open_details
+  - open_by_capability
   - start_join_flow
 categories:
   games:
@@ -120,8 +120,18 @@ card:
   - Осталось 4 места
   primary_action_count: 1
 personal_activity:
-  location: home.main
-  contract: docs/PROFILE_ACTIVITY.yaml
+  home_preview: home.main
+  full_list: profile.activity
+  management: management.center
   catalog_tabs_forbidden:
   - participating
   - managing
+catalog_open_policy:
+  action_id: games.open_entity
+  resolver: dynamic.catalog_entity_entry
+  manager_result: dynamic.entity_manage
+  public_result: dynamic.entity_details
+  rules:
+  - canManageHint is only an optimization and must be revalidated by the server
+  - revoked permission falls back to public details with a clear notice
+  - returning from manage restores catalog category, filters and scroll position

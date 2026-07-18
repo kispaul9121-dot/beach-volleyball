@@ -952,7 +952,7 @@ screens:
       evidence: 'Связи: calendar, chat, deep_link, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 113 непустых строк, 21 заголовков.'
+      evidence: 'Spec существует: 114 непустых строк, 21 заголовков.'
 - id: profile.main
   title: Профиль
   section: profile

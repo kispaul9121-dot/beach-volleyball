@@ -1,8 +1,7 @@
-exit_code: 1
+exit_code: 0
 
 stdout:
-Profile and management validation failed:
-  - Profile spec restored activity switch
+Profile and management validation passed.
 
 stderr:
 

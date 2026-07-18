@@ -82,6 +82,27 @@ def update_screens(text: str) -> str:
         if marker not in text:
             raise RuntimeError("trainer.public_profile marker not found in SCREENS.yaml")
         text = text.replace(marker, snippet + marker, 1)
+
+    trainer_block = (
+        "  - id: trainer.public_profile\n"
+        "    title: Тренер\n"
+        "    route: /trainers/:trainerId\n"
+        "    section: clubs\n"
+        "    spec: docs/screens/clubs/trainer-details.md\n"
+        "    purpose: Публичный профиль, расписание и отзывы тренера.\n"
+        "    back_fallback: /clubs?category=trainers"
+    )
+    trainer_block_with_variants = (
+        "  - id: trainer.public_profile\n"
+        "    title: Тренер\n"
+        "    route: /trainers/:trainerId\n"
+        "    section: clubs\n"
+        "    spec: docs/screens/clubs/trainer-details.md\n"
+        "    purpose: Публичный профиль, расписание и отзывы тренера.\n"
+        "    variants: [guest, authenticated_player, owner, organization_manager]\n"
+        "    back_fallback: /clubs?category=trainers"
+    )
+    text = replace(text, trainer_block, trainer_block_with_variants)
     return text
 
 
@@ -98,11 +119,29 @@ def update_routes(text: str) -> str:
         if marker not in text:
             raise RuntimeError("trainer route marker not found in ROUTES.yaml")
         text = text.replace(marker, snippet + marker, 1)
+
+    text = replace(
+        text,
+        "accepts_query: [category, managed, date, actorId]",
+        "accepts_query: [category, managed, date, actorId, trainerId]",
+    )
     return text
 
 
 def update_actions(text: str) -> str:
     text = replace(text, "destination: dynamic.player_public_profile", "destination: player.public_profile")
+
+    text = replace(
+        text,
+        "  - id: my_games.continue_draft\n    label: Продолжить создание\n    source: profile.my_games\n    destination: game.create\n    permission: draft_owner",
+        "  - id: my_games.continue_draft\n    label: Продолжить создание\n    source: profile.my_games\n    destination: game.create\n    permission: draft_owner\n    context:\n      returnTo: /profile/games?tab=created\n      actorId: draft_actor",
+    )
+
+    text = replace(
+        text,
+        "  - id: players.open_picker\n    label: Добавить игроков\n    source: dynamic.entity_create_or_manage\n    destination: player.picker\n    permission: entity_inviter",
+        "  - id: players.open_picker\n    label: Добавить игроков\n    source: dynamic.entity_create_or_manage\n    destination: player.picker\n    permission: entity_inviter\n    context:\n      entityType: current_entity_type\n      entityId: current_entity_id_or_null\n      draftId: current_draft_id_or_null\n      actorId: active_actor\n      returnTo: current_create_or_manage_route",
+    )
 
     if "  - id: notifications.open_target\n" not in text:
         marker = "  - id: nav.open_profile_calendar\n"

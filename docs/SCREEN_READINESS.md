@@ -6,9 +6,9 @@
 
 ## Итог
 
-- Экранов проверено: **57**.
+- Экранов проверено: **58**.
 - Средняя архитектурная готовность: **85%**.
-- Готово: **28**.
+- Готово: **29**.
 - Частично: **28**.
 - Слабо описано: **1**.
 
@@ -44,17 +44,18 @@
 | **Переключить профиль**<br><code>actor.switcher</code> | <code>system://actor-switcher</code> | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | — | ◐ | ✅ | ✅ | **83% · частично** |
 | **Добавить игроков**<br><code>player.picker</code> | <code>system://player-picker</code> | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ | — | ✅ | ✅ | ✅ | **94% · готово** |
 | **Уведомления**<br><code>global.notifications</code> | <code>/notifications</code> | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | — | ◐ | ✅ | ✅ | **83% · частично** |
-| **Главная**<br><code>home.main</code> | <code>/</code> | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **100% · готово** |
+| **Профиль**<br><code>home.main</code> | <code>/</code> | ✅ | ✅ | ✅ | ◐ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
 | **События**<br><code>play.main</code> | <code>/play</code> | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **100% · готово** |
 | **Чаты**<br><code>chats.main</code> | <code>/chats</code> | ✅ | ✅ | ✅ | ✅ | ✅ | ○ | ✅ | ✅ | ◐ | ✅ | **85% · частично** |
 | **Чат**<br><code>chat.details</code> | <code>/chats/:chatId</code> | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ | **90% · готово** |
-| **Клубы**<br><code>clubs.main</code> | <code>/clubs</code> | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | ✅ | **85% · готово** |
+| **Клубы**<br><code>clubs.main</code> | <code>/clubs</code> | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
 | **Клуб**<br><code>club.details</code> | <code>/clubs/:clubId</code> | ✅ | ◐ | ◐ | ✅ | ◐ | ◐ | ✅ | ◐ | ✅ | ✅ | **75% · частично** |
 | **Управление клубом**<br><code>club.manage</code> | <code>/clubs/:clubId/manage</code> | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | ✅ | **95% · готово** |
 | **Площадка**<br><code>venue.details</code> | <code>/venues/:venueId</code> | ✅ | ◐ | ◐ | ✅ | ◐ | ○ | ◐ | ◐ | ◐ | ◐ | **55% · слабо** |
 | **Игрок**<br><code>player.public_profile</code> | <code>/players/:playerId</code> | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **95% · готово** |
 | **Тренер**<br><code>trainer.public_profile</code> | <code>/trainers/:trainerId</code> | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **100% · готово** |
-| **Профиль**<br><code>profile.main</code> | <code>/profile</code> | ✅ | ✅ | ✅ | ◐ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
+| **Найти тренера**<br><code>trainer.search</code> | <code>/trainers/search</code> | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | **95% · готово** |
+| **Настройки**<br><code>profile.main</code> | <code>/profile</code> | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
 | **Мои профили**<br><code>profile.actor_profiles</code> | <code>/profile/actors</code> | ✅ | ◐ | ◐ | ✅ | ◐ | ◐ | ✅ | ◐ | ✅ | ✅ | **75% · частично** |
 | **Мой календарь**<br><code>profile.calendar</code> | <code>/profile/calendar</code> | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
 | **Мои игры**<br><code>profile.my_games</code> | <code>/profile/games</code> | ✅ | ◐ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
@@ -64,7 +65,7 @@
 | **Мои туры и поездки**<br><code>profile.trips</code> | <code>/profile/trips</code> | ✅ | ◐ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
 | **Статистика**<br><code>profile.statistics</code> | <code>/profile/statistics</code> | ✅ | ✅ | ✅ | ◐ | ◐ | ◐ | ✅ | ✅ | ◐ | ✅ | **80% · частично** |
 | **Платежи**<br><code>profile.payments</code> | <code>/profile/payments</code> | ✅ | ✅ | ✅ | ◐ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
-| **Настройки**<br><code>profile.settings</code> | <code>/profile/settings</code> | ✅ | ◐ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
+| **Аккаунт и приложение**<br><code>profile.settings</code> | <code>/profile/settings</code> | ✅ | ◐ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
 | **Игра**<br><code>game.details</code> | <code>/games/:gameId</code> | ✅ | ✅ | ✅ | ✅ | ◐ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
 | **Создание игры**<br><code>game.create</code> | <code>/games/create</code> | ✅ | ◐ | ✅ | ✅ | ◐ | ○ | ✅ | ✅ | ✅ | ✅ | **80% · частично** |
 | **Управление игрой**<br><code>game.manage</code> | <code>/games/:gameId/manage</code> | ✅ | ✅ | ✅ | ✅ | ◐ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
@@ -93,16 +94,16 @@
 
 | № | Критерий | ✅ | ◐ | ○ | — |
 |---:|---|---:|---:|---:|---:|
-| 1 | ID и маршрут | 57 | 0 | 0 | 0 |
-| 2 | Профили и права | 40 | 17 | 0 | 0 |
-| 3 | Назначение и данные | 42 | 15 | 0 | 0 |
-| 4 | Блоки | 36 | 21 | 0 | 0 |
-| 5 | Действия | 39 | 17 | 1 | 0 |
-| 6 | Состояния | 9 | 29 | 19 | 0 |
-| 7 | Варианты ролей | 38 | 6 | 0 | 13 |
-| 8 | Навигация | 40 | 17 | 0 | 0 |
-| 9 | Интеграции | 47 | 6 | 0 | 4 |
-| 10 | Спецификация | 53 | 4 | 0 | 0 |
+| 1 | ID и маршрут | 58 | 0 | 0 | 0 |
+| 2 | Профили и права | 41 | 17 | 0 | 0 |
+| 3 | Назначение и данные | 42 | 16 | 0 | 0 |
+| 4 | Блоки | 37 | 21 | 0 | 0 |
+| 5 | Действия | 40 | 17 | 1 | 0 |
+| 6 | Состояния | 8 | 31 | 19 | 0 |
+| 7 | Варианты ролей | 39 | 6 | 0 | 13 |
+| 8 | Навигация | 41 | 17 | 0 | 0 |
+| 9 | Интеграции | 49 | 5 | 0 | 4 |
+| 10 | Спецификация | 54 | 4 | 0 | 0 |
 
 ## Первые экраны на доработку
 

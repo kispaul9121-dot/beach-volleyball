@@ -32,44 +32,44 @@ criteria:
 - id: spec
   name: Спецификация
 summary:
-  screens: 57
-  ready: 28
+  screens: 58
+  ready: 29
   partial: 28
   weak: 1
   average_score: 85
   by_criterion:
     identity_route:
-      ready: 57
+      ready: 58
     actors_permissions:
-      ready: 40
+      ready: 41
       partial: 17
     purpose_data:
       ready: 42
-      partial: 15
+      partial: 16
     blocks:
       partial: 21
-      ready: 36
+      ready: 37
     actions:
-      ready: 39
+      ready: 40
       partial: 17
       missing: 1
     states:
-      partial: 29
-      ready: 9
+      partial: 31
+      ready: 8
       missing: 19
     role_variants:
       na: 13
-      ready: 38
+      ready: 39
       partial: 6
     navigation:
-      ready: 40
+      ready: 41
       partial: 17
     integrations:
       na: 4
-      ready: 47
-      partial: 6
+      ready: 49
+      partial: 5
     spec:
-      ready: 53
+      ready: 54
       partial: 4
 screens:
 - id: auth.welcome
@@ -551,7 +551,8 @@ screens:
       evidence: Есть структурный раздел и 30 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: notifications.open_target; действия описаны в spec.'
+      evidence: 'ACTIONS.yaml: notifications.open_target, trainer.accept_player_relationship, trainer.decline_player_relationship,
+        trainer.message_requesting_player; действия описаны в spec.'
     states:
       status: partial
       evidence: 'Описана только часть состояний: error, offline.'
@@ -566,13 +567,13 @@ screens:
       evidence: 'Связи: chat, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 36 непустых строк, 6 заголовков.'
+      evidence: 'Spec существует: 38 непустых строк, 7 заголовков.'
 - id: home.main
-  title: Главная
+  title: Профиль
   section: home
   route: /
   spec: docs/screens/home/main.md
-  score: 100
+  score: 90
   status: готово
   criteria:
     identity_route:
@@ -585,14 +586,15 @@ screens:
       status: ready
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
-      status: ready
-      evidence: Есть структурный раздел и 39 пунктов.
+      status: partial
+      evidence: 'Структура описана частично; пунктов: 51.'
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: home.open_managed_entity, home.open_participating_entity; действия описаны в spec.'
+      evidence: 'ACTIONS.yaml: home.open_managed_entity, home.open_participating_entity, profile.open_trainer_search, profile.open_linked_trainer…;
+        действия описаны в spec.'
     states:
-      status: ready
-      evidence: 'Описаны состояния: loading, empty, error, offline.'
+      status: partial
+      evidence: 'Описана только часть состояний: loading, error, offline.'
     role_variants:
       status: ready
       evidence: variants=player, trainer, organization.
@@ -604,7 +606,7 @@ screens:
       evidence: 'Связи: calendar, chat, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 60 непустых строк, 8 заголовков.'
+      evidence: 'Spec существует: 72 непустых строк, 9 заголовков.'
 - id: play.main
   title: События
   section: play
@@ -725,7 +727,7 @@ screens:
   section: clubs
   route: /clubs
   spec: docs/screens/clubs/main.md
-  score: 85
+  score: 90
   status: готово
   criteria:
     identity_route:
@@ -739,7 +741,7 @@ screens:
       evidence: Purpose задан, но источник данных описан неявно.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 21 пунктов.
+      evidence: Есть структурный раздел и 20 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: clubs.open_club, clubs.open_venue, clubs.open_trainer, clubs.open_tour; действия описаны в
@@ -754,11 +756,11 @@ screens:
       status: ready
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
-      status: partial
-      evidence: 'Указана одна связь: maps.'
+      status: ready
+      evidence: 'Связи: chat, maps.'
     spec:
       status: ready
-      evidence: 'Spec существует: 41 непустых строк, 11 заголовков.'
+      evidence: 'Spec существует: 41 непустых строк, 9 заголовков.'
 - id: club.details
   title: Клуб
   section: clubs
@@ -952,9 +954,48 @@ screens:
       evidence: 'Связи: calendar, chat, deep_link, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 114 непустых строк, 21 заголовков.'
+      evidence: 'Spec существует: 116 непустых строк, 22 заголовков.'
+- id: trainer.search
+  title: Найти тренера
+  section: home
+  route: /trainers/search
+  spec: docs/screens/shared/trainer-search.md
+  score: 95
+  status: готово
+  criteria:
+    identity_route:
+      status: ready
+      evidence: ID, route и запись ROUTES.yaml совпадают.
+    actors_permissions:
+      status: ready
+      evidence: variants=player; permission=authenticated_player.
+    purpose_data:
+      status: ready
+      evidence: Purpose задан; в spec есть источник или модель данных.
+    blocks:
+      status: ready
+      evidence: Есть структурный раздел и 53 пунктов.
+    actions:
+      status: ready
+      evidence: 'ACTIONS.yaml: trainer.search_query, trainer.search_filters, trainer.search_open_profile, trainer.request_from_search;
+        действия описаны в spec.'
+    states:
+      status: partial
+      evidence: 'Описана только часть состояний: loading, error, offline.'
+    role_variants:
+      status: ready
+      evidence: роли в spec=organization, player, trainer.
+    navigation:
+      status: ready
+      evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
+    integrations:
+      status: ready
+      evidence: 'Связи: chat, maps, notifications.'
+    spec:
+      status: ready
+      evidence: 'Spec существует: 71 непустых строк, 10 заголовков.'
 - id: profile.main
-  title: Профиль
+  title: Настройки
   section: profile
   route: /profile
   spec: docs/screens/profile/main.md
@@ -968,18 +1009,18 @@ screens:
       status: ready
       evidence: variants=player, trainer, organization.
     purpose_data:
-      status: ready
-      evidence: Purpose задан; в spec есть источник или модель данных.
-    blocks:
       status: partial
-      evidence: 'Структура описана частично; пунктов: 67.'
+      evidence: Purpose задан, но источник данных описан неявно.
+    blocks:
+      status: ready
+      evidence: Есть структурный раздел и 24 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: nav.open_profile_calendar, nav.open_profile_my_games, nav.open_profile_competitions, nav.open_profile_trainings…;
         действия описаны в spec.'
     states:
       status: partial
-      evidence: 'Описана только часть состояний: loading, empty, offline.'
+      evidence: 'Описана только часть состояний: offline.'
     role_variants:
       status: ready
       evidence: variants=player, trainer, organization.
@@ -988,10 +1029,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: calendar, chat.'
+      evidence: 'Связи: audit, calendar, chat, notifications.'
     spec:
       status: ready
-      evidence: 'Spec существует: 84 непустых строк, 7 заголовков.'
+      evidence: 'Spec существует: 40 непустых строк, 8 заголовков.'
 - id: profile.actor_profiles
   title: Мои профили
   section: profile
@@ -1338,7 +1379,7 @@ screens:
       status: ready
       evidence: 'Spec существует: 82 непустых строк, 11 заголовков.'
 - id: profile.settings
-  title: Настройки
+  title: Аккаунт и приложение
   section: profile
   route: /profile/settings
   spec: docs/screens/profile/settings.md

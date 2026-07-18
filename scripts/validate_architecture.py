@@ -90,7 +90,7 @@ def main() -> int:
                 "home.main",
                 "play.main",
                 "chats.main",
-                "clubs.main",
+                "camps.main",
                 "profile.main",
                 "auth.welcome",
             }:
@@ -129,10 +129,7 @@ def main() -> int:
             if not route.get("back_fallback"):
                 errors.append(f"Stack/modal route has no back_fallback: {path}")
 
-    for screen_id, screen in screen_by_id.items():
-        if screen_id == "actor.switcher":
-            # It is represented by a system:// route.
-            pass
+    for screen_id in screen_by_id:
         if screen_id not in route_by_screen:
             errors.append(f"Screen has no route entry: {screen_id}")
 
@@ -141,6 +138,7 @@ def main() -> int:
         "global.header",
         "dynamic.global_or_section_header",
         "dynamic.entity_details",
+        "dynamic.entity.manage",
         "dynamic.entity_manage",
         "dynamic.create_wizard",
         "dynamic.onboarding_optional_profile",
@@ -165,12 +163,10 @@ def main() -> int:
 
         if action_id.startswith("create.") or ".create" in action_id:
             context = action.get("context", {}) or {}
-            # Shared wizard-local actions do not need navigation context.
             if destination in {
                 "game.create",
                 "training.create",
                 "tournament.create",
-                "season.create",
                 "tour.create",
             }:
                 if "actorId" not in context:
@@ -181,13 +177,13 @@ def main() -> int:
         "home": "home.main",
         "play": "play.main",
         "chats": "chats.main",
-        "clubs": "clubs.main",
+        "camps": "camps.main",
         "profile": "profile.main",
     }
     bottom_tabs = screens_doc.get("bottom_tabs", []) or []
     if bottom_tabs != list(expected_tab_screens):
         errors.append(
-            "bottom_tabs must be exactly: home, play, chats, clubs, profile"
+            "bottom_tabs must be exactly: home, play, chats, camps, profile"
         )
     for tab_screen in expected_tab_screens.values():
         if tab_screen not in screen_by_id:

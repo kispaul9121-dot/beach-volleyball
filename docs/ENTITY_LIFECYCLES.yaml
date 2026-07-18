@@ -1,166 +1,194 @@
-version: 3
-
+version: 4
 entity_lifecycles:
   common:
     statuses:
-      - draft
+    - draft
+    - scheduled
+    - registration_open
+    - registration_closed
+    - in_progress
+    - completed
+    - cancelled
+    - archived
+    transitions:
+      draft:
       - scheduled
       - registration_open
+      - cancelled
+      scheduled:
+      - registration_open
+      - in_progress
+      - cancelled
+      registration_open:
       - registration_closed
       - in_progress
+      - cancelled
+      registration_closed:
+      - registration_open
+      - in_progress
+      - cancelled
+      in_progress:
       - completed
       - cancelled
+      completed:
       - archived
-    transitions:
-      draft: [scheduled, registration_open, cancelled]
-      scheduled: [registration_open, in_progress, cancelled]
-      registration_open: [registration_closed, in_progress, cancelled]
-      registration_closed: [registration_open, in_progress, cancelled]
-      in_progress: [completed, cancelled]
-      completed: [archived]
-      cancelled: [archived]
+      cancelled:
+      - archived
     rules:
-      - published entities cannot return to draft
-      - cancellation requires reason
-      - completion requires required results or an organizer override
-      - published game, training, tournament, season and tour have one event chat context
-
+    - published entities cannot return to draft
+    - cancellation requires reason
+    - completion requires required results or an organizer override
+    - published game, training, tournament and camp have one event chat context
   tournament:
     additional_statuses:
-      - format_setup
-      - draw_ready
-      - live_round
+    - format_setup
+    - draw_ready
+    - live_round
     required_for_start:
-      - competition_format
-      - confirmed_participants
-      - seeding_or_draw
-      - schedule
+    - competition_format
+    - confirmed_participants
+    - seeding_or_draw
+    - schedule
     required_for_complete:
-      - all_required_matches_resolved
-      - final_places_calculated
-
-  season:
-    additional_statuses:
-      - between_game_days
-    required_for_complete:
-      - all_required_game_days_completed_or_cancelled
+    - all_required_matches_resolved
+    - final_places_calculated
+    seasonal_mode:
+      additional_statuses:
+      - between_tournament_days
+      required_for_complete:
+      - all_required_tournament_days_completed_or_cancelled
       - standings_finalized
-
   tour:
     additional_statuses:
-      - booking_open
-      - booking_closed
-      - departed
-      - returned
+    - booking_open
+    - booking_closed
+    - departed
+    - returned
     transitions_extension:
-      booking_open: [booking_closed, cancelled]
-      booking_closed: [departed, booking_open, cancelled]
-      departed: [returned]
-      returned: [completed]
-
+      booking_open:
+      - booking_closed
+      - cancelled
+      booking_closed:
+      - departed
+      - booking_open
+      - cancelled
+      departed:
+      - returned
+      returned:
+      - completed
 participation_lifecycle:
   statuses:
+  - invited
+  - requested
+  - waitlisted
+  - approved
+  - payment_required
+  - confirmed
+  - checked_in
+  - participated
+  - no_show
+  - declined
+  - invitation_expired
+  - invitation_revoked
+  - cancelled_by_participant
+  - removed_by_organizer
+  - refunded
+  typical_paths:
+    invited_free:
     - invited
+    - confirmed
+    - checked_in
+    - participated
+    invited_paid:
+    - invited
+    - payment_required
+    - confirmed
+    - checked_in
+    - participated
+    open_free:
     - requested
-    - waitlisted
+    - confirmed
+    - checked_in
+    - participated
+    approval_paid:
+    - requested
     - approved
     - payment_required
     - confirmed
     - checked_in
     - participated
-    - no_show
-    - declined
-    - invitation_expired
-    - invitation_revoked
-    - cancelled_by_participant
-    - removed_by_organizer
-    - refunded
-  typical_paths:
-    invited_free:
-      - invited
-      - confirmed
-      - checked_in
-      - participated
-    invited_paid:
-      - invited
-      - payment_required
-      - confirmed
-      - checked_in
-      - participated
-    open_free:
-      - requested
-      - confirmed
-      - checked_in
-      - participated
-    approval_paid:
-      - requested
-      - approved
-      - payment_required
-      - confirmed
-      - checked_in
-      - participated
     full_capacity:
-      - requested
-      - waitlisted
-      - approved
-      - payment_required
-      - confirmed
+    - requested
+    - waitlisted
+    - approved
+    - payment_required
+    - confirmed
   rules:
-    - saving a player in My Players does not create participation
-    - invitation always belongs to a concrete entity
-    - invited and requested users do not enter event chat before confirmation
-    - confirmed participants enter event chat according to chat policy
-    - cancellation or removal recalculates chat access
-    - cancellation may trigger waitlist promotion
-    - payment status must not be inferred only from participation status
-    - organizer direct confirmation requires permission and audit when the player did not accept in app
-
+  - saving a player in My Players does not create participation
+  - invitation always belongs to a concrete entity
+  - invited and requested users do not enter event chat before confirmation
+  - confirmed participants enter event chat according to chat policy
+  - cancellation or removal recalculates chat access
+  - cancellation may trigger waitlist promotion
+  - payment status must not be inferred only from participation status
+  - organizer direct confirmation requires permission and audit when the player did not accept in app
 invitation_lifecycle:
   statuses:
-    - invited
+  - invited
+  - accepted
+  - declined
+  - expired
+  - revoked
+  transitions:
+    invited:
     - accepted
     - declined
     - expired
     - revoked
-  transitions:
-    invited: [accepted, declined, expired, revoked]
   rules:
-    - accepted invitation creates or advances participation only when capacity and eligibility allow
-    - paid event acceptance may result in payment_required instead of confirmed
-    - full capacity follows waitlist or rejection policy
-    - revoked or declined invitation does not remove the player from My Players
-
+  - accepted invitation creates or advances participation only when capacity and eligibility allow
+  - paid event acceptance may result in payment_required instead of confirmed
+  - full capacity follows waitlist or rejection policy
+  - revoked or declined invitation does not remove the player from My Players
 payment_lifecycle:
   statuses:
-    - not_required
-    - pending
-    - authorized
-    - paid
-    - partially_refunded
-    - refunded
-    - failed
-    - expired
+  - not_required
+  - pending
+  - authorized
+  - paid
+  - partially_refunded
+  - refunded
+  - failed
+  - expired
   rules:
-    - payment records are separate from participation records
-    - refunds create immutable transaction records
-    - organizer views aggregate balances, participant views only own payments
-
+  - payment records are separate from participation records
+  - refunds create immutable transaction records
+  - organizer views aggregate balances, participant views only own payments
 round_lifecycle:
   statuses:
-    - draft
+  - draft
+  - published
+  - in_progress
+  - results_pending
+  - completed
+  - rolled_back
+  transitions:
+    draft:
     - published
+    published:
     - in_progress
+    - rolled_back
+    in_progress:
     - results_pending
     - completed
+    results_pending:
+    - completed
+    - in_progress
+    completed:
     - rolled_back
-  transitions:
-    draft: [published]
-    published: [in_progress, rolled_back]
-    in_progress: [results_pending, completed]
-    results_pending: [completed, in_progress]
-    completed: [rolled_back]
-    rolled_back: [draft]
+    rolled_back:
+    - draft
   rules:
-    - publishing sends participant notifications and a system message to the event chat
-    - rollback requires organizer permission and reason
-    - next round generation requires completed previous round unless format explicitly allows parallel rounds
+  - publishing sends participant notifications and a system message to the event chat
+  - rollback requires organizer permission and reason
+  - next round generation requires completed previous round unless format explicitly allows parallel rounds

@@ -1,107 +1,111 @@
-version: 1
-
+version: 2
 scope: entity_sections
 source_of_truth_for:
-  - public entity navigation
-  - participant entity navigation
-  - mandatory event chat
-  - type-specific sections
-
+- public entity navigation
+- participant entity navigation
+- mandatory event chat
+- type-specific sections
 common_rules:
-  - У каждого опубликованного события есть канонический экран и один связанный чат события.
-  - Черновик не создаёт доступный участникам чат.
-  - Гость не видит сообщения чата, даже если публичный preview события доступен.
-  - Подтверждённый участник, организатор и уполномоченный сотрудник получают доступ согласно политике чата.
-  - Приглашённый или подавший заявку пользователь не получает доступ к чату до подтверждения участия.
-  - Удаление из события или потеря права пересчитывает доступ на сервере.
-  - Чат не заменяет карточку события, таблицу, расписание, результаты или статистику.
-  - Системные изменения события публикуются в чат как системные сообщения с action_id.
-
+- У каждого опубликованного события есть канонический экран и один связанный чат события.
+- Черновик не создаёт доступный участникам чат.
+- Гость не видит сообщения чата, даже если публичный preview события доступен.
+- Подтверждённый участник, организатор и уполномоченный сотрудник получают доступ согласно политике чата.
+- Приглашённый или подавший заявку пользователь не получает доступ к чату до подтверждения участия.
+- Удаление из события или потеря права пересчитывает доступ на сервере.
+- Чат не заменяет карточку события, таблицу, расписание, результаты или статистику.
+- Системные изменения события публикуются в чат как системные сообщения с action_id.
 common_sections:
   required:
-    - overview
-    - participants
-    - chat
+  - overview
+  - participants
+  - chat
   labels:
     participants_individual: Игроки
     participants_pairs: Пары
     participants_teams: Команды
     chat: Чат
   optional_by_state:
-    - payments
-    - announcements
-    - documents
-    - results
-    - statistics
-
+  - payments
+  - announcements
+  - documents
+  - results
+  - statistics
 chat:
   creation: on_publish_or_first_confirmed_participant
-  context_types: [game, training, tournament, season, tour]
+  context_types:
+  - game
+  - training
+  - tournament
+  - tour
   members:
-    - confirmed_participants
-    - entity_owner_actor
-    - authorized_entity_staff
+  - confirmed_participants
+  - entity_owner_actor
+  - authorized_entity_staff
   moderators:
-    - entity_owner
-    - entity_manager
-    - explicitly_assigned_moderator
+  - entity_owner
+  - entity_manager
+  - explicitly_assigned_moderator
   system_events:
-    - schedule_changed
-    - venue_changed
-    - participant_added
-    - participant_removed
-    - registration_changed
-    - payment_required
-    - round_published
-    - court_assigned
-    - result_changed
-    - entity_cancelled
+  - schedule_changed
+  - venue_changed
+  - participant_added
+  - participant_removed
+  - registration_changed
+  - payment_required
+  - round_published
+  - court_assigned
+  - result_changed
+  - entity_cancelled
   completed_behavior: read_only_or_writable_by_entity_policy
   archived_behavior: read_only
-
 entity_types:
   game:
-    base_sections: [overview, participants, chat]
+    base_sections:
+    - overview
+    - participants
+    - chat
     conditional_sections:
       rounds: game_format_has_rounds
       results: results_published_or_completed
       statistics: statistics_available
   training:
-    base_sections: [overview, participants, chat]
+    base_sections:
+    - overview
+    - participants
+    - chat
     conditional_sections:
       program: program_available
       attendance: manager_or_post_event_participant_view
       payments: payment_context_available
       materials: materials_available
   tournament:
-    base_sections: [overview, participants, chat]
+    base_sections:
+    - overview
+    - participants
+    - chat
     conditional_sections:
       matches: format_has_matches
       bracket: elimination_or_groups_playoff_or_placement
       rounds: swiss_or_placement
       schedule: round_robin_or_timed_matches
-      standings: round_robin_or_swiss_or_groups
+      standings: round_robin_or_swiss_or_groups_or_king_of_the_beach_or_seasonal
       placements: full_placement_or_completed
       statistics: statistics_available
-  season:
-    base_sections: [overview, participants, chat]
-    conditional_sections:
-      game_days: always
-      standings: always
-      rules: always
-      statistics: statistics_available
+      tournament_days: tournament_mode_is_seasonal
   tour:
-    base_sections: [overview, participants, chat]
+    base_sections:
+    - overview
+    - participants
+    - chat
     conditional_sections:
       program: always
       accommodation: accommodation_available
       payments: commercial_or_payment_schedule
       documents: documents_required_or_available
       transport: transport_available
-
 implementation_rules:
-  - Не создавать отдельные социальные группы вокруг события.
-  - Не создавать отдельный чат для таблицы, раунда или списка игроков без явного продуктового решения.
-  - Внутренние вкладки зависят от типа, формата, статуса и роли пользователя.
-  - На мобильном допускается горизонтальный tab bar или меню разделов, но глобальная нижняя навигация не заменяется.
-  - Вкладка `Игроки`, `Пары` или `Команды` показывает состав и статусы участия, а не социальный список пользователя.
+- Не создавать отдельные социальные группы вокруг события.
+- Не создавать отдельный чат для таблицы, раунда или списка игроков без явного продуктового решения.
+- Внутренние вкладки зависят от типа, формата, статуса и роли пользователя.
+- На мобильном допускается горизонтальный tab bar или меню разделов, но глобальная нижняя навигация не заменяется.
+- Вкладка `Игроки`, `Пары` или `Команды` показывает состав и статусы участия, а не социальный список пользователя.

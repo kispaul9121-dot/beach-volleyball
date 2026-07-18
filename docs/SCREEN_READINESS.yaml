@@ -32,45 +32,45 @@ criteria:
 - id: spec
   name: Спецификация
 summary:
-  screens: 58
+  screens: 53
   ready: 30
-  partial: 27
-  weak: 1
-  average_score: 85
+  partial: 23
+  weak: 0
+  average_score: 86
   by_criterion:
     identity_route:
-      ready: 58
+      ready: 53
     actors_permissions:
-      ready: 41
-      partial: 17
+      ready: 40
+      partial: 13
     purpose_data:
-      ready: 43
+      ready: 38
       partial: 15
     blocks:
-      partial: 21
-      ready: 37
+      partial: 19
+      ready: 34
     actions:
-      ready: 40
-      partial: 17
+      ready: 37
+      partial: 15
       missing: 1
     states:
       partial: 31
       ready: 8
-      missing: 19
+      missing: 14
     role_variants:
       na: 13
-      ready: 39
-      partial: 6
+      ready: 35
+      partial: 5
     navigation:
-      ready: 41
-      partial: 17
+      ready: 40
+      partial: 13
     integrations:
       na: 4
-      ready: 49
-      partial: 5
+      ready: 46
+      partial: 3
     spec:
-      ready: 54
-      partial: 4
+      ready: 50
+      partial: 3
 screens:
 - id: auth.welcome
   title: Добро пожаловать
@@ -608,7 +608,7 @@ screens:
       status: ready
       evidence: 'Spec существует: 78 непустых строк, 9 заголовков.'
 - id: play.main
-  title: События
+  title: Игры
   section: play
   route: /play
   spec: docs/screens/play/main.md
@@ -626,10 +626,10 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 61 пунктов.
+      evidence: Есть структурный раздел и 50 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: play.open_managed_filter, play.open_my_upcoming_filter, play.open_entity, play.create_game;
+      evidence: 'ACTIONS.yaml: games.change_tab, games.change_category, games.change_tournament_mode, games.open_search…;
         действия описаны в spec.'
     states:
       status: ready
@@ -642,10 +642,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: chat, maps, payments.'
+      evidence: 'Связи: chat, maps, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 93 непустых строк, 17 заголовков.'
+      evidence: 'Spec существует: 96 непустых строк, 16 заголовков.'
 - id: chats.main
   title: Чаты
   section: chats
@@ -722,11 +722,11 @@ screens:
     spec:
       status: ready
       evidence: 'Spec существует: 56 непустых строк, 8 заголовков.'
-- id: clubs.main
-  title: Клубы
-  section: clubs
-  route: /clubs
-  spec: docs/screens/clubs/main.md
+- id: camps.main
+  title: Кэмпы
+  section: camps
+  route: /camps
+  spec: docs/screens/camps/main.md
   score: 90
   status: готово
   criteria:
@@ -741,14 +741,13 @@ screens:
       evidence: Purpose задан, но источник данных описан неявно.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 20 пунктов.
+      evidence: Есть структурный раздел и 15 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: clubs.open_club, clubs.open_venue, clubs.open_trainer, clubs.open_tour; действия описаны в
-        spec.'
+      evidence: 'ACTIONS.yaml: camps.change_tab, camps.open_search, camps.open_camp, camps.create; действия описаны в spec.'
     states:
       status: partial
-      evidence: 'Описана только часть состояний: offline.'
+      evidence: 'Описана только часть состояний: loading, offline.'
     role_variants:
       status: ready
       evidence: variants=player, trainer, organization.
@@ -760,22 +759,21 @@ screens:
       evidence: 'Связи: chat, maps.'
     spec:
       status: ready
-      evidence: 'Spec существует: 41 непустых строк, 9 заголовков.'
+      evidence: 'Spec существует: 38 непустых строк, 9 заголовков.'
 - id: club.details
   title: Клуб
-  section: clubs
+  section: discovery
   route: /clubs/:clubId
   spec: docs/screens/clubs/details.md
-  score: 75
+  score: 80
   status: частично
   criteria:
     identity_route:
       status: ready
       evidence: ID, route и запись ROUTES.yaml совпадают.
     actors_permissions:
-      status: partial
-      evidence: 'route access=public_preview_or_authenticated; роли упомянуты в spec: manager, organization, trainer, но actor-правила
-        не формализованы.'
+      status: ready
+      evidence: Доступ ограничен через route access=public_preview_or_authenticated.
     purpose_data:
       status: partial
       evidence: Purpose задан, но источник данных описан неявно.
@@ -802,7 +800,7 @@ screens:
       evidence: 'Spec существует: 36 непустых строк, 9 заголовков.'
 - id: club.manage
   title: Управление клубом
-  section: clubs
+  section: organization
   route: /clubs/:clubId/manage
   spec: docs/screens/clubs/manage.md
   score: 95
@@ -840,19 +838,18 @@ screens:
       evidence: 'Spec существует: 92 непустых строк, 13 заголовков.'
 - id: venue.details
   title: Площадка
-  section: clubs
+  section: discovery
   route: /venues/:venueId
   spec: docs/screens/clubs/venue-details.md
-  score: 55
-  status: слабо
+  score: 60
+  status: частично
   criteria:
     identity_route:
       status: ready
       evidence: ID, route и запись ROUTES.yaml совпадают.
     actors_permissions:
-      status: partial
-      evidence: 'route access=public_preview_or_authenticated; роли упомянуты в spec: organization, trainer, но actor-правила
-        не формализованы.'
+      status: ready
+      evidence: Доступ ограничен через route access=public_preview_or_authenticated.
     purpose_data:
       status: partial
       evidence: Purpose задан, но источник данных описан неявно.
@@ -879,7 +876,7 @@ screens:
       evidence: 'Spec существует, но краткий: 29 строк, 5 заголовков.'
 - id: player.public_profile
   title: Игрок
-  section: clubs
+  section: discovery
   route: /players/:playerId
   spec: docs/screens/clubs/player-details.md
   score: 95
@@ -918,7 +915,7 @@ screens:
       evidence: 'Spec существует: 53 непустых строк, 12 заголовков.'
 - id: trainer.public_profile
   title: Тренер
-  section: clubs
+  section: discovery
   route: /trainers/:trainerId
   spec: docs/screens/clubs/trainer-details.md
   score: 100
@@ -1150,7 +1147,7 @@ screens:
       status: ready
       evidence: 'Spec существует: 69 непустых строк, 9 заголовков.'
 - id: profile.competitions
-  title: Мои турниры и сезоны
+  title: Мои турниры
   section: profile
   route: /profile/competitions
   spec: docs/screens/profile/my-competitions.md
@@ -1171,8 +1168,8 @@ screens:
       evidence: Есть структурный раздел и 53 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: competitions.create_tournament, competitions.create_season, competitions.open_entity, competitions.manage_entity;
-        действия описаны в spec.'
+      evidence: 'ACTIONS.yaml: competitions.create_tournament, competitions.open_entity, competitions.manage_entity; действия
+        описаны в spec.'
     states:
       status: missing
       evidence: Нет loading, empty, error, offline и permission states.
@@ -1266,7 +1263,7 @@ screens:
       status: ready
       evidence: 'Spec существует: 104 непустых строк, 16 заголовков.'
 - id: profile.trips
-  title: Мои туры и поездки
+  title: Мои кэмпы
   section: profile
   route: /profile/trips
   spec: docs/screens/profile/my-trips.md
@@ -1840,199 +1837,8 @@ screens:
     spec:
       status: ready
       evidence: 'Spec существует: 45 непустых строк, 7 заголовков.'
-- id: season.details
-  title: Сезон
-  section: shared
-  route: /seasons/:seasonId
-  spec: docs/screens/shared/season-details.md
-  score: 85
-  status: частично
-  criteria:
-    identity_route:
-      status: ready
-      evidence: ID, route и запись ROUTES.yaml совпадают.
-    actors_permissions:
-      status: ready
-      evidence: variants=guest, participant, organizer.
-    purpose_data:
-      status: ready
-      evidence: Purpose задан; в spec есть источник или модель данных.
-    blocks:
-      status: ready
-      evidence: Есть структурный раздел и 46 пунктов.
-    actions:
-      status: ready
-      evidence: 'ACTIONS.yaml: season.open_game_day; действия описаны в spec.'
-    states:
-      status: missing
-      evidence: Нет loading, empty, error, offline и permission states.
-    role_variants:
-      status: ready
-      evidence: variants=guest, participant, organizer.
-    navigation:
-      status: partial
-      evidence: Навигация определена только в реестре или только в spec.
-    integrations:
-      status: ready
-      evidence: 'Связи: chat, payments.'
-    spec:
-      status: ready
-      evidence: 'Spec существует: 63 непустых строк, 9 заголовков.'
-- id: season.create
-  title: Создание сезона
-  section: shared
-  route: /seasons/create
-  spec: docs/screens/shared/season-create.md
-  score: 65
-  status: частично
-  criteria:
-    identity_route:
-      status: ready
-      evidence: ID, route и запись ROUTES.yaml совпадают.
-    actors_permissions:
-      status: partial
-      evidence: 'route access=authenticated_onboarded; роли упомянуты в spec: participant, player, но actor-правила не формализованы.'
-    purpose_data:
-      status: ready
-      evidence: Purpose задан; в spec есть источник или модель данных.
-    blocks:
-      status: ready
-      evidence: Есть структурный раздел и 24 пунктов.
-    actions:
-      status: partial
-      evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
-    states:
-      status: missing
-      evidence: Нет loading, empty, error, offline и permission states.
-    role_variants:
-      status: partial
-      evidence: роли в spec=participant, player; различия описаны не полностью.
-    navigation:
-      status: partial
-      evidence: Навигация определена только в реестре или только в spec.
-    integrations:
-      status: ready
-      evidence: 'Связи: chat, notifications, payments.'
-    spec:
-      status: partial
-      evidence: 'Spec существует, но краткий: 32 строк, 5 заголовков.'
-- id: season.manage
-  title: Управление сезоном
-  section: shared
-  route: /seasons/:seasonId/manage
-  spec: docs/screens/shared/season-manage.md
-  score: 90
-  status: частично
-  criteria:
-    identity_route:
-      status: ready
-      evidence: ID, route и запись ROUTES.yaml совпадают.
-    actors_permissions:
-      status: ready
-      evidence: permission=entity_manager.
-    purpose_data:
-      status: ready
-      evidence: Purpose задан; в spec есть источник или модель данных.
-    blocks:
-      status: ready
-      evidence: Есть структурный раздел и 15 пунктов.
-    actions:
-      status: ready
-      evidence: 'ACTIONS.yaml: season.create_game_day, season.manage_game_day; действия описаны в spec.'
-    states:
-      status: missing
-      evidence: Нет loading, empty, error, offline и permission states.
-    role_variants:
-      status: ready
-      evidence: роли в spec=manager, organizer, participant.
-    navigation:
-      status: ready
-      evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
-    integrations:
-      status: ready
-      evidence: 'Связи: audit, chat, notifications, payments.'
-    spec:
-      status: ready
-      evidence: 'Spec существует: 37 непустых строк, 12 заголовков.'
-- id: season.game_day
-  title: Игровой день
-  section: shared
-  route: /seasons/:seasonId/game-days/:gameDayId
-  spec: docs/screens/shared/season-game-day.md
-  score: 65
-  status: частично
-  criteria:
-    identity_route:
-      status: ready
-      evidence: ID, route и запись ROUTES.yaml совпадают.
-    actors_permissions:
-      status: partial
-      evidence: 'route access=public_preview_or_authenticated; роли упомянуты в spec: organizer, participant, player, но actor-правила
-        не формализованы.'
-    purpose_data:
-      status: ready
-      evidence: Purpose задан; в spec есть источник или модель данных.
-    blocks:
-      status: partial
-      evidence: 'Структура описана частично; пунктов: 33.'
-    actions:
-      status: partial
-      evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
-    states:
-      status: missing
-      evidence: Нет loading, empty, error, offline и permission states.
-    role_variants:
-      status: ready
-      evidence: роли в spec=organizer, participant, player.
-    navigation:
-      status: partial
-      evidence: Навигация определена только в реестре или только в spec.
-    integrations:
-      status: partial
-      evidence: 'Указана одна связь: chat.'
-    spec:
-      status: ready
-      evidence: 'Spec существует: 47 непустых строк, 9 заголовков.'
-- id: season.game_day_manage
-  title: Управление игровым днём
-  section: shared
-  route: /seasons/:seasonId/game-days/:gameDayId/manage
-  spec: docs/screens/shared/season-game-day.md
-  score: 75
-  status: частично
-  criteria:
-    identity_route:
-      status: ready
-      evidence: ID, route и запись ROUTES.yaml совпадают.
-    actors_permissions:
-      status: ready
-      evidence: permission=entity_manager.
-    purpose_data:
-      status: ready
-      evidence: Purpose задан; в spec есть источник или модель данных.
-    blocks:
-      status: partial
-      evidence: 'Структура описана частично; пунктов: 33.'
-    actions:
-      status: ready
-      evidence: 'ACTIONS.yaml: game_day.generate_rounds; действия описаны в spec.'
-    states:
-      status: missing
-      evidence: Нет loading, empty, error, offline и permission states.
-    role_variants:
-      status: ready
-      evidence: роли в spec=organizer, participant, player.
-    navigation:
-      status: partial
-      evidence: Навигация определена только в реестре или только в spec.
-    integrations:
-      status: partial
-      evidence: 'Указана одна связь: chat.'
-    spec:
-      status: ready
-      evidence: 'Spec существует: 47 непустых строк, 9 заголовков.'
 - id: tour.details
-  title: Тур
+  title: Кэмп
   section: shared
   route: /tours/:tourId
   spec: docs/screens/shared/tour-details.md
@@ -2070,7 +1876,7 @@ screens:
       status: ready
       evidence: 'Spec существует: 57 непустых строк, 10 заголовков.'
 - id: tour.create
-  title: Создание тура
+  title: Создание кэмпа
   section: shared
   route: /tours/create
   spec: docs/screens/shared/tour-create.md
@@ -2109,7 +1915,7 @@ screens:
       status: partial
       evidence: 'Spec существует, но краткий: 34 строк, 7 заголовков.'
 - id: tour.manage
-  title: Управление туром
+  title: Управление кэмпом
   section: shared
   route: /tours/:tourId/manage
   spec: docs/screens/shared/tour-manage.md
@@ -2147,7 +1953,7 @@ screens:
       status: ready
       evidence: 'Spec существует: 35 непустых строк, 9 заголовков.'
 - id: tour.booking
-  title: Бронирование тура
+  title: Бронирование кэмпа
   section: shared
   route: /tours/:tourId/booking
   spec: docs/screens/shared/tour-details.md

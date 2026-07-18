@@ -1,8 +1,10 @@
-version: 2
-
+version: 3
 shared_configuration:
   participant_unit:
-    values: [individual, pair, team]
+    values:
+    - individual
+    - pair
+    - team
     default_for_beach_volleyball: pair
   scoring:
     match_win_points: configurable
@@ -10,37 +12,37 @@ shared_configuration:
     walkover_policy: configurable
     withdrawal_policy: configurable
   required_before_start:
-    - registration_closed_or_manual_override
-    - participants_confirmed
-    - format_validated
-    - courts_assigned_or_schedule_without_courts_allowed
-    - organizer_confirmed_start
+  - registration_closed_or_manual_override
+  - participants_confirmed
+  - format_validated
+  - courts_assigned_or_schedule_without_courts_allowed
+  - organizer_confirmed_start
   shared_screens:
     participant:
-      - overview
-      - registration
-      - participants
-      - schedule
-      - match_details
-      - results_or_standings
-      - chat
+    - overview
+    - registration
+    - participants
+    - schedule
+    - match_details
+    - results_or_standings
+    - chat
     organizer:
-      - dashboard
-      - registration
-      - format_and_rules
-      - seeding_and_draw
-      - schedule_and_courts
-      - live_round_control
-      - results
-      - payments
-      - notifications
-      - settings
-      - audit_log
-
+    - dashboard
+    - registration
+    - format_and_rules
+    - seeding_and_draw
+    - schedule_and_courts
+    - live_round_control
+    - results
+    - payments
+    - notifications
+    - settings
+    - audit_log
 formats:
   single_elimination:
     title: Плей-офф на выбывание
-    entity_types: [tournament]
+    entity_types:
+    - tournament
     mvp: true
     participant_count:
       minimum: 2
@@ -49,37 +51,52 @@ formats:
     algorithm:
       rounds: ceil_log2_participant_count
       loss: eliminated_from_championship
-      seeding: [manual, rating, random]
+      seeding:
+      - manual
+      - rating
+      - random
       byes: highest_seeds_or_random
     outputs:
-      - champion
-      - finalist
-      - semifinalists
-      - optional_third_place
-    tabs: [overview, matches, bracket, participants, chat]
-
+    - champion
+    - finalist
+    - semifinalists
+    - optional_third_place
+    tabs:
+    - overview
+    - matches
+    - bracket
+    - participants
+    - chat
   round_robin:
     title: Круговая система
-    entity_types: [tournament, season]
+    entity_types:
+    - tournament
     mvp: true
     participant_count:
       minimum: 3
       recommended_maximum_mvp: 16
     algorithm:
-      meetings_per_pair: [1, 2]
+      meetings_per_pair:
+      - 1
+      - 2
       odd_count: one_bye_per_round
       schedule: circle_method_or_manual
     standings_default_order:
-      - match_wins
-      - set_ratio
-      - point_ratio
-      - head_to_head
-      - seed
-    tabs: [overview, schedule, standings, participants, chat]
-
+    - match_wins
+    - set_ratio
+    - point_ratio
+    - head_to_head
+    - seed
+    tabs:
+    - overview
+    - schedule
+    - standings
+    - participants
+    - chat
   groups_then_playoff:
     title: Группы + плей-офф
-    entity_types: [tournament]
+    entity_types:
+    - tournament
     mvp: true
     configuration:
       group_size_min: 3
@@ -91,11 +108,18 @@ formats:
       group_stage: round_robin
       qualification_order: group_standings
       cross_group_seeding: configurable
-    tabs: [overview, groups, matches, bracket, standings, participants, chat]
-
+    tabs:
+    - overview
+    - groups
+    - matches
+    - bracket
+    - standings
+    - participants
+    - chat
   swiss:
     title: Швейцарская система
-    entity_types: [tournament]
+    entity_types:
+    - tournament
     mvp: true
     participant_count:
       minimum: 4
@@ -105,7 +129,10 @@ formats:
         minimum: 3
         maximum_mvp: 7
         default_rule: organizer_selects_with_recommendation
-      seeding: [rating, manual, random]
+      seeding:
+      - rating
+      - manual
+      - random
       pairing_mode: score_groups
       allow_repeat_pairing: only_when_unavoidable
       bye_points: same_as_match_win
@@ -117,32 +144,41 @@ formats:
       step_5: assign_bye_to_lowest_ranked_without_previous_bye
       step_6: organizer_reviews_and_confirms_round
     standings_default_order:
-      - match_points
-      - buchholz_opponents_score
-      - point_difference
-      - points_scored
-      - head_to_head_when_applicable
-      - initial_seed
+    - match_points
+    - buchholz_opponents_score
+    - point_difference
+    - points_scored
+    - head_to_head_when_applicable
+    - initial_seed
     round_lifecycle:
-      - draft_pairings
-      - organizer_review
-      - published
-      - in_progress
-      - completed
-      - next_round_generated
-    tabs: [overview, rounds, standings, participants, chat]
+    - draft_pairings
+    - organizer_review
+    - published
+    - in_progress
+    - completed
+    - next_round_generated
+    tabs:
+    - overview
+    - rounds
+    - standings
+    - participants
+    - chat
     organizer_warnings:
-      - repeat_pairing_required
-      - multiple_valid_byes
-      - incomplete_previous_results
-      - participant_withdrawal
-
+    - repeat_pairing_required
+    - multiple_valid_byes
+    - incomplete_previous_results
+    - participant_withdrawal
   full_placement:
     title: Полное распределение мест
-    entity_types: [tournament]
+    entity_types:
+    - tournament
     mvp: true
     participant_count:
-      supported_mvp: [4, 8, 16, 32]
+      supported_mvp:
+      - 4
+      - 8
+      - 16
+      - 32
       other_counts: later_or_preliminary_round
     purpose: Каждый участник продолжает играть после победы и поражения, пока не получит точное итоговое место.
     algorithm:
@@ -158,34 +194,92 @@ formats:
       matches_per_round: 16
       total_matches: 80
       final_places: 1_to_32
-    tabs: [overview, rounds, placement_bracket, places, participants, chat]
+    tabs:
+    - overview
+    - rounds
+    - placement_bracket
+    - places
+    - participants
+    - chat
     organizer_requirements:
-      - all_results_in_round_complete_before_next_round
-      - every_participant_has_exactly_one_match_per_round
-      - no_duplicate_participant_in_round
-
-  league_season:
-    title: Сезонная таблица
-    entity_types: [season]
+    - all_results_in_round_complete_before_next_round
+    - every_participant_has_exactly_one_match_per_round
+    - no_duplicate_participant_in_round
+  king_of_the_beach:
+    title: Король пляжа
+    entity_types:
+    - tournament
     mvp: true
+    participant_unit: individual
+    purpose: Игроки меняют партнёров и соперников, а итоговая таблица считается персонально.
     configuration:
-      schedule_model: [fixed_fixtures, recurring_game_days]
-      scoring_model: [match_points, personal_points, hybrid]
-      participant_roster: [fixed, flexible_by_game_day]
-      court_count: per_game_day
-    standings_default_order:
-      - season_points
-      - wins
+      rounds: configurable
+      partner_rotation: required
+      repeat_partner_policy: minimize
+      standings:
+      - personal_wins
       - point_difference
-      - attendance_or_games_played_when_configured
-      - head_to_head
-    tabs: [overview, game_days, standings, participants, rules, chat]
-
+      - points_scored
+      - head_to_head_when_applicable
+    tabs:
+    - overview
+    - rounds
+    - standings
+    - participants
+    - chat
+  seasonal_tournament:
+    title: Сезонный турнир
+    entity_types:
+    - tournament
+    mvp: true
+    purpose: Один турнир с несколькими игровыми днями и общей накопительной таблицей.
+    configuration:
+      schedule_model:
+      - fixed_dates
+      - recurring_tournament_days
+      scoring_model:
+      - match_points
+      - personal_points
+      - hybrid
+      participant_roster:
+      - fixed
+      - flexible_by_tournament_day
+      court_count: per_tournament_day
+    standings_default_order:
+    - series_points
+    - wins
+    - point_difference
+    - games_played
+    - head_to_head
+    tabs:
+    - overview
+    - tournament_days
+    - standings
+    - participants
+    - rules
+    - chat
 validation_rules:
-  - competition_format must be compatible with entity_type
-  - every participant must have a stable participant_id
-  - a published round cannot be regenerated without an explicit rollback
-  - result corrections must create an audit record
-  - next round generation is blocked while required results are missing
-  - standings are calculated from immutable result events, not manually typed totals
-  - organizer overrides require reason and actor_id
+- competition_format must be compatible with entity_type
+- every participant must have a stable participant_id
+- a published round cannot be regenerated without an explicit rollback
+- result corrections must create an audit record
+- next round generation is blocked while required results are missing
+- standings are calculated from immutable result events, not manually typed totals
+- organizer overrides require reason and actor_id
+catalog_modes:
+  classic:
+    title: Классика
+    formats:
+    - single_elimination
+    - round_robin
+    - groups_then_playoff
+    - swiss
+    - full_placement
+  king_of_the_beach:
+    title: Король пляжа
+    formats:
+    - king_of_the_beach
+  seasonal:
+    title: Сезонные
+    formats:
+    - seasonal_tournament

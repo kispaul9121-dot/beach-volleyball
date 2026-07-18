@@ -39,9 +39,9 @@ def main() -> int:
 
     expected_tabs = [
         {"id": "home", "title": "Профиль", "route": "/"},
-        {"id": "play", "title": "События", "route": "/play"},
+        {"id": "play", "title": "Игры", "route": "/play"},
         {"id": "chats", "title": "Чаты", "route": "/chats"},
-        {"id": "clubs", "title": "Клубы", "route": "/clubs"},
+        {"id": "camps", "title": "Кэмпы", "route": "/camps"},
         {"id": "profile", "title": "Настройки", "route": "/profile"},
     ]
 

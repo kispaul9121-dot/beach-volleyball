@@ -118,14 +118,14 @@ navigation:
       title: Профиль
       route: /
     - id: play
-      title: События
+      title: Игры
       route: /play
     - id: chats
       title: Чаты
       route: /chats
-    - id: clubs
-      title: Клубы
-      route: /clubs
+    - id: camps
+      title: Кэмпы
+      route: /camps
     - id: profile
       title: Настройки
       route: /profile

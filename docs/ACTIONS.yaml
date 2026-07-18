@@ -1,4 +1,4 @@
-version: 2
+version: 3
 action_rules:
 - every tappable control must have an action_id
 - destination screen must exist or be a declared system action
@@ -145,26 +145,6 @@ actions:
   source: profile.main
   destination: profile.settings
   permission: authenticated
-- id: clubs.open_club
-  label: Открыть клуб
-  source: clubs.main
-  destination: club.details
-  permission: public
-- id: clubs.open_venue
-  label: Открыть площадку
-  source: clubs.main
-  destination: venue.details
-  permission: public
-- id: clubs.open_trainer
-  label: Открыть тренера
-  source: clubs.main
-  destination: trainer.public_profile
-  permission: public
-- id: clubs.open_tour
-  label: Открыть тур
-  source: clubs.main
-  destination: tour.details
-  permission: public
 - id: home.open_managed_entity
   label: Управлять
   source: home.main
@@ -175,25 +155,6 @@ actions:
   source: home.main
   destination: dynamic.entity_details
   permission: authenticated
-- id: play.open_managed_filter
-  label: Управляю
-  source: play.main
-  destination: system.local_filter
-  context:
-    managed: true
-  permission: authenticated
-- id: play.open_my_upcoming_filter
-  label: Мои ближайшие
-  source: play.main
-  destination: system.local_filter
-  context:
-    relationship: participant_or_manager
-  permission: authenticated
-- id: play.open_entity
-  label: Открыть событие
-  source: play.main
-  destination: dynamic.entity_details
-  permission: public
 - id: global.open_create_menu
   label: Создать
   source: dynamic.global_or_section_header
@@ -206,14 +167,6 @@ actions:
   permission: authenticated
   context:
     returnTo: /profile/games?tab=created
-    actorId: active_actor
-- id: play.create_game
-  label: Создать игру
-  source: play.main
-  destination: game.create
-  permission: authenticated
-  context:
-    returnTo: /play?category=games&managed=true
     actorId: active_actor
 - id: create.choose_actor
   label: Создать как
@@ -419,14 +372,6 @@ actions:
   context:
     actorId: active_actor
     returnTo: /profile/competitions?tab=organized&type=tournament
-- id: competitions.create_season
-  label: Создать сезон
-  source: profile.competitions
-  destination: season.create
-  permission: authenticated
-  context:
-    actorId: active_actor
-    returnTo: /profile/competitions?tab=organized&type=season
 - id: competitions.open_entity
   label: Открыть
   source: profile.competitions
@@ -477,26 +422,6 @@ actions:
   source: competition.match
   destination: system.confirm_result
   permission: participant_or_result_editor
-- id: season.create_game_day
-  label: Добавить игровой день
-  source: season.manage
-  destination: system.create_game_day
-  permission: entity_manager
-- id: season.open_game_day
-  label: Открыть игровой день
-  source: season.details
-  destination: season.game_day
-  permission: public
-- id: season.manage_game_day
-  label: Управлять игровым днём
-  source: season.manage
-  destination: season.game_day_manage
-  permission: entity_manager
-- id: game_day.generate_rounds
-  label: Сформировать раунды
-  source: season.game_day_manage
-  destination: system.generate_game_format_rounds
-  permission: entity_manager
 - id: trainings.create
   label: Создать тренировку
   source: profile.trainings
@@ -755,3 +680,105 @@ actions:
   source: global.notifications
   destination: system.decline_trainer_relationship_request_confirmation
   permission: relationship_target_trainer
+- id: games.change_tab
+  label: Все / Участвую / Управляю
+  source: play.main
+  destination: system.local_filter
+  permission: public
+- id: games.change_category
+  label: Игры / Тренировки / Турниры
+  source: play.main
+  destination: system.local_filter
+  permission: public
+- id: games.change_tournament_mode
+  label: Классика / Король пляжа / Сезонные
+  source: play.main
+  destination: system.local_filter
+  permission: public
+- id: games.open_search
+  label: Поиск
+  source: play.main
+  destination: system.games_search
+  permission: public
+- id: games.open_filters
+  label: Фильтры
+  source: play.main
+  destination: system.search_filters
+  permission: public
+- id: games.open_entity
+  label: Открыть
+  source: play.main
+  destination: dynamic.entity_details
+  permission: public
+- id: games.find_organizers
+  label: Добавить организацию
+  source: play.main
+  destination: system.organizer_search
+  permission: authenticated
+- id: games.find_players
+  label: Добавить игроков
+  source: play.main
+  destination: system.player_search
+  permission: authenticated
+- id: games.follow_organizer
+  label: Отслеживать организацию
+  source: play.main
+  destination: system.follow_organizer
+  permission: authenticated
+- id: games.open_organizer
+  label: Открыть организацию
+  source: play.main
+  destination: club.details
+  permission: public
+- id: games.open_venue
+  label: Открыть площадку
+  source: play.main
+  destination: venue.details
+  permission: public
+- id: games.create_game
+  label: Создать игру
+  source: play.main
+  destination: game.create
+  permission: authenticated
+  context:
+    actorId: active_actor
+    returnTo: /play?tab=manage&category=games
+- id: games.create_training
+  label: Создать тренировку
+  source: play.main
+  destination: training.create
+  permission: trainer_or_organization
+  context:
+    actorId: active_actor
+    returnTo: /play?tab=manage&category=trainings
+- id: games.create_tournament
+  label: Создать турнир
+  source: play.main
+  destination: tournament.create
+  permission: authenticated
+  context:
+    actorId: active_actor
+    returnTo: /play?tab=manage&category=tournaments
+- id: camps.change_tab
+  label: Все / Участвую / Управляю
+  source: camps.main
+  destination: system.local_filter
+  permission: public
+- id: camps.open_search
+  label: Поиск кэмпов
+  source: camps.main
+  destination: system.camps_search
+  permission: public
+- id: camps.open_camp
+  label: Открыть кэмп
+  source: camps.main
+  destination: tour.details
+  permission: public
+- id: camps.create
+  label: Создать кэмп
+  source: camps.main
+  destination: tour.create
+  permission: authenticated
+  context:
+    actorId: active_actor
+    returnTo: /camps?tab=manage

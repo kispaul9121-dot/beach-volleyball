@@ -1,4 +1,4 @@
-version: 2
+version: 3
 route_rules:
 - unauthenticated users are redirected to /auth except public deep links that may show a preview
 - authenticated users with incomplete onboarding are redirected to the next onboarding step
@@ -87,11 +87,22 @@ routes:
   navigator: tab
   access: authenticated_onboarded
   accepts_query:
+  - tab
   - category
-  - managed
+  - tournamentMode
   - date
-  - actorId
+  - sort
+  - distance
+  - level
+  - price
+  - freePlaces
+  - source
+  - scope
+  - organizerId
+  - playerId
   - trainerId
+  - followed
+  - actorId
 - path: /chats
   screen: chats.main
   navigator: tab
@@ -100,13 +111,18 @@ routes:
   - category
   - unread
   - actorId
-- path: /clubs
-  screen: clubs.main
+- path: /camps
+  screen: camps.main
   navigator: tab
   access: public_preview_or_authenticated
   accepts_query:
-  - category
-  - city
+  - tab
+  - type
+  - date
+  - sort
+  - destination
+  - level
+  - price
   - actorId
 - path: /profile
   screen: profile.main
@@ -266,7 +282,9 @@ routes:
   access: public_preview_or_authenticated
   accepts_query:
   - tab
+  - dayId
   - round
+  - mode
   back_fallback: /play?category=tournaments
 - path: /tournaments/:tournamentId/manage
   screen: tournament.manage
@@ -274,55 +292,15 @@ routes:
   permission: entity_manager
   accepts_query:
   - tab
+  - dayId
   - round
+  - mode
   back_fallback: /profile/competitions?tab=organized
 - path: /matches/:matchId
   screen: competition.match
   navigator: entity_stack
   access: public_preview_or_authenticated
   back_fallback: /play
-- path: /seasons/create
-  screen: season.create
-  navigator: modal_stack
-  access: authenticated_onboarded
-  accepts_query:
-  - returnTo
-  - actorId
-  - draftId
-  - templateId
-  back_fallback: /profile/competitions
-- path: /seasons/:seasonId
-  screen: season.details
-  navigator: entity_stack
-  access: public_preview_or_authenticated
-  accepts_query:
-  - tab
-  - gameDayId
-  back_fallback: /play?category=seasons
-- path: /seasons/:seasonId/manage
-  screen: season.manage
-  navigator: entity_stack
-  permission: entity_manager
-  accepts_query:
-  - tab
-  - gameDayId
-  back_fallback: /profile/competitions?tab=organized
-- path: /seasons/:seasonId/game-days/:gameDayId
-  screen: season.game_day
-  navigator: entity_stack
-  access: public_preview_or_authenticated
-  accepts_query:
-  - tab
-  - round
-  back_fallback: /seasons/:seasonId
-- path: /seasons/:seasonId/game-days/:gameDayId/manage
-  screen: season.game_day_manage
-  navigator: entity_stack
-  permission: entity_manager
-  accepts_query:
-  - tab
-  - round
-  back_fallback: /seasons/:seasonId/manage?tab=game-days
 - path: /tours/create
   screen: tour.create
   navigator: modal_stack
@@ -332,21 +310,21 @@ routes:
   - actorId
   - draftId
   - mode
-  back_fallback: /profile/trips
+  back_fallback: /camps?tab=manage
 - path: /tours/:tourId
   screen: tour.details
   navigator: entity_stack
   access: public_preview_or_authenticated
   accepts_query:
   - tab
-  back_fallback: /play?category=tours
+  back_fallback: /camps
 - path: /tours/:tourId/manage
   screen: tour.manage
   navigator: entity_stack
   permission: entity_manager
   accepts_query:
   - tab
-  back_fallback: /profile/trips?tab=organized
+  back_fallback: /camps?tab=manage
 - path: /tours/:tourId/booking
   screen: tour.booking
   navigator: modal_stack
@@ -358,7 +336,7 @@ routes:
   access: public_preview_or_authenticated
   accepts_query:
   - tab
-  back_fallback: /clubs
+  back_fallback: /play?scope=organizers
 - path: /clubs/:clubId/manage
   screen: club.manage
   navigator: entity_stack
@@ -370,7 +348,7 @@ routes:
   screen: venue.details
   navigator: entity_stack
   access: public_preview_or_authenticated
-  back_fallback: /clubs?category=venues
+  back_fallback: /play?scope=venues
 - path: /players/:playerId
   screen: player.public_profile
   navigator: entity_stack

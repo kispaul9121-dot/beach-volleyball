@@ -3,23 +3,24 @@ scope: contextual_search
 universal_search_screen_in_mvp: false
 
 contexts:
-  events:
+  games:
     screen: play.main
-    entities: [game, training, tournament, season, tour]
-    tour_variants: [informal, training_camp, organization_package]
-    user_labels: [Игры, Тренировки, Турниры, Сезоны, Туры и кэмпы]
-  clubs:
-    screen: clubs.main
-    entities: [club, venue, court]
+    entities: [game, training, tournament, organization, venue, player]
+    categories: [games, trainings, tournaments]
+    default_sort: starts_at_ascending
+    tournament_modes: [classic, king_of_the_beach, seasonal]
+  camps:
+    screen: camps.main
+    entities: [tour]
+    creator_actor_types: [player, trainer, organization]
+    default_sort: starts_at_ascending
   trainers:
     screen: trainer.search
     entry_points: [home.player_no_trainer, home.player_my_trainers, trainer.public_profile]
     entities: [trainer_profile]
-    result_action: send_relationship_request
   players:
-    screens: [profile.players, player.picker]
+    screens: [profile.players, player.picker, play.main]
     entities: [player_profile]
-    trainer_pending_requests_surface: profile.players.new
   chats:
     screen: chats.main
     entities: [conversation, conversation_member]
@@ -29,10 +30,8 @@ contexts:
 
 rules:
   - search context determines initial entity type and filters
-  - tours and training camps are discoverable only in Events
-  - global Clubs catalog does not contain trainer or tour categories
-  - trainer search is available to player profile from the first Profile tab and creates a pending request
-  - trainer approval occurs in notifications or Settings > My Players > New
-  - only accepted requests become active trainer relationships and enter the trainer saved-player list
-  - all result cards open canonical detail screens
+  - organizations and venues are found inside Games search, not a bottom tab
+  - camps have a dedicated bottom tab and are not mixed into the Games category chips
+  - seasonal competition is a tournament mode and never a separate search entity
+  - all public lists default to nearest upcoming date first
   - blocked, hidden or nonpublic entities are excluded according to permissions

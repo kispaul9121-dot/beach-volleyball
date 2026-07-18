@@ -1,9 +1,9 @@
-version: 2
+version: 3
 bottom_tabs:
 - home
 - play
 - chats
-- clubs
+- camps
 - profile
 global_overlays:
 - actor.switcher
@@ -121,11 +121,11 @@ screens:
   - organization
   back_fallback: null
 - id: play.main
-  title: События
+  title: Игры
   route: /play
   section: play
   spec: docs/screens/play/main.md
-  purpose: Каталог, участия и управление событиями через вкладки Все, Участвую и Управляю.
+  purpose: Поиск, участие и управление играми, публичными тренировками и турнирами с выдачей по ближайшей дате.
   variants:
   - player
   - trainer
@@ -136,7 +136,7 @@ screens:
   route: /chats
   section: chats
   spec: docs/screens/chats/main.md
-  purpose: Чаты игр, тренировок, турниров, сезонов, клубов, туров и личные сообщения.
+  purpose: Чаты игр, тренировок, турниров, кэмпов, организаций и личные сообщения.
   variants:
   - player
   - trainer
@@ -149,12 +149,12 @@ screens:
   spec: docs/screens/chats/details.md
   purpose: Общение и переход к связанной сущности.
   back_fallback: /chats
-- id: clubs.main
-  title: Клубы
-  route: /clubs
-  section: clubs
-  spec: docs/screens/clubs/main.md
-  purpose: Публичный каталог клубов, площадок и кортов.
+- id: camps.main
+  title: Кэмпы
+  route: /camps
+  section: camps
+  spec: docs/screens/camps/main.md
+  purpose: Каталог, участие и управление кэмпами, лагерями и совместными игровыми поездками.
   variants:
   - player
   - trainer
@@ -163,14 +163,14 @@ screens:
 - id: club.details
   title: Клуб
   route: /clubs/:clubId
-  section: clubs
+  section: discovery
   spec: docs/screens/clubs/details.md
   purpose: Публичная страница клуба и его расписание.
-  back_fallback: /clubs
+  back_fallback: /play?scope=organizers
 - id: club.manage
   title: Управление клубом
   route: /clubs/:clubId/manage
-  section: clubs
+  section: organization
   spec: docs/screens/clubs/manage.md
   purpose: Площадки, сотрудники, расписание, события и финансы организации.
   permission: organization_member
@@ -178,14 +178,14 @@ screens:
 - id: venue.details
   title: Площадка
   route: /venues/:venueId
-  section: clubs
+  section: discovery
   spec: docs/screens/clubs/venue-details.md
   purpose: Корты, расписание, адрес и бронирование площадки.
-  back_fallback: /clubs
+  back_fallback: /play?scope=venues
 - id: player.public_profile
   title: Игрок
   route: /players/:playerId
-  section: clubs
+  section: discovery
   spec: docs/screens/clubs/player-details.md
   purpose: Публичный спортивный профиль игрока с учётом приватности.
   variants:
@@ -196,7 +196,7 @@ screens:
 - id: trainer.public_profile
   title: Тренер
   route: /trainers/:trainerId
-  section: clubs
+  section: discovery
   spec: docs/screens/clubs/trainer-details.md
   purpose: Публичный профиль, расписание и отзывы тренера.
   variants:
@@ -210,7 +210,7 @@ screens:
   route: /trainers/search
   section: home
   spec: docs/screens/shared/trainer-search.md
-  purpose: Поиск тренеров и прямое добавление одного или нескольких тренеров игроку.
+  purpose: Поиск тренеров и отправка запросов одному или нескольким тренерам игрока.
   variants:
   - player
   permission: authenticated_player
@@ -251,11 +251,11 @@ screens:
   purpose: Участие и управление одноразовыми играми.
   back_fallback: /profile
 - id: profile.competitions
-  title: Мои турниры и сезоны
+  title: Мои турниры
   route: /profile/competitions
   section: profile
   spec: docs/screens/profile/my-competitions.md
-  purpose: Участие, организация, черновики и завершённые соревнования.
+  purpose: Участие, организация, черновики и завершённые турниры, включая сезонные.
   back_fallback: /profile
 - id: profile.trainings
   title: Мои тренировки
@@ -276,11 +276,11 @@ screens:
   - organization
   back_fallback: /profile
 - id: profile.trips
-  title: Мои туры и поездки
+  title: Мои кэмпы
   route: /profile/trips
   section: profile
   spec: docs/screens/profile/my-trips.md
-  purpose: Участие и организация поездок разных типов.
+  purpose: Участие и организация кэмпов, лагерей и совместных поездок.
   back_fallback: /profile
 - id: profile.statistics
   title: Статистика
@@ -378,7 +378,7 @@ screens:
   route: /tournaments/:tournamentId
   section: shared
   spec: docs/screens/shared/tournament-details.md
-  purpose: Динамические вкладки участника по формату турнира.
+  purpose: Канонический экран классического, Короля пляжа или сезонного турнира.
   variants:
   - guest
   - participant
@@ -389,14 +389,14 @@ screens:
   route: /tournaments/create
   section: shared
   spec: docs/screens/shared/tournament-create.md
-  purpose: Выбор профиля-создателя, формата, регистрации, правил и расписания.
+  purpose: Создание классического, Короля пляжа или сезонного турнира.
   back_fallback: /profile/competitions
 - id: tournament.manage
   title: Управление турниром
   route: /tournaments/:tournamentId/manage
   section: shared
   spec: docs/screens/shared/tournament-manage.md
-  purpose: Регистрация, формат, жеребьёвка, раунды, корты, результаты и выплаты.
+  purpose: Регистрация, игровые дни, жеребьёвка, раунды, таблица, корты, результаты и выплаты.
   permission: entity_manager
   back_fallback: /profile/competitions?tab=organized
 - id: competition.match
@@ -406,75 +406,34 @@ screens:
   spec: docs/screens/shared/competition-match.md
   purpose: Состав, корт, счёт, статус и подтверждение результата.
   back_fallback: /play
-- id: season.details
-  title: Сезон
-  route: /seasons/:seasonId
-  section: shared
-  spec: docs/screens/shared/season-details.md
-  purpose: Обзор, игровые дни, таблица, участники, правила и чат.
-  variants:
-  - guest
-  - participant
-  - organizer
-  back_fallback: /play?category=seasons
-- id: season.create
-  title: Создание сезона
-  route: /seasons/create
-  section: shared
-  spec: docs/screens/shared/season-create.md
-  purpose: Формат таблицы, расписание игровых дней и правила состава.
-  back_fallback: /profile/competitions
-- id: season.manage
-  title: Управление сезоном
-  route: /seasons/:seasonId/manage
-  section: shared
-  spec: docs/screens/shared/season-manage.md
-  purpose: Участники, игровые дни, таблица, результаты, оплаты и настройки.
-  permission: entity_manager
-  back_fallback: /profile/competitions?tab=organized
-- id: season.game_day
-  title: Игровой день
-  route: /seasons/:seasonId/game-days/:gameDayId
-  section: shared
-  spec: docs/screens/shared/season-game-day.md
-  purpose: Участники, корты, раунды, результаты и личное расписание.
-  back_fallback: /seasons/:seasonId
-- id: season.game_day_manage
-  title: Управление игровым днём
-  route: /seasons/:seasonId/game-days/:gameDayId/manage
-  section: shared
-  spec: docs/screens/shared/season-game-day.md
-  purpose: Вместимость, состав, генерация раундов, корты и результаты.
-  permission: entity_manager
-  back_fallback: /seasons/:seasonId/manage
 - id: tour.details
-  title: Тур
+  title: Кэмп
   route: /tours/:tourId
   section: shared
   spec: docs/screens/shared/tour-details.md
-  purpose: Программа, проживание, тренеры, цена, участники и чат.
+  purpose: Программа, формат совместной игры, проживание при наличии, тренеры, цена, участники и чат.
   variants:
   - informal
   - training_camp
   - organization_package
-  back_fallback: /clubs?category=tours
+  back_fallback: /camps
 - id: tour.create
-  title: Создание тура
+  title: Создание кэмпа
   route: /tours/create
   section: shared
   spec: docs/screens/shared/tour-create.md
-  purpose: Создание неформальной поездки, лагеря тренера или тура организации.
-  back_fallback: /profile/trips
+  purpose: Создание совместного игрового кэмпа игроком, лагеря тренером или коммерческого кэмпа организацией.
+  back_fallback: /camps?tab=manage
 - id: tour.manage
-  title: Управление туром
+  title: Управление кэмпом
   route: /tours/:tourId/manage
   section: shared
   spec: docs/screens/shared/tour-manage.md
   purpose: Заявки, бронирования, программа, участники, оплаты и сообщения.
   permission: entity_manager
-  back_fallback: /profile/trips?tab=organized
+  back_fallback: /camps?tab=manage
 - id: tour.booking
-  title: Бронирование тура
+  title: Бронирование кэмпа
   route: /tours/:tourId/booking
   section: shared
   spec: docs/screens/shared/tour-details.md

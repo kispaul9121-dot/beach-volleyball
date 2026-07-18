@@ -85,8 +85,8 @@ def main() -> int:
         errors.append("NAVIGATION_RESOLVERS.yaml must mark bottom_navigation immutable=true")
 
     expected_ids = [str(item.get("id", "")) for item in nav_items]
-    if expected_ids != ["home", "play", "chats", "clubs", "profile"]:
-        errors.append("Bottom navigation IDs must be exactly home, play, chats, clubs, profile")
+    if expected_ids != ["home", "play", "chats", "camps", "profile"]:
+        errors.append("Bottom navigation IDs must be exactly home, play, chats, camps, profile")
     if screens_doc.get("bottom_tabs") != expected_ids:
         errors.append("SCREENS.yaml bottom_tabs differs from immutable navigation contract")
 
@@ -127,7 +127,7 @@ def main() -> int:
         if overlay_id not in screen_by_id and not is_system(overlay_id):
             errors.append(f"Global overlay is neither a screen nor system overlay: {overlay_id}")
 
-    legacy_phrase = "Главная · События · Чаты · Клубы · Профиль"
+    legacy_phrase = "Профиль · События · Чаты · Клубы · Настройки"
     for source in (DOCS / "NAVIGATION_RESOLVERS.yaml", DOCS / "DESIGN_TOKENS.yaml", DOCS / "UI_RULES.md"):
         if legacy_phrase in source.read_text(encoding="utf-8"):
             errors.append("Legacy bottom navigation title contract returned: " + str(source.relative_to(ROOT)))
@@ -249,7 +249,7 @@ def main() -> int:
             if "confirmation" not in destination and "confirm" not in destination:
                 errors.append(f"Destructive action {action_id} must use a confirmation destination")
 
-        if destination in {"game.create", "training.create", "tournament.create", "season.create", "tour.create"}:
+        if destination in {"game.create", "training.create", "tournament.create", "tour.create"}:
             if not {"actorId", "returnTo"}.issubset(context):
                 errors.append(f"Creation navigation {action_id} must pass actorId and returnTo")
 
@@ -267,6 +267,19 @@ def main() -> int:
             continue
         if not incoming.get(screen_id):
             warnings.append(f"No registered incoming action/resolver for screen {screen_id}")
+
+    # Standalone season and the removed Clubs bottom tab are forbidden in active registries.
+    forbidden_registry_tokens = {
+        DOCS / "SCREENS.yaml": ["season.details", "season.create", "season.manage", "clubs.main"],
+        DOCS / "ROUTES.yaml": ["/seasons/", "screen: season.", "screen: clubs.main"],
+        DOCS / "NAVIGATION_RESOLVERS.yaml": ["season.details", "season.manage", "id: clubs"],
+        DOCS / "ENTITY_SECTIONS.yaml": ["  season:"],
+    }
+    for registry_path, tokens in forbidden_registry_tokens.items():
+        registry_text = registry_path.read_text(encoding="utf-8")
+        for token in tokens:
+            if token in registry_text:
+                errors.append(f"Removed concept {token!r} remains in {registry_path.relative_to(ROOT)}")
 
     # Block known obsolete concepts from returning to source-of-truth navigation docs.
     legacy_patterns = {

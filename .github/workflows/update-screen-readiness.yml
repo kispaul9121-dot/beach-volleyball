@@ -10,6 +10,7 @@ on:
       - "docs/ACTIONS.yaml"
       - "docs/screens/**"
       - "scripts/migrate_direct_event_management.py"
+      - "scripts/fix_direct_event_management.py"
       - "scripts/generate_screen_readiness.py"
       - "scripts/requirements.txt"
       - ".github/workflows/update-screen-readiness.yml"
@@ -41,6 +42,9 @@ jobs:
       - name: Apply direct event management migration
         run: python scripts/migrate_direct_event_management.py
 
+      - name: Fix remaining Profile ownership references
+        run: python scripts/fix_direct_event_management.py
+
       - name: Generate readiness matrix
         run: python scripts/generate_screen_readiness.py
 
@@ -52,6 +56,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Architecture and readiness audit are already current."
           else
-            git commit -m "Move event management out of Profile"
+            git commit -m "Finalize direct event management architecture"
             git push
           fi

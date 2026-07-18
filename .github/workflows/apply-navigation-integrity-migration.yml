@@ -6,6 +6,7 @@ on:
       - architecture/v2-multi-profile
     paths:
       - "scripts/apply_navigation_integrity_migration.py"
+      - ".github/workflows/apply-navigation-integrity-migration.yml"
   workflow_dispatch:
 
 permissions:

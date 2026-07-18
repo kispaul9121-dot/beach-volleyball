@@ -10,7 +10,6 @@ on:
       - "scripts/validate_navigation.py"
       - "scripts/validate_design_system.py"
       - "scripts/validate_profile_activity.py"
-      - "scripts/migrate_profile_activity.py"
       - "scripts/generate_screen_readiness.py"
       - "scripts/requirements.txt"
       - ".github/workflows/validate-architecture.yml"
@@ -26,54 +25,15 @@ on:
       - "scripts/validate_navigation.py"
       - "scripts/validate_design_system.py"
       - "scripts/validate_profile_activity.py"
-      - "scripts/migrate_profile_activity.py"
       - "scripts/generate_screen_readiness.py"
       - "scripts/requirements.txt"
       - ".github/workflows/validate-architecture.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  migrate-profile-activity:
-    if: github.event_name == 'pull_request' && github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check -r scripts/requirements.txt
-
-      - name: Apply profile activity migration
-        run: python scripts/migrate_profile_activity.py
-
-      - name: Regenerate readiness matrix
-        run: python scripts/generate_screen_readiness.py
-
-      - name: Commit migration
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -- .github/workflows/validate-architecture.yml
-          git add README.md docs scripts/validate_profile_activity.py
-          if git diff --cached --quiet; then
-            echo "Migration is already current."
-          else
-            git commit -m "Move participation and management to Profile"
-            git push origin HEAD:${{ github.event.pull_request.head.ref }}
-          fi
-
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -98,6 +58,9 @@ jobs:
 
       - name: Validate dark-first cross-platform design system
         run: python scripts/validate_design_system.py
+
+      - name: Validate Profile activity and discovery boundaries
+        run: python scripts/validate_profile_activity.py
 
       - name: Verify screen readiness table is current
         run: python scripts/generate_screen_readiness.py --check

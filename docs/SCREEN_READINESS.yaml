@@ -973,7 +973,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 53 пунктов.
+      evidence: Есть структурный раздел и 55 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: trainer.search_query, trainer.search_filters, trainer.search_open_profile, trainer.add_from_search;
@@ -992,7 +992,7 @@ screens:
       evidence: 'Связи: chat, maps, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 71 непустых строк, 10 заголовков.'
+      evidence: 'Spec существует: 73 непустых строк, 10 заголовков.'
 - id: profile.main
   title: Настройки
   section: profile

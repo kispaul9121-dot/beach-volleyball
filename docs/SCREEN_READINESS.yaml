@@ -548,7 +548,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 32 пунктов.
+      evidence: Есть структурный раздел и 37 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: notifications.open_target, trainer.message_new_player; действия описаны в spec.'
@@ -566,7 +566,7 @@ screens:
       evidence: 'Связи: chat, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 47 непустых строк, 7 заголовков.'
+      evidence: 'Spec существует: 52 непустых строк, 7 заголовков.'
 - id: home.main
   title: Профиль
   section: home

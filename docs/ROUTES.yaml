@@ -353,6 +353,12 @@ routes:
     access: public_preview_or_authenticated
     back_fallback: /clubs?category=venues
 
+  - path: /players/:playerId
+    screen: player.public_profile
+    navigator: entity_stack
+    access: public_preview_or_authenticated
+    back_fallback: /profile/players
+
   - path: /trainers/:trainerId
     screen: trainer.public_profile
     navigator: entity_stack

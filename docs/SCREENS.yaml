@@ -11,8 +11,8 @@ global_overlays:
   - actor.switcher
   - player.picker
   - global.notifications
-  - global.create_menu
-  - global.search_filters
+  - system.create_menu
+  - system.search_filters
 
 screens:
   # Authentication and onboarding
@@ -193,6 +193,15 @@ screens:
     spec: docs/screens/clubs/venue-details.md
     purpose: Корты, расписание, адрес и бронирование площадки.
     back_fallback: /clubs
+
+  - id: player.public_profile
+    title: Игрок
+    route: /players/:playerId
+    section: clubs
+    spec: docs/screens/clubs/player-details.md
+    purpose: Публичный спортивный профиль игрока с учётом приватности.
+    variants: [stranger, saved_player, owner]
+    back_fallback: /profile/players
 
   - id: trainer.public_profile
     title: Тренер
@@ -496,5 +505,5 @@ screens:
     route: /invitations/:invitationId
     section: shared
     spec: docs/screens/shared/invitations.md
-    purpose: Принятие или отклонение приглашения в событие, группу или организацию.
+    purpose: Принятие или отклонение приглашения в событие или организацию.
     back_fallback: /

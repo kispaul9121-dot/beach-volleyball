@@ -117,6 +117,12 @@ actions:
     destination: global.notifications
     permission: authenticated
 
+  - id: notifications.open_target
+    label: Открыть уведомление
+    source: global.notifications
+    destination: dynamic.notification_target
+    permission: authenticated
+
   - id: nav.open_profile_calendar
     label: Мой календарь
     source: profile.main
@@ -170,6 +176,31 @@ actions:
     source: profile.main
     destination: profile.settings
     permission: authenticated
+
+  # Club directory cards
+  - id: clubs.open_club
+    label: Открыть клуб
+    source: clubs.main
+    destination: club.details
+    permission: public
+
+  - id: clubs.open_venue
+    label: Открыть площадку
+    source: clubs.main
+    destination: venue.details
+    permission: public
+
+  - id: clubs.open_trainer
+    label: Открыть тренера
+    source: clubs.main
+    destination: trainer.public_profile
+    permission: public
+
+  - id: clubs.open_tour
+    label: Открыть тур
+    source: clubs.main
+    destination: tour.details
+    permission: public
 
   # Home and Play visibility
   - id: home.open_managed_entity
@@ -283,7 +314,7 @@ actions:
   - id: players.open_public_profile
     label: Открыть профиль игрока
     source: profile.players
-    destination: dynamic.player_public_profile
+    destination: player.public_profile
     permission: authenticated
 
   - id: players.open_picker
@@ -327,6 +358,42 @@ actions:
     source: player.picker
     destination: system.add_confirmed_participant_with_audit
     permission: participant_manager
+
+  - id: players.save_from_public_profile
+    label: Добавить в Мои игроки
+    source: player.public_profile
+    destination: system.save_player_to_directory
+    permission: authenticated
+
+  - id: players.remove_from_public_profile
+    label: Удалить из Моих игроков
+    source: player.public_profile
+    destination: system.remove_saved_player_confirmation
+    permission: saved_player_list_owner
+
+  - id: players.invite_from_public_profile
+    label: Пригласить в событие
+    source: player.public_profile
+    destination: system.event_picker_for_invitation
+    permission: entity_inviter
+
+  - id: player.open_shared_event
+    label: Открыть общее событие
+    source: player.public_profile
+    destination: dynamic.entity_details
+    permission: authenticated
+
+  - id: player.share_profile
+    label: Поделиться профилем
+    source: player.public_profile
+    destination: system.share_sheet
+    permission: public
+
+  - id: player.report_profile
+    label: Пожаловаться
+    source: player.public_profile
+    destination: system.report_profile
+    permission: authenticated
 
   # Participation actions shared by entities
   - id: entity.join
@@ -587,6 +654,51 @@ actions:
     destination: tour.manage
     permission: entity_manager
 
+  # Public trainer profile
+  - id: trainer.open_training
+    label: Открыть тренировку
+    source: trainer.public_profile
+    destination: training.details
+    permission: public
+
+  - id: trainer.open_schedule
+    label: Посмотреть расписание
+    source: trainer.public_profile
+    destination: play.main
+    context: {category: trainings, trainerId: selected_trainer}
+    permission: public
+
+  - id: trainer.open_tour
+    label: Открыть тур
+    source: trainer.public_profile
+    destination: tour.details
+    permission: public
+
+  - id: trainer.open_club
+    label: Открыть клуб
+    source: trainer.public_profile
+    destination: club.details
+    permission: public
+
+  - id: trainer.message
+    label: Написать
+    source: trainer.public_profile
+    destination: system.open_or_create_direct_chat
+    permission: trainer_allows_messages
+
+  - id: trainer.share
+    label: Поделиться
+    source: trainer.public_profile
+    destination: system.share_sheet
+    permission: public
+
+  - id: trainer.owner_edit_profile
+    label: Редактировать публичный профиль
+    source: trainer.public_profile
+    destination: profile.settings
+    context: {section: trainer-public-profile}
+    permission: profile_owner
+
   # Calendar
   - id: calendar.open_event
     label: Открыть событие
@@ -613,6 +725,12 @@ actions:
     permission: authenticated
 
   # Chat
+  - id: chats.open_chat
+    label: Открыть чат
+    source: chats.main
+    destination: chat.details
+    permission: conversation_member
+
   - id: chat.open_context
     label: Открыть событие
     source: chat.details

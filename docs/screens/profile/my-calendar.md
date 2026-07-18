@@ -2,7 +2,7 @@
 
 - Screen ID: `profile.calendar`
 - Route: `/profile/calendar`
-- Parent: `profile.main`
+- Parent: `home.main`
 
 ## Назначение
 
@@ -69,4 +69,4 @@
 - actor потерял доступ;
 - offline с кэшированными данными.
 
-Назад → Настройки. При deep link fallback `/profile`.
+Назад → Профиль. При deep link fallback `/`.

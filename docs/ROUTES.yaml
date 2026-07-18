@@ -137,41 +137,41 @@ routes:
   back_fallback: /profile
 - path: /profile/calendar
   screen: profile.calendar
-  navigator: profile_stack
-  parent: /profile
+  navigator: home_stack
+  parent: /
   accepts_query:
   - view
   - date
   - scope
   - actorId
-  back_fallback: /profile
+  back_fallback: /
 - path: /profile/games
   screen: profile.my_games
-  navigator: profile_stack
-  parent: /profile
+  navigator: home_stack
+  parent: /
   accepts_query:
   - mode
   - tab
   - actorId
-  back_fallback: /profile
+  back_fallback: /
 - path: /profile/competitions
   screen: profile.competitions
-  navigator: profile_stack
-  parent: /profile
+  navigator: home_stack
+  parent: /
   accepts_query:
   - mode
   - tab
   - actorId
-  back_fallback: /profile
+  back_fallback: /
 - path: /profile/trainings
   screen: profile.trainings
-  navigator: profile_stack
-  parent: /profile
+  navigator: home_stack
+  parent: /
   accepts_query:
   - mode
   - tab
   - actorId
-  back_fallback: /profile
+  back_fallback: /
 - path: /profile/players
   screen: profile.players
   navigator: profile_stack
@@ -184,13 +184,13 @@ routes:
   back_fallback: /profile
 - path: /profile/trips
   screen: profile.trips
-  navigator: profile_stack
-  parent: /profile
+  navigator: home_stack
+  parent: /
   accepts_query:
   - mode
   - tab
   - actorId
-  back_fallback: /profile
+  back_fallback: /
 - path: /profile/statistics
   screen: profile.statistics
   navigator: profile_stack
@@ -225,7 +225,7 @@ routes:
   - actorId
   - draftId
   - templateId
-  back_fallback: /play?category=games
+  back_fallback: /profile/games?mode=managing&tab=active
 - path: /games/:gameId
   screen: game.details
   navigator: entity_stack
@@ -237,7 +237,7 @@ routes:
   permission: entity_manager
   accepts_query:
   - tab
-  back_fallback: /profile/games?tab=created
+  back_fallback: /profile/games?mode=managing&tab=active
 - path: /trainings/create
   screen: training.create
   navigator: modal_stack
@@ -247,7 +247,7 @@ routes:
   - actorId
   - draftId
   - templateId
-  back_fallback: /profile/trainings
+  back_fallback: /profile/trainings?mode=managing&tab=active
 - path: /trainings/:trainingId
   screen: training.details
   navigator: entity_stack
@@ -259,7 +259,7 @@ routes:
   permission: entity_manager
   accepts_query:
   - tab
-  back_fallback: /profile/trainings?tab=created
+  back_fallback: /profile/trainings?mode=managing&tab=active
 - path: /trainings/:trainingId/attendance
   screen: training.attendance
   navigator: entity_stack
@@ -274,7 +274,7 @@ routes:
   - actorId
   - draftId
   - templateId
-  back_fallback: /profile/competitions
+  back_fallback: /profile/competitions?mode=managing&tab=active
 - path: /tournaments/:tournamentId
   screen: tournament.details
   navigator: entity_stack
@@ -294,7 +294,7 @@ routes:
   - dayId
   - round
   - mode
-  back_fallback: /profile/competitions?tab=organized
+  back_fallback: /profile/competitions?mode=managing&tab=active
 - path: /matches/:matchId
   screen: competition.match
   navigator: entity_stack
@@ -309,7 +309,7 @@ routes:
   - actorId
   - draftId
   - mode
-  back_fallback: /camps?tab=manage
+  back_fallback: /profile/trips?mode=managing&tab=active
 - path: /tours/:tourId
   screen: tour.details
   navigator: entity_stack
@@ -323,7 +323,7 @@ routes:
   permission: entity_manager
   accepts_query:
   - tab
-  back_fallback: /camps?tab=manage
+  back_fallback: /profile/trips?mode=managing&tab=active
 - path: /tours/:tourId/booking
   screen: tour.booking
   navigator: modal_stack

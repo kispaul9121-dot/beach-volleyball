@@ -1070,7 +1070,7 @@ screens:
       evidence: 'Spec существует: 48 непустых строк, 7 заголовков.'
 - id: profile.calendar
   title: Мой календарь
-  section: profile
+  section: home
   route: /profile/calendar
   spec: docs/screens/profile/my-calendar.md
   score: 90
@@ -1109,7 +1109,7 @@ screens:
       evidence: 'Spec существует: 51 непустых строк, 10 заголовков.'
 - id: profile.my_games
   title: Мои игры
-  section: profile
+  section: home
   route: /profile/games
   spec: docs/screens/profile/my-games.md
   score: 75
@@ -1148,7 +1148,7 @@ screens:
       evidence: 'Spec существует, но краткий: 24 строк, 4 заголовков.'
 - id: profile.competitions
   title: Мои турниры
-  section: profile
+  section: home
   route: /profile/competitions
   spec: docs/screens/profile/my-competitions.md
   score: 55
@@ -1186,7 +1186,7 @@ screens:
       evidence: 'Spec существует, но краткий: 17 строк, 3 заголовков.'
 - id: profile.trainings
   title: Мои тренировки
-  section: profile
+  section: home
   route: /profile/trainings
   spec: docs/screens/profile/my-trainings.md
   score: 75
@@ -1263,7 +1263,7 @@ screens:
       evidence: 'Spec существует: 104 непустых строк, 16 заголовков.'
 - id: profile.trips
   title: Мои кэмпы
-  section: profile
+  section: home
   route: /profile/trips
   spec: docs/screens/profile/my-trips.md
   score: 70

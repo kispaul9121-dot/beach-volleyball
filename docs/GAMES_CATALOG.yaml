@@ -1,93 +1,127 @@
 version: 1
 scope: games_catalog
 source_of_truth_for:
-  - Игры bottom tab
-  - catalog categories and ordering
-  - followed organizers and saved players
-  - empty-state recovery
-
+- Игры bottom tab
+- catalog categories and ordering
+- followed organizers and saved players
+- empty-state recovery
 bottom_tab:
   screen_id: play.main
   route: /play
   title: Игры
-  primary_tabs: [all, participating, managing]
-  category_chips: [games, trainings, tournaments]
+  category_chips:
+  - games
+  - trainings
+  - tournaments
   default_sort: starts_at_ascending
   sorting_rule: nearest_upcoming_first_then_later_dates
-
+  mode: discovery_only
+  capabilities:
+  - browse
+  - search
+  - filter
+  - open_details
+  - start_join_flow
 categories:
   games:
     title: Игры
     sources:
-      - public_open_games_from_any_player
-      - followed_organizers
-      - saved_players
+    - public_open_games_from_any_player
+    - followed_organizers
+    - saved_players
     rules:
-      - public games are discoverable even when creator is not followed
-      - followed and saved sources improve relevance but do not hide the open public catalog
+    - public games are discoverable even when creator is not followed
+    - followed and saved sources improve relevance but do not hide the open public catalog
   trainings:
     title: Тренировки
     sources:
-      - public_trainings_from_private_trainers
-      - public_trainings_from_organizations
+    - public_trainings_from_private_trainers
+    - public_trainings_from_organizations
     rules:
-      - only whole public trainings appear in the catalog
-      - private trainings remain accessible only through participation or invitation
+    - only whole public trainings appear in the catalog
+    - private trainings remain accessible only through participation or invitation
   tournaments:
     title: Турниры
-    mode_chips: [all, classic, king_of_the_beach, seasonal]
+    mode_chips:
+    - all
+    - classic
+    - king_of_the_beach
+    - seasonal
     mode_labels:
       all: Все
       classic: Классика
       king_of_the_beach: Король пляжа
       seasonal: Сезонные
     rules:
-      - seasonal is a tournament mode and badge, not a separate entity
-      - every list is ordered from nearest date to latest date
-
+    - seasonal is a tournament mode and badge, not a separate entity
+    - every list is ordered from nearest date to latest date
 following:
   organizer_follow:
     owner: player_profile
     target: organization_actor
-    selectable_categories: [games, trainings, tournaments, camps]
+    selectable_categories:
+    - games
+    - trainings
+    - tournaments
+    - camps
     effects:
-      - prioritize matching public publications in catalogs
-      - allow notification preferences per category
+    - prioritize matching public publications in catalogs
+    - allow notification preferences per category
     forbidden_effects:
-      - automatic participation
-      - access to private events
+    - automatic participation
+    - access to private events
   saved_players:
     source: docs/PLAYER_DIRECTORY.yaml
     effects:
-      - prioritize public games created by saved players
+    - prioritize public games created by saved players
     mutual_friendship_required: false
-
 search:
-  entities: [game, training, tournament, organization, venue, player]
-  result_groups: [games, trainings, tournaments, organizers, venues, players]
+  entities:
+  - game
+  - training
+  - tournament
+  - organization
+  - venue
+  - player
+  result_groups:
+  - games
+  - trainings
+  - tournaments
+  - organizers
+  - venues
+  - players
   organizer_search_entry: empty_state_or_search_scope
   player_search_entry: empty_state_or_saved_players
-
 empty_states:
   all:
     title: Пока нет подходящих игр
     actions:
-      - id: games.find_organizers
-        label: Добавить организацию
-      - id: games.find_players
-        label: Добавить игроков
+    - id: games.find_organizers
+      label: Добавить организацию
+    - id: games.find_players
+      label: Добавить игроков
     rules:
-      - actions open search immediately rather than an explanatory dead-end screen
-      - show nearby public suggestions when available
-  participating:
-    title: Вы пока нигде не участвуете
-    primary_action: open_all
-  managing:
-    title: Вы ещё ничего не создали
-    primary_action: open_create_menu
-
+    - actions open search immediately rather than an explanatory dead-end screen
+    - show nearby public suggestions when available
 card:
-  required_fields: [type, title, starts_at, venue, creator, price_or_free, capacity, free_places, relationship_status]
+  required_fields:
+  - type
+  - title
+  - starts_at
+  - venue
+  - creator
+  - price_or_free
+  - capacity
+  - free_places
+  - relationship_status
   date_is_prominent: true
-  capacity_examples: [8 из 12, Осталось 4 места]
+  capacity_examples:
+  - 8 из 12
+  - Осталось 4 места
   primary_action_count: 1
+personal_activity:
+  location: home.main
+  contract: docs/PROFILE_ACTIVITY.yaml
+  catalog_tabs_forbidden:
+  - participating
+  - managing

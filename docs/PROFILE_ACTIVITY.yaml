@@ -1,0 +1,157 @@
+version: 1
+scope: profile_activity
+source_of_truth_for:
+- personal participation and management entry points
+- two-tab personal activity lists
+- post-join Profile tab feedback
+- discovery-only boundaries for Games and Camps
+catalog_boundaries:
+  games:
+    screen: play.main
+    route: /play
+    mode: discovery_only
+    allows:
+    - browse
+    - search
+    - filter
+    - open_details
+    - start_join_flow
+    forbids:
+    - participating_tab
+    - managing_tab
+    - personal_archive
+    - management_dashboard
+  camps:
+    screen: camps.main
+    route: /camps
+    mode: discovery_only
+    allows:
+    - browse
+    - search
+    - filter
+    - open_details
+    - start_join_flow
+    forbids:
+    - participating_tab
+    - managing_tab
+    - personal_archive
+    - management_dashboard
+profile_root:
+  screen: home.main
+  route: /
+  activity_switch:
+    values:
+    - participating
+    - managing
+    labels:
+      participating: Участвую
+      managing: Управляю
+    default_by_actor:
+      player: participating
+      trainer: managing
+      organization: managing
+    persist_per_actor: true
+  participating_sections:
+  - games
+  - trainings
+  - tournaments
+  - camps
+  managing_sections:
+  - games
+  - trainings
+  - tournaments
+  - camps
+  preview_rule: show_nearest_items_and_required_actions_then_open_full_list
+full_lists:
+  games:
+    screen: profile.my_games
+    route: /profile/games
+    participating_tabs:
+    - upcoming
+    - past
+    participating_labels:
+    - Предстоящие
+    - Прошедшие
+    managing_tabs:
+    - active
+    - completed
+    managing_labels:
+    - Активные
+    - Завершённые
+  trainings:
+    screen: profile.trainings
+    route: /profile/trainings
+    participating_tabs:
+    - booked
+    - past
+    participating_labels:
+    - Записан
+    - Прошедшие
+    managing_tabs:
+    - active
+    - completed
+    managing_labels:
+    - Активные
+    - Завершённые
+  tournaments:
+    screen: profile.competitions
+    route: /profile/competitions
+    participating_tabs:
+    - registered
+    - past
+    participating_labels:
+    - Заявлен
+    - Прошедшие
+    managing_tabs:
+    - active
+    - completed
+    managing_labels:
+    - Активные
+    - Завершённые
+  camps:
+    screen: profile.trips
+    route: /profile/trips
+    participating_tabs:
+    - booked
+    - past
+    participating_labels:
+    - Записан
+    - Прошедшие
+    managing_tabs:
+    - active
+    - completed
+    managing_labels:
+    - Активные
+    - Завершённые
+join_flow:
+  product_status: definition_pending
+  entry_action_id: entity.start_join_flow
+  entry_label: Вступить
+  resolver: system.resolve_join_flow
+  possible_future_outcomes:
+  - free_immediate_confirmation
+  - paid_checkout
+  - organizer_approval
+  - waitlist
+  - invitation_only
+  rule: do_not_expose_a_final_join_mechanism_until_the_product_decision_is_approved
+profile_tab_feedback:
+  trigger: profile_activity_item_created_or_updated_after_join_flow
+  bottom_tab_id: home
+  duration_ms: 900
+  repetitions: 1
+  confirmed:
+    semantic_color: status.success
+    badge: check
+    message: Игра добавлена в Профиль
+  pending_or_payment_required:
+    semantic_color: status.info
+    badge: dot
+    message: Статус вступления сохранён в Профиле
+  rules:
+  - never_loop
+  - never_move_or_resize_the_tab_bar
+  - do_not_use_color_as_the_only_signal
+  - respect_reduce_motion
+  - feedback_does_not_mean_confirmed_when_status_is_pending
+  reduce_motion_fallback: static_badge_and_accessibility_announcement

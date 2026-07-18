@@ -114,7 +114,7 @@ screens:
   route: /
   section: home
   spec: docs/screens/home/main.md
-  purpose: Профильная страница активного actor с личной информацией, тренерами, ближайшими событиями и задачами.
+  purpose: Живая профильная страница active actor с переключателем Участвую / Управляю и входами во всю личную активность.
   variants:
   - player
   - trainer
@@ -125,7 +125,7 @@ screens:
   route: /play
   section: play
   spec: docs/screens/play/main.md
-  purpose: Поиск, участие и управление играми, публичными тренировками и турнирами с выдачей по ближайшей дате.
+  purpose: Публичный подбор, поиск, фильтрация и начало вступления в игры, тренировки и турниры без личных вкладок.
   variants:
   - player
   - trainer
@@ -154,7 +154,7 @@ screens:
   route: /camps
   section: camps
   spec: docs/screens/camps/main.md
-  purpose: Каталог, участие и управление кэмпами, лагерями и совместными игровыми поездками.
+  purpose: Публичный подбор, поиск, фильтрация и начало вступления в кэмпы без личных вкладок.
   variants:
   - player
   - trainer
@@ -220,7 +220,7 @@ screens:
   route: /profile
   section: profile
   spec: docs/screens/profile/main.md
-  purpose: Список настроек аккаунта, профилей, архивов, платежей и служебных разделов.
+  purpose: Настройки аккаунта, профилей, платежей, безопасности и служебных параметров без личных архивов.
   variants:
   - player
   - trainer
@@ -248,21 +248,21 @@ screens:
   route: /profile/games
   section: profile
   spec: docs/screens/profile/my-games.md
-  purpose: Участие и управление одноразовыми играми.
+  purpose: 'Личный список игр из Профиля: Предстоящие / Прошедшие или Активные / Завершённые.'
   back_fallback: /profile
 - id: profile.competitions
   title: Мои турниры
   route: /profile/competitions
   section: profile
   spec: docs/screens/profile/my-competitions.md
-  purpose: Участие, организация, черновики и завершённые турниры, включая сезонные.
+  purpose: 'Личный список турниров из Профиля: Заявлен / Прошедшие или Активные / Завершённые.'
   back_fallback: /profile
 - id: profile.trainings
   title: Мои тренировки
   route: /profile/trainings
   section: profile
   spec: docs/screens/profile/my-trainings.md
-  purpose: Записи игрока и управляемые тренировки тренера или организации.
+  purpose: 'Личный список тренировок из Профиля: Записан / Прошедшие или Активные / Завершённые.'
   back_fallback: /profile
 - id: profile.players
   title: Мои игроки
@@ -280,7 +280,7 @@ screens:
   route: /profile/trips
   section: profile
   spec: docs/screens/profile/my-trips.md
-  purpose: Участие и организация кэмпов, лагерей и совместных поездок.
+  purpose: 'Мои кэмпы: Записан / Прошедшие или управляемые Активные / Завершённые.'
   back_fallback: /profile
 - id: profile.statistics
   title: Статистика

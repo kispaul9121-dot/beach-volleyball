@@ -33,10 +33,10 @@ criteria:
   name: Спецификация
 summary:
   screens: 53
-  ready: 30
-  partial: 23
-  weak: 0
-  average_score: 86
+  ready: 28
+  partial: 24
+  weak: 1
+  average_score: 85
   by_criterion:
     identity_route:
       ready: 53
@@ -44,33 +44,33 @@ summary:
       ready: 40
       partial: 13
     purpose_data:
-      ready: 38
-      partial: 15
-    blocks:
-      partial: 20
-      ready: 33
-    actions:
-      ready: 37
-      partial: 15
-      missing: 1
-    states:
-      partial: 30
-      ready: 9
-      missing: 14
-    role_variants:
-      na: 13
-      ready: 35
-      partial: 5
-    navigation:
       ready: 40
       partial: 13
+    blocks:
+      partial: 22
+      ready: 31
+    actions:
+      ready: 35
+      partial: 17
+      missing: 1
+    states:
+      partial: 29
+      ready: 9
+      missing: 15
+    role_variants:
+      na: 13
+      ready: 33
+      partial: 7
+    navigation:
+      ready: 39
+      partial: 14
     integrations:
       na: 4
-      ready: 46
-      partial: 3
+      ready: 45
+      partial: 4
     spec:
-      ready: 50
-      partial: 3
+      ready: 46
+      partial: 7
 screens:
 - id: auth.welcome
   title: Добро пожаловать
@@ -587,10 +587,10 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: partial
-      evidence: 'Структура описана частично; пунктов: 57.'
+      evidence: 'Структура описана частично; пунктов: 39.'
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: home.open_managed_entity, home.open_participating_entity, profile.open_trainer_search, profile.open_linked_trainer…;
+      evidence: 'ACTIONS.yaml: nav.open_profile_calendar, nav.open_profile_my_games, nav.open_profile_competitions, nav.open_profile_trainings…;
         действия описаны в spec.'
     states:
       status: partial
@@ -603,10 +603,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: calendar, chat, notifications, payments.'
+      evidence: 'Связи: chat, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 78 непустых строк, 9 заголовков.'
+      evidence: 'Spec существует: 70 непустых строк, 10 заголовков.'
 - id: play.main
   title: Игры
   section: play
@@ -626,7 +626,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 50 пунктов.
+      evidence: Есть структурный раздел и 31 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: games.change_tab, games.change_category, games.change_tournament_mode, games.open_search…;
@@ -642,10 +642,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: chat, maps, notifications, payments.'
+      evidence: 'Связи: deep_link, maps, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 96 непустых строк, 16 заголовков.'
+      evidence: 'Spec существует: 63 непустых строк, 10 заголовков.'
 - id: chats.main
   title: Чаты
   section: chats
@@ -727,7 +727,7 @@ screens:
   section: camps
   route: /camps
   spec: docs/screens/camps/main.md
-  score: 90
+  score: 95
   status: готово
   criteria:
     identity_route:
@@ -737,11 +737,11 @@ screens:
       status: ready
       evidence: variants=player, trainer, organization.
     purpose_data:
-      status: partial
-      evidence: Purpose задан, но источник данных описан неявно.
+      status: ready
+      evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 15 пунктов.
+      evidence: Есть структурный раздел и 14 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: camps.change_tab, camps.open_search, camps.open_camp, camps.create; действия описаны в spec.'
@@ -756,10 +756,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: chat, maps.'
+      evidence: 'Связи: maps, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 38 непустых строк, 9 заголовков.'
+      evidence: 'Spec существует: 37 непустых строк, 9 заголовков.'
 - id: club.details
   title: Клуб
   section: discovery
@@ -996,7 +996,7 @@ screens:
   section: profile
   route: /profile
   spec: docs/screens/profile/main.md
-  score: 90
+  score: 95
   status: готово
   criteria:
     identity_route:
@@ -1006,14 +1006,14 @@ screens:
       status: ready
       evidence: variants=player, trainer, organization.
     purpose_data:
-      status: partial
-      evidence: Purpose задан, но источник данных описан неявно.
+      status: ready
+      evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 24 пунктов.
+      evidence: Есть структурный раздел и 22 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: nav.open_profile_calendar, nav.open_profile_my_games, nav.open_profile_competitions, nav.open_profile_trainings…;
+      evidence: 'ACTIONS.yaml: nav.open_profile_players, nav.open_profile_statistics, nav.open_profile_payments, nav.open_profile_settings;
         действия описаны в spec.'
     states:
       status: partial
@@ -1026,10 +1026,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: audit, calendar, chat, notifications.'
+      evidence: 'Связи: audit, chat, notifications.'
     spec:
       status: ready
-      evidence: 'Spec существует: 40 непустых строк, 8 заголовков.'
+      evidence: 'Spec существует: 36 непустых строк, 7 заголовков.'
 - id: profile.actor_profiles
   title: Мои профили
   section: profile
@@ -1112,85 +1112,84 @@ screens:
   section: profile
   route: /profile/games
   spec: docs/screens/profile/my-games.md
-  score: 90
-  status: готово
+  score: 75
+  status: частично
   criteria:
     identity_route:
       status: ready
       evidence: ID, route и запись ROUTES.yaml совпадают.
     actors_permissions:
       status: partial
-      evidence: 'роли упомянуты в spec: manager, organizer, participant, но actor-правила не формализованы.'
+      evidence: 'роли упомянуты в spec: manager, organizer, но actor-правила не формализованы.'
     purpose_data:
       status: ready
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
-      status: ready
-      evidence: Есть структурный раздел и 51 пунктов.
+      status: partial
+      evidence: 'Структура описана частично; пунктов: 8.'
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: my_games.create, my_games.open_participating_game, my_games.manage_created_game, my_games.continue_draft;
         действия описаны в spec.'
     states:
       status: partial
-      evidence: 'Описана только часть состояний: empty, error, offline.'
+      evidence: 'Описана только часть состояний: empty.'
     role_variants:
-      status: ready
-      evidence: роли в spec=manager, organizer, participant.
+      status: partial
+      evidence: роли в spec=manager, organizer; различия описаны не полностью.
     navigation:
       status: ready
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: calendar, chat, notifications, payments.'
+      evidence: 'Связи: chat, payments.'
     spec:
-      status: ready
-      evidence: 'Spec существует: 69 непустых строк, 9 заголовков.'
+      status: partial
+      evidence: 'Spec существует, но краткий: 24 строк, 4 заголовков.'
 - id: profile.competitions
   title: Мои турниры
   section: profile
   route: /profile/competitions
   spec: docs/screens/profile/my-competitions.md
-  score: 80
-  status: частично
+  score: 55
+  status: слабо
   criteria:
     identity_route:
       status: ready
       evidence: ID, route и запись ROUTES.yaml совпадают.
     actors_permissions:
       status: partial
-      evidence: 'роли упомянуты в spec: manager, organizer, participant, но actor-правила не формализованы.'
+      evidence: 'роли упомянуты в spec: manager, но actor-правила не формализованы.'
     purpose_data:
       status: ready
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
-      status: ready
-      evidence: Есть структурный раздел и 53 пунктов.
+      status: partial
+      evidence: 'Структура описана частично; пунктов: 4.'
     actions:
-      status: ready
-      evidence: 'ACTIONS.yaml: competitions.create_tournament, competitions.open_entity, competitions.manage_entity; действия
-        описаны в spec.'
+      status: partial
+      evidence: Есть 3 action(s), но UX-действия в spec описаны слабо.
     states:
       status: missing
       evidence: Нет loading, empty, error, offline и permission states.
     role_variants:
-      status: ready
-      evidence: роли в spec=manager, organizer, participant.
+      status: partial
+      evidence: роли в spec=manager; различия описаны не полностью.
     navigation:
       status: partial
       evidence: Навигация определена только в реестре или только в spec.
     integrations:
-      status: ready
-      evidence: 'Связи: chat, notifications, payments.'
+      status: partial
+      evidence: 'Указана одна связь: payments.'
     spec:
-      status: ready
-      evidence: 'Spec существует: 70 непустых строк, 8 заголовков.'
+      status: partial
+      evidence: 'Spec существует, но краткий: 17 строк, 3 заголовков.'
 - id: profile.trainings
   title: Мои тренировки
   section: profile
   route: /profile/trainings
   spec: docs/screens/profile/my-trainings.md
-  score: 80
+  score: 75
   status: частично
   criteria:
     identity_route:
@@ -1198,22 +1197,22 @@ screens:
       evidence: ID, route и запись ROUTES.yaml совпадают.
     actors_permissions:
       status: partial
-      evidence: 'роли упомянуты в spec: manager, organization, player, trainer, но actor-правила не формализованы.'
+      evidence: 'роли упомянуты в spec: manager, organization, trainer, но actor-правила не формализованы.'
     purpose_data:
       status: ready
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
-      status: partial
-      evidence: 'Структура описана частично; пунктов: 52.'
+      status: ready
+      evidence: Есть структурный раздел и 4 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: trainings.create, trainings.open, trainings.manage; действия описаны в spec.'
     states:
-      status: partial
-      evidence: 'Описана только часть состояний: empty.'
+      status: missing
+      evidence: Нет loading, empty, error, offline и permission states.
     role_variants:
       status: ready
-      evidence: роли в spec=manager, organization, player, trainer.
+      evidence: роли в spec=manager, organization, trainer.
     navigation:
       status: partial
       evidence: Навигация определена только в реестре или только в spec.
@@ -1221,8 +1220,8 @@ screens:
       status: ready
       evidence: 'Связи: chat, payments.'
     spec:
-      status: ready
-      evidence: 'Spec существует: 73 непустых строк, 9 заголовков.'
+      status: partial
+      evidence: 'Spec существует, но краткий: 18 строк, 4 заголовков.'
 - id: profile.players
   title: Мои игроки
   section: profile
@@ -1267,39 +1266,39 @@ screens:
   section: profile
   route: /profile/trips
   spec: docs/screens/profile/my-trips.md
-  score: 90
-  status: готово
+  score: 70
+  status: частично
   criteria:
     identity_route:
       status: ready
       evidence: ID, route и запись ROUTES.yaml совпадают.
     actors_permissions:
       status: partial
-      evidence: 'роли упомянуты в spec: manager, organization, organizer, participant, trainer, но actor-правила не формализованы.'
+      evidence: 'роли упомянуты в spec: manager, organization, player, trainer, но actor-правила не формализованы.'
     purpose_data:
       status: ready
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
-      status: ready
-      evidence: Есть структурный раздел и 42 пунктов.
+      status: partial
+      evidence: 'Структура описана частично; пунктов: 8.'
     actions:
-      status: ready
-      evidence: 'ACTIONS.yaml: trips.create; действия описаны в spec.'
+      status: partial
+      evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
     states:
       status: partial
-      evidence: 'Описана только часть состояний: empty, error.'
+      evidence: 'Описана только часть состояний: empty.'
     role_variants:
       status: ready
-      evidence: роли в spec=manager, organization, organizer, participant, trainer.
+      evidence: роли в spec=manager, organization, player, trainer.
     navigation:
-      status: ready
-      evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
+      status: partial
+      evidence: Навигация определена только в реестре или только в spec.
     integrations:
       status: ready
       evidence: 'Связи: chat, payments.'
     spec:
-      status: ready
-      evidence: 'Spec существует: 62 непустых строк, 11 заголовков.'
+      status: partial
+      evidence: 'Spec существует, но краткий: 22 строк, 4 заголовков.'
 - id: profile.statistics
   title: Статистика
   section: profile

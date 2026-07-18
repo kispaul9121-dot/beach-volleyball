@@ -82,12 +82,15 @@ routes:
   screen: home.main
   navigator: tab
   access: authenticated_onboarded
+  accepts_query:
+  - activityMode
+  - highlightEntityType
+  - highlightEntityId
 - path: /play
   screen: play.main
   navigator: tab
   access: authenticated_onboarded
   accepts_query:
-  - tab
   - category
   - tournamentMode
   - date
@@ -102,7 +105,6 @@ routes:
   - playerId
   - trainerId
   - followed
-  - actorId
 - path: /chats
   screen: chats.main
   navigator: tab
@@ -116,14 +118,12 @@ routes:
   navigator: tab
   access: public_preview_or_authenticated
   accepts_query:
-  - tab
   - type
   - date
   - sort
   - destination
   - level
   - price
-  - actorId
 - path: /profile
   screen: profile.main
   navigator: tab
@@ -150,8 +150,8 @@ routes:
   navigator: profile_stack
   parent: /profile
   accepts_query:
+  - mode
   - tab
-  - status
   - actorId
   back_fallback: /profile
 - path: /profile/competitions
@@ -159,9 +159,8 @@ routes:
   navigator: profile_stack
   parent: /profile
   accepts_query:
+  - mode
   - tab
-  - type
-  - status
   - actorId
   back_fallback: /profile
 - path: /profile/trainings
@@ -169,8 +168,8 @@ routes:
   navigator: profile_stack
   parent: /profile
   accepts_query:
+  - mode
   - tab
-  - status
   - actorId
   back_fallback: /profile
 - path: /profile/players
@@ -188,8 +187,8 @@ routes:
   navigator: profile_stack
   parent: /profile
   accepts_query:
+  - mode
   - tab
-  - status
   - actorId
   back_fallback: /profile
 - path: /profile/statistics

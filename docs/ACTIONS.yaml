@@ -102,22 +102,22 @@ actions:
   permission: authenticated
 - id: nav.open_profile_calendar
   label: Мой календарь
-  source: profile.main
+  source: home.main
   destination: profile.calendar
   permission: authenticated
 - id: nav.open_profile_my_games
   label: Мои игры
-  source: profile.main
+  source: home.main
   destination: profile.my_games
   permission: authenticated
 - id: nav.open_profile_competitions
-  label: Мои турниры и сезоны
-  source: profile.main
+  label: Мои турниры
+  source: home.main
   destination: profile.competitions
   permission: authenticated
 - id: nav.open_profile_trainings
   label: Мои тренировки
-  source: profile.main
+  source: home.main
   destination: profile.trainings
   permission: authenticated
 - id: nav.open_profile_players
@@ -126,8 +126,8 @@ actions:
   destination: profile.players
   permission: authenticated
 - id: nav.open_profile_trips
-  label: Мои туры и поездки
-  source: profile.main
+  label: Мои кэмпы
+  source: home.main
   destination: profile.trips
   permission: authenticated
 - id: nav.open_profile_statistics
@@ -144,6 +144,11 @@ actions:
   label: Аккаунт и приложение
   source: profile.main
   destination: profile.settings
+  permission: authenticated
+- id: home.change_activity_mode
+  label: Участвую / Управляю
+  source: home.main
+  destination: system.local_state
   permission: authenticated
 - id: home.open_managed_entity
   label: Управлять
@@ -166,7 +171,7 @@ actions:
   destination: game.create
   permission: authenticated
   context:
-    returnTo: /profile/games?tab=created
+    returnTo: /profile/games?mode=managing&tab=active
     actorId: active_actor
 - id: create.choose_actor
   label: Создать как
@@ -199,7 +204,7 @@ actions:
   destination: game.create
   permission: draft_owner
   context:
-    returnTo: /profile/games?tab=created
+    returnTo: /profile/games?mode=managing&tab=active
     actorId: draft_actor
 - id: players.add
   label: Добавить игрока
@@ -287,20 +292,11 @@ actions:
   source: player.public_profile
   destination: system.report_profile
   permission: authenticated
-- id: entity.join
-  label: Присоединиться
+- id: entity.start_join_flow
+  label: Вступить
   source: dynamic.entity_details
-  destination: system.create_participation
-  permission: authenticated
-- id: entity.request_to_join
-  label: Подать заявку
-  source: dynamic.entity_details
-  destination: system.submit_participation_request
-  permission: authenticated
-- id: entity.join_waitlist
-  label: В лист ожидания
-  source: dynamic.entity_details
-  destination: system.join_waitlist
+  destination: system.resolve_join_flow
+  success: system.profile_activity_feedback
   permission: authenticated
 - id: entity.cancel_participation
   label: Отменить участие
@@ -371,7 +367,7 @@ actions:
   permission: authenticated
   context:
     actorId: active_actor
-    returnTo: /profile/competitions?tab=organized&type=tournament
+    returnTo: /profile/competitions?mode=managing&tab=active
 - id: competitions.open_entity
   label: Открыть
   source: profile.competitions
@@ -429,7 +425,7 @@ actions:
   permission: trainer_or_organization
   context:
     actorId: active_actor
-    returnTo: /profile/trainings?tab=created
+    returnTo: /profile/trainings?mode=managing&tab=active
 - id: trainings.open
   label: Открыть тренировку
   source: profile.trainings
@@ -451,13 +447,13 @@ actions:
   destination: system.update_attendance
   permission: training_manager
 - id: trips.create
-  label: Создать тур или поездку
-  source: profile.trips
+  label: Создать кэмп
+  source: home.main
   destination: tour.create
   permission: authenticated
   context:
     actorId: active_actor
-    returnTo: /profile/trips?tab=organized
+    returnTo: /?activityMode=managing
 - id: tour.choose_mode
   label: Формат тура
   source: tour.create

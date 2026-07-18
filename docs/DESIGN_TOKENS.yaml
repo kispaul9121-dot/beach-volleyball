@@ -298,6 +298,17 @@ motion:
     required: true
     transform_fallback: crossfade_or_none
     infinite_decorative_loops_forbidden: true
+  one_shot_feedback:
+    profile_activity_confirmation:
+      component: AppTabBar
+      tab_id: home
+      duration_ms: 900
+      repetitions: 1
+      confirmed_semantic_color: status.success
+      pending_semantic_color: status.info
+      non_color_signal: check_or_dot_badge_and_accessibility_announcement
+      reduce_motion_fallback: static_badge_then_fade
+      layout_change_forbidden: true
 responsive:
   required_test_widths:
   - 320

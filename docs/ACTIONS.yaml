@@ -155,14 +155,6 @@ actions:
   source: profile.my_games
   destination: game.details
   permission: game_participant
-- id: my_games.continue_draft
-  label: Продолжить создание
-  source: profile.my_games
-  destination: game.create
-  permission: draft_owner
-  context:
-    returnTo: /manage?tab=active&type=games
-    actorId: draft_actor
 - id: players.add
   label: Добавить игрока
   source: profile.players

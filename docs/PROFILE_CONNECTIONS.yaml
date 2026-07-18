@@ -25,7 +25,7 @@ placement:
   layout: single_horizontal_connection_rail
   full_lists_are_not_rendered_on_home: true
 player_variant:
-  rows:
+  cards:
     trainers:
       title: Мои тренеры
       preview_items: 2
@@ -73,10 +73,6 @@ player_variant:
         followed: true
       source_of_truth: docs/GAMES_CATALOG.yaml
 trainer_variant:
-  default_rows:
-  - new_player_requests
-  - my_players
-  - followed_organizations
   new_player_requests:
     title: Новые игроки
     badge_field: pending_trainer_requests_count
@@ -84,12 +80,16 @@ trainer_variant:
     destination_context:
       tab: new
   note: personal linked trainers remain part of the player's profile context, not the trainer actor dashboard
+  default_cards:
+  - new_player_requests
+  - my_players
+  - followed_organizations
 organization_variant:
-  default_rows:
+  note: detailed organization administration remains outside this compact block
+  default_cards:
   - employees
   - my_players
   - followed_organizations
-  note: detailed organization administration remains outside this compact block
 row_ui:
   presentation: three_compact_cards_in_one_horizontal_rail
   card_min_width: 112
@@ -102,14 +102,12 @@ row_ui:
   full_width_stacked_rows_forbidden: true
   nested_primary_buttons_forbidden: true
 rules:
-- show all three rows inside one section rather than three long home sections
 - counts must be textual and cannot rely on color alone
 - pending trainer requests must be distinguishable from active trainers
 - saved players do not imply mutual friendship or access to private data
 - organization following only affects discovery and notification preferences
 - organization following never creates participation or private-event access
 - empty state is local to its row and does not hide the other rows
-- the block stays above Участвую / Управляю because it describes relationships, not event activity
 - render one compact rail rather than three vertical home sections
 - the rail must not push the upcoming timeline below the first meaningful viewport
 states:

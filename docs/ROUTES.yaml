@@ -197,14 +197,15 @@ routes:
   back_fallback: /activity
 - path: /profile/players
   screen: profile.players
-  navigator: profile_stack
-  parent: /profile
+  navigator: home_stack
+  parent: /
   accepts_query:
+  - tab
   - mode
   - entityType
   - entityId
   - actorId
-  back_fallback: /profile
+  back_fallback: /
 - path: /profile/trips
   screen: profile.trips
   navigator: home_stack

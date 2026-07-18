@@ -1206,7 +1206,7 @@ screens:
       evidence: Есть структурный раздел и 4 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: my_games.open_participating_game, my_games.continue_draft; действия описаны в spec.'
+      evidence: 'ACTIONS.yaml: my_games.open_participating_game; действия описаны в spec.'
     states:
       status: missing
       evidence: Нет loading, empty, error, offline и permission states.
@@ -1300,7 +1300,7 @@ screens:
       evidence: 'Spec существует, но краткий: 13 строк, 3 заголовков.'
 - id: profile.players
   title: Мои игроки
-  section: profile
+  section: home
   route: /profile/players
   spec: docs/screens/profile/my-players.md
   score: 100
@@ -1336,7 +1336,7 @@ screens:
       evidence: 'Связи: chat, deep_link, maps, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 104 непустых строк, 16 заголовков.'
+      evidence: 'Spec существует: 106 непустых строк, 17 заголовков.'
 - id: profile.trips
   title: Мои кэмпы
   section: home

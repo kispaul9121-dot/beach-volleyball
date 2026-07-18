@@ -290,14 +290,14 @@ screens:
 - id: profile.players
   title: Мои игроки
   route: /profile/players
-  section: profile
+  section: home
   spec: docs/screens/profile/my-players.md
-  purpose: Односторонний список игроков активного профиля и быстрый выбор для приглашений.
+  purpose: Сохранённые игроки active actor и новые запросы тренеру; открывается из компактной строки связей в Профиле.
   variants:
   - player
   - trainer
   - organization
-  back_fallback: /profile
+  back_fallback: /
 - id: profile.trips
   title: Мои кэмпы
   route: /profile/trips

@@ -1244,7 +1244,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 42 пунктов.
+      evidence: Есть структурный раздел и 60 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: players.add, players.remove, players.open_public_profile; действия описаны в spec.'
@@ -1259,10 +1259,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: chat, deep_link, notifications, payments.'
+      evidence: 'Связи: chat, deep_link, maps, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 74 непустых строк, 13 заголовков.'
+      evidence: 'Spec существует: 104 непустых строк, 16 заголовков.'
 - id: profile.trips
   title: Мои туры и поездки
   section: profile

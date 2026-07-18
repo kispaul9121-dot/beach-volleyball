@@ -47,15 +47,15 @@ summary:
       ready: 38
       partial: 15
     blocks:
-      partial: 19
-      ready: 34
+      partial: 20
+      ready: 33
     actions:
       ready: 37
       partial: 15
       missing: 1
     states:
-      partial: 31
-      ready: 8
+      partial: 30
+      ready: 9
       missing: 14
     role_variants:
       na: 13
@@ -1433,14 +1433,14 @@ screens:
       status: ready
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
-      status: ready
-      evidence: Есть структурный раздел и 50 пунктов.
+      status: partial
+      evidence: 'Структура описана частично; пунктов: 43.'
     actions:
       status: partial
       evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
     states:
-      status: partial
-      evidence: 'Описана только часть состояний: loading, offline.'
+      status: ready
+      evidence: 'Описаны состояния: loading, empty, error, offline.'
     role_variants:
       status: ready
       evidence: variants=guest, participant, organizer.
@@ -1449,10 +1449,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: calendar, chat, notifications, payments.'
+      evidence: 'Связи: calendar, chat, deep_link, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 69 непустых строк, 8 заголовков.'
+      evidence: 'Spec существует: 57 непустых строк, 7 заголовков.'
 - id: game.create
   title: Создание игры
   section: shared

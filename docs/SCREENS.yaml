@@ -209,6 +209,7 @@ screens:
     section: clubs
     spec: docs/screens/clubs/trainer-details.md
     purpose: Публичный профиль, расписание и отзывы тренера.
+    variants: [guest, authenticated_player, owner, organization_manager]
     back_fallback: /clubs?category=trainers
 
   - id: profile.main

@@ -297,6 +297,9 @@ actions:
     source: profile.my_games
     destination: game.create
     permission: draft_owner
+    context:
+      returnTo: /profile/games?tab=created
+      actorId: draft_actor
 
   # Player directory and event invitations
   - id: players.add
@@ -322,6 +325,12 @@ actions:
     source: dynamic.entity_create_or_manage
     destination: player.picker
     permission: entity_inviter
+    context:
+      entityType: current_entity_type
+      entityId: current_entity_id_or_null
+      draftId: current_draft_id_or_null
+      actorId: active_actor
+      returnTo: current_create_or_manage_route
 
   - id: players.close_picker
     label: Закрыть выбор игроков

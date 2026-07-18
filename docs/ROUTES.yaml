@@ -101,7 +101,7 @@ routes:
     screen: play.main
     navigator: tab
     access: authenticated_onboarded
-    accepts_query: [category, managed, date, actorId]
+    accepts_query: [category, managed, date, actorId, trainerId]
 
   - path: /chats
     screen: chats.main

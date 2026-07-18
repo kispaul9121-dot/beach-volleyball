@@ -586,7 +586,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: partial
-      evidence: 'Структура описана частично; пунктов: 53.'
+      evidence: 'Структура описана частично; пунктов: 57.'
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: home.open_managed_entity, home.open_participating_entity, profile.open_trainer_search, profile.open_linked_trainer…;
@@ -605,7 +605,7 @@ screens:
       evidence: 'Связи: calendar, chat, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 73 непустых строк, 9 заголовков.'
+      evidence: 'Spec существует: 78 непустых строк, 9 заголовков.'
 - id: play.main
   title: События
   section: play

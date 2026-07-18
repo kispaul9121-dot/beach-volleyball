@@ -1,4 +1,5 @@
 version: 1
+status: approved_product_structure
 scope: profile_connections
 source_of_truth_for:
   - compact social and working relationships on home.main

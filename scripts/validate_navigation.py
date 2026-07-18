@@ -6,6 +6,8 @@ Checks:
 - screens and routes form a one-to-one mapping;
 - stack/modal parents and back fallbacks resolve to registered routes;
 - every action has a label, permission and valid source/destination;
+- action navigation context is accepted by the destination route;
+- player picker navigation always carries entity/draft context and returnTo;
 - dynamic sources, destinations and success aliases are explicitly declared;
 - destructive actions use a confirmation destination;
 - legacy navigation concepts do not return to source-of-truth documents.
@@ -13,7 +15,6 @@ Checks:
 
 from __future__ import annotations
 
-import re
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -60,6 +61,7 @@ def main() -> int:
     if not all(isinstance(value, list) for value in (screens, routes, actions)):
         raise ValueError("screens, routes and actions must be lists")
 
+    screen_ids = [str(item.get("id", "")) for item in screens if isinstance(item, dict)]
     screen_by_id = {str(item.get("id")): item for item in screens if isinstance(item, dict) and item.get("id")}
     route_by_screen: dict[str, list[dict[str, Any]]] = defaultdict(list)
     route_by_path: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -69,7 +71,7 @@ def main() -> int:
         route_by_screen[str(route.get("screen", ""))].append(route)
         route_by_path[str(route.get("path", ""))].append(route)
 
-    for value in duplicates(list(screen_by_id)):
+    for value in duplicates(screen_ids):
         errors.append(f"Duplicate screen id: {value}")
     for value in duplicates([str(route.get("path", "")) for route in routes if isinstance(route, dict)]):
         errors.append(f"Duplicate route path: {value}")
@@ -146,7 +148,7 @@ def main() -> int:
         navigator = str(route.get("navigator", ""))
         root = navigator in {"tab", "auth_stack", "onboarding_stack"} and not route.get("back_fallback")
         fallback = str(route.get("back_fallback", ""))
-        if not root and navigator not in {"tab"} and not fallback:
+        if not root and navigator != "tab" and not fallback:
             errors.append(f"Non-root route has no back_fallback: {path}")
         if fallback and not fallback.startswith("system://"):
             target = route_without_query(fallback)
@@ -193,6 +195,7 @@ def main() -> int:
         destination = str(action.get("destination", ""))
         permission = str(action.get("permission", ""))
         success = str(action.get("success", ""))
+        context = action.get("context", {}) or {}
 
         if not action_id:
             errors.append("Action without id")
@@ -200,14 +203,25 @@ def main() -> int:
             errors.append(f"Action {action_id} has no label")
         if not permission:
             errors.append(f"Action {action_id} has no permission")
+        if not isinstance(context, dict):
+            errors.append(f"Action {action_id} context must be a mapping")
+            context = {}
 
         if source not in screen_by_id and source not in pseudo_sources and not is_system(source):
             errors.append(f"Action {action_id} has undeclared source {source}")
 
         if destination in screen_by_id:
             incoming[destination].add(action_id)
-            if len(route_by_screen.get(destination, [])) != 1:
+            destination_routes = route_by_screen.get(destination, [])
+            if len(destination_routes) != 1:
                 errors.append(f"Action {action_id} points to screen without one route: {destination}")
+            elif context:
+                accepted = set(destination_routes[0].get("accepts_query", []) or [])
+                unknown = set(context) - accepted
+                if unknown:
+                    errors.append(
+                        f"Action {action_id} passes unsupported route context to {destination}: {sorted(unknown)}"
+                    )
         elif destination.startswith("dynamic."):
             if destination not in dynamic_destinations:
                 errors.append(f"Action {action_id} uses undeclared dynamic destination {destination}")
@@ -231,9 +245,15 @@ def main() -> int:
                 errors.append(f"Destructive action {action_id} must use a confirmation destination")
 
         if destination in {"game.create", "training.create", "tournament.create", "season.create", "tour.create"}:
-            context = action.get("context", {}) or {}
-            if not isinstance(context, dict) or not {"actorId", "returnTo"}.issubset(context):
+            if not {"actorId", "returnTo"}.issubset(context):
                 errors.append(f"Creation navigation {action_id} must pass actorId and returnTo")
+
+        if destination == "player.picker":
+            required = {"entityType", "actorId", "returnTo"}
+            if not required.issubset(context):
+                errors.append(f"Player picker action {action_id} is missing {sorted(required - set(context))}")
+            if not context.get("entityId") and not context.get("draftId"):
+                errors.append(f"Player picker action {action_id} must pass entityId or draftId")
 
     # Screens without a discoverable entry are warnings: they may still be direct public deep links.
     roots = {"auth.welcome"} | expected_tab_screens

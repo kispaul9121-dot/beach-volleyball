@@ -1,510 +1,503 @@
 version: 2
-
 bottom_tabs:
-  - home
-  - play
-  - chats
-  - clubs
-  - profile
-
+- home
+- play
+- chats
+- clubs
+- profile
 global_overlays:
-  - actor.switcher
-  - player.picker
-  - global.notifications
-  - system.create_menu
-  - system.search_filters
-
+- actor.switcher
+- player.picker
+- global.notifications
+- system.create_menu
+- system.search_filters
 screens:
-  # Authentication and onboarding
-  - id: auth.welcome
-    title: Добро пожаловать
-    route: /auth
-    section: auth
-    spec: docs/screens/auth/onboarding.md
-    purpose: Первый экран с входом через Google и email.
-    variants: [signed_out]
-    back_fallback: null
-
-  - id: auth.sign_in
-    title: Вход
-    route: /auth/sign-in
-    section: auth
-    spec: docs/screens/auth/onboarding.md
-    purpose: Вход по email и паролю.
-    back_fallback: /auth
-
-  - id: auth.email_registration
-    title: Регистрация по email
-    route: /auth/register
-    section: auth
-    spec: docs/screens/auth/onboarding.md
-    purpose: Создание аккаунта по email.
-    back_fallback: /auth
-
-  - id: auth.verify_email
-    title: Подтверждение email
-    route: /auth/verify
-    section: auth
-    spec: docs/screens/auth/onboarding.md
-    purpose: Подтверждение email и повторная отправка письма.
-    back_fallback: /auth
-
-  - id: auth.reset_password
-    title: Восстановление пароля
-    route: /auth/reset-password
-    section: auth
-    spec: docs/screens/auth/onboarding.md
-    purpose: Запрос и установка нового пароля.
-    back_fallback: /auth/sign-in
-
-  - id: onboarding.profile_selection
-    title: Выбор профилей
-    route: /onboarding/profiles
-    section: onboarding
-    spec: docs/screens/auth/onboarding.md
-    purpose: Выбор игрока, тренера и организации в любом сочетании.
-    back_fallback: /auth
-
-  - id: onboarding.player
-    title: Профиль игрока
-    route: /onboarding/player
-    section: onboarding
-    spec: docs/screens/auth/onboarding.md
-    purpose: Минимальное заполнение обязательного личного профиля.
-    back_fallback: /onboarding/profiles
-
-  - id: onboarding.trainer
-    title: Профиль тренера
-    route: /onboarding/trainer
-    section: onboarding
-    spec: docs/screens/auth/onboarding.md
-    purpose: Профессиональная информация и статус проверки тренера.
-    back_fallback: /onboarding/player
-
-  - id: onboarding.organization
-    title: Профиль организации
-    route: /onboarding/organization
-    section: onboarding
-    spec: docs/screens/auth/onboarding.md
-    purpose: Данные компании, клуба или спортивного проекта.
-    back_fallback: /onboarding/player
-
-  - id: onboarding.permissions
-    title: Разрешения
-    route: /onboarding/permissions
-    section: onboarding
-    spec: docs/screens/auth/onboarding.md
-    purpose: Уведомления, геолокация и календарь.
-    back_fallback: /onboarding/player
-
-  # Global shell
-  - id: actor.switcher
-    title: Переключить профиль
-    route: system://actor-switcher
-    section: global
-    spec: docs/screens/profile/actor-switcher.md
-    purpose: Смена активного профиля без повторного входа.
-    back_fallback: system://dismiss
-
-  - id: player.picker
-    title: Добавить игроков
-    route: system://player-picker
-    section: global
-    spec: docs/screens/shared/player-picker.md
-    purpose: Множественный выбор и приглашение игроков в конкретное событие.
-    variants: [create_context, manage_context]
-    permission: entity_inviter
-    back_fallback: system://dismiss
-
-  - id: global.notifications
-    title: Уведомления
-    route: /notifications
-    section: global
-    spec: docs/screens/shared/notifications.md
-    purpose: Все системные и событийные уведомления.
-    back_fallback: /
-
-  # Bottom tabs
-  - id: home.main
-    title: Главная
-    route: /
-    section: home
-    spec: docs/screens/home/main.md
-    purpose: Адаптивная сводка игрока, тренера или организации.
-    variants: [player, trainer, organization]
-    back_fallback: null
-
-  - id: play.main
-    title: События
-    route: /play
-    section: play
-    spec: docs/screens/play/main.md
-    purpose: Каталог, участия и управление событиями через вкладки Все, Участвую и Управляю.
-    variants: [player, trainer, organization]
-    back_fallback: null
-
-  - id: chats.main
-    title: Чаты
-    route: /chats
-    section: chats
-    spec: docs/screens/chats/main.md
-    purpose: Чаты игр, тренировок, турниров, сезонов, клубов, туров и личные сообщения.
-    variants: [player, trainer, organization]
-    back_fallback: null
-
-  - id: chat.details
-    title: Чат
-    route: /chats/:chatId
-    section: chats
-    spec: docs/screens/chats/details.md
-    purpose: Общение и переход к связанной сущности.
-    back_fallback: /chats
-
-  - id: clubs.main
-    title: Клубы
-    route: /clubs
-    section: clubs
-    spec: docs/screens/clubs/main.md
-    purpose: Клубы, корты, тренеры и публичные туры.
-    variants: [player, trainer, organization]
-    back_fallback: null
-
-  - id: club.details
-    title: Клуб
-    route: /clubs/:clubId
-    section: clubs
-    spec: docs/screens/clubs/details.md
-    purpose: Публичная страница клуба и его расписание.
-    back_fallback: /clubs
-
-  - id: club.manage
-    title: Управление клубом
-    route: /clubs/:clubId/manage
-    section: clubs
-    spec: docs/screens/clubs/manage.md
-    purpose: Площадки, сотрудники, расписание, события и финансы организации.
-    permission: organization_member
-    back_fallback: /profile
-
-  - id: venue.details
-    title: Площадка
-    route: /venues/:venueId
-    section: clubs
-    spec: docs/screens/clubs/venue-details.md
-    purpose: Корты, расписание, адрес и бронирование площадки.
-    back_fallback: /clubs
-
-  - id: player.public_profile
-    title: Игрок
-    route: /players/:playerId
-    section: clubs
-    spec: docs/screens/clubs/player-details.md
-    purpose: Публичный спортивный профиль игрока с учётом приватности.
-    variants: [stranger, saved_player, owner]
-    back_fallback: /profile/players
-
-  - id: trainer.public_profile
-    title: Тренер
-    route: /trainers/:trainerId
-    section: clubs
-    spec: docs/screens/clubs/trainer-details.md
-    purpose: Публичный профиль, расписание и отзывы тренера.
-    variants: [guest, authenticated_player, owner, organization_manager]
-    back_fallback: /clubs?category=trainers
-
-  - id: profile.main
-    title: Профиль
-    route: /profile
-    section: profile
-    spec: docs/screens/profile/main.md
-    purpose: Адаптивный кабинет активного профиля.
-    variants: [player, trainer, organization]
-    back_fallback: null
-
-  - id: profile.actor_profiles
-    title: Мои профили
-    route: /profile/actors
-    section: profile
-    spec: docs/screens/profile/actor-switcher.md
-    purpose: Добавление, редактирование и отключение actor-профилей.
-    back_fallback: /profile
-
-  - id: profile.calendar
-    title: Мой календарь
-    route: /profile/calendar
-    section: profile
-    spec: docs/screens/profile/my-calendar.md
-    purpose: Все участия и управляемые события активного аккаунта.
-    variants: [all_profiles, active_profile]
-    back_fallback: /profile
-
-  - id: profile.my_games
-    title: Мои игры
-    route: /profile/games
-    section: profile
-    spec: docs/screens/profile/my-games.md
-    purpose: Участие и управление одноразовыми играми.
-    back_fallback: /profile
-
-  - id: profile.competitions
-    title: Мои турниры и сезоны
-    route: /profile/competitions
-    section: profile
-    spec: docs/screens/profile/my-competitions.md
-    purpose: Участие, организация, черновики и завершённые соревнования.
-    back_fallback: /profile
-
-  - id: profile.trainings
-    title: Мои тренировки
-    route: /profile/trainings
-    section: profile
-    spec: docs/screens/profile/my-trainings.md
-    purpose: Записи игрока и управляемые тренировки тренера или организации.
-    back_fallback: /profile
-
-  - id: profile.players
-    title: Мои игроки
-    route: /profile/players
-    section: profile
-    spec: docs/screens/profile/my-players.md
-    purpose: Односторонний список игроков активного профиля и быстрый выбор для приглашений.
-    variants: [player, trainer, organization]
-    back_fallback: /profile
-
-  - id: profile.trips
-    title: Мои туры и поездки
-    route: /profile/trips
-    section: profile
-    spec: docs/screens/profile/my-trips.md
-    purpose: Участие и организация поездок разных типов.
-    back_fallback: /profile
-
-  - id: profile.statistics
-    title: Статистика
-    route: /profile/statistics
-    section: profile
-    spec: docs/screens/profile/statistics.md
-    purpose: Показатели игрока, тренера или организации.
-    variants: [player, trainer, organization]
-    back_fallback: /profile
-
-  - id: profile.payments
-    title: Платежи
-    route: /profile/payments
-    section: profile
-    spec: docs/screens/profile/payments.md
-    purpose: Личные платежи, возвраты, выплаты и отчёты в зависимости от профиля.
-    variants: [player, trainer, organization]
-    back_fallback: /profile
-
-  - id: profile.settings
-    title: Настройки
-    route: /profile/settings
-    section: profile
-    spec: docs/screens/profile/settings.md
-    purpose: Аккаунт, профили, безопасность, уведомления, приватность и выплаты.
-    back_fallback: /profile
-
-  # Games
-  - id: game.details
-    title: Игра
-    route: /games/:gameId
-    section: shared
-    spec: docs/screens/shared/game-details.md
-    purpose: Канонический экран одноразовой игры для гостя, участника и организатора.
-    variants: [guest, participant, organizer]
-    back_fallback: /play?category=games
-
-  - id: game.create
-    title: Создание игры
-    route: /games/create
-    section: shared
-    spec: docs/screens/shared/game-create.md
-    purpose: Единый мастер с выбором «Создать как».
-    back_fallback: /play?category=games
-
-  - id: game.manage
-    title: Управление игрой
-    route: /games/:gameId/manage
-    section: shared
-    spec: docs/screens/shared/game-manage.md
-    purpose: Участники, раунды, корты, результаты, оплаты, чат и настройки.
-    permission: entity_manager
-    back_fallback: /profile/games?tab=created
-
-  # Trainings
-  - id: training.details
-    title: Тренировка
-    route: /trainings/:trainingId
-    section: shared
-    spec: docs/screens/shared/training-details.md
-    purpose: Канонический экран тренировки.
-    variants: [guest, participant, trainer, organization_manager]
-    back_fallback: /play?category=trainings
-
-  - id: training.create
-    title: Создание тренировки
-    route: /trainings/create
-    section: shared
-    spec: docs/screens/shared/training-create.md
-    purpose: Создание тренировки, приглашение игроков и настройка публичности.
-    permission: trainer_or_organization
-    back_fallback: /profile/trainings
-
-  - id: training.manage
-    title: Управление тренировкой
-    route: /trainings/:trainingId/manage
-    section: shared
-    spec: docs/screens/shared/training-manage.md
-    purpose: Записи, программа, посещаемость, оплаты и сообщения.
-    permission: entity_manager
-    back_fallback: /profile/trainings?tab=created
-
-
-  - id: training.attendance
-    title: Посещаемость
-    route: /trainings/:trainingId/attendance
-    section: shared
-    spec: docs/screens/shared/training-manage.md
-    purpose: Отметка присутствия, опозданий и пропусков.
-    permission: training_manager
-    back_fallback: /trainings/:trainingId/manage
-
-  # Tournaments and matches
-  - id: tournament.details
-    title: Турнир
-    route: /tournaments/:tournamentId
-    section: shared
-    spec: docs/screens/shared/tournament-details.md
-    purpose: Динамические вкладки участника по формату турнира.
-    variants: [guest, participant, organizer]
-    back_fallback: /play?category=tournaments
-
-  - id: tournament.create
-    title: Создание турнира
-    route: /tournaments/create
-    section: shared
-    spec: docs/screens/shared/tournament-create.md
-    purpose: Выбор профиля-создателя, формата, регистрации, правил и расписания.
-    back_fallback: /profile/competitions
-
-  - id: tournament.manage
-    title: Управление турниром
-    route: /tournaments/:tournamentId/manage
-    section: shared
-    spec: docs/screens/shared/tournament-manage.md
-    purpose: Регистрация, формат, жеребьёвка, раунды, корты, результаты и выплаты.
-    permission: entity_manager
-    back_fallback: /profile/competitions?tab=organized
-
-  - id: competition.match
-    title: Матч
-    route: /matches/:matchId
-    section: shared
-    spec: docs/screens/shared/competition-match.md
-    purpose: Состав, корт, счёт, статус и подтверждение результата.
-    back_fallback: /play
-
-  # Seasons
-  - id: season.details
-    title: Сезон
-    route: /seasons/:seasonId
-    section: shared
-    spec: docs/screens/shared/season-details.md
-    purpose: Обзор, игровые дни, таблица, участники, правила и чат.
-    variants: [guest, participant, organizer]
-    back_fallback: /play?category=seasons
-
-  - id: season.create
-    title: Создание сезона
-    route: /seasons/create
-    section: shared
-    spec: docs/screens/shared/season-create.md
-    purpose: Формат таблицы, расписание игровых дней и правила состава.
-    back_fallback: /profile/competitions
-
-  - id: season.manage
-    title: Управление сезоном
-    route: /seasons/:seasonId/manage
-    section: shared
-    spec: docs/screens/shared/season-manage.md
-    purpose: Участники, игровые дни, таблица, результаты, оплаты и настройки.
-    permission: entity_manager
-    back_fallback: /profile/competitions?tab=organized
-
-  - id: season.game_day
-    title: Игровой день
-    route: /seasons/:seasonId/game-days/:gameDayId
-    section: shared
-    spec: docs/screens/shared/season-game-day.md
-    purpose: Участники, корты, раунды, результаты и личное расписание.
-    back_fallback: /seasons/:seasonId
-
-  - id: season.game_day_manage
-    title: Управление игровым днём
-    route: /seasons/:seasonId/game-days/:gameDayId/manage
-    section: shared
-    spec: docs/screens/shared/season-game-day.md
-    purpose: Вместимость, состав, генерация раундов, корты и результаты.
-    permission: entity_manager
-    back_fallback: /seasons/:seasonId/manage
-
-  # Tours
-  - id: tour.details
-    title: Тур
-    route: /tours/:tourId
-    section: shared
-    spec: docs/screens/shared/tour-details.md
-    purpose: Программа, проживание, тренеры, цена, участники и чат.
-    variants: [informal, training_camp, organization_package]
-    back_fallback: /clubs?category=tours
-
-  - id: tour.create
-    title: Создание тура
-    route: /tours/create
-    section: shared
-    spec: docs/screens/shared/tour-create.md
-    purpose: Создание неформальной поездки, лагеря тренера или тура организации.
-    back_fallback: /profile/trips
-
-  - id: tour.manage
-    title: Управление туром
-    route: /tours/:tourId/manage
-    section: shared
-    spec: docs/screens/shared/tour-manage.md
-    purpose: Заявки, бронирования, программа, участники, оплаты и сообщения.
-    permission: entity_manager
-    back_fallback: /profile/trips?tab=organized
-
-  - id: tour.booking
-    title: Бронирование тура
-    route: /tours/:tourId/booking
-    section: shared
-    spec: docs/screens/shared/tour-details.md
-    purpose: Участники бронирования, варианты размещения, документы и оплата.
-    back_fallback: /tours/:tourId
-
-  # Payments and invitations
-  - id: payment.checkout
-    title: Оплата
-    route: /payments/checkout/:orderId
-    section: shared
-    spec: docs/screens/shared/payments.md
-    purpose: Проверка заказа и переход к платёжному провайдеру.
-    back_fallback: /profile/payments
-
-  - id: payment.details
-    title: Детали платежа
-    route: /payments/:paymentId
-    section: shared
-    spec: docs/screens/shared/payments.md
-    purpose: Статус, чек, возврат и связанная сущность.
-    back_fallback: /profile/payments
-
-  - id: invitation.details
-    title: Приглашение
-    route: /invitations/:invitationId
-    section: shared
-    spec: docs/screens/shared/invitations.md
-    purpose: Принятие или отклонение приглашения в событие или организацию.
-    back_fallback: /
+- id: auth.welcome
+  title: Добро пожаловать
+  route: /auth
+  section: auth
+  spec: docs/screens/auth/onboarding.md
+  purpose: Первый экран с входом через Google и email.
+  variants:
+  - signed_out
+  back_fallback: null
+- id: auth.sign_in
+  title: Вход
+  route: /auth/sign-in
+  section: auth
+  spec: docs/screens/auth/onboarding.md
+  purpose: Вход по email и паролю.
+  back_fallback: /auth
+- id: auth.email_registration
+  title: Регистрация по email
+  route: /auth/register
+  section: auth
+  spec: docs/screens/auth/onboarding.md
+  purpose: Создание аккаунта по email.
+  back_fallback: /auth
+- id: auth.verify_email
+  title: Подтверждение email
+  route: /auth/verify
+  section: auth
+  spec: docs/screens/auth/onboarding.md
+  purpose: Подтверждение email и повторная отправка письма.
+  back_fallback: /auth
+- id: auth.reset_password
+  title: Восстановление пароля
+  route: /auth/reset-password
+  section: auth
+  spec: docs/screens/auth/onboarding.md
+  purpose: Запрос и установка нового пароля.
+  back_fallback: /auth/sign-in
+- id: onboarding.profile_selection
+  title: Выбор профилей
+  route: /onboarding/profiles
+  section: onboarding
+  spec: docs/screens/auth/onboarding.md
+  purpose: Выбор игрока, тренера и организации в любом сочетании.
+  back_fallback: /auth
+- id: onboarding.player
+  title: Профиль игрока
+  route: /onboarding/player
+  section: onboarding
+  spec: docs/screens/auth/onboarding.md
+  purpose: Минимальное заполнение обязательного личного профиля.
+  back_fallback: /onboarding/profiles
+- id: onboarding.trainer
+  title: Профиль тренера
+  route: /onboarding/trainer
+  section: onboarding
+  spec: docs/screens/auth/onboarding.md
+  purpose: Профессиональная информация и статус проверки тренера.
+  back_fallback: /onboarding/player
+- id: onboarding.organization
+  title: Профиль организации
+  route: /onboarding/organization
+  section: onboarding
+  spec: docs/screens/auth/onboarding.md
+  purpose: Данные компании, клуба или спортивного проекта.
+  back_fallback: /onboarding/player
+- id: onboarding.permissions
+  title: Разрешения
+  route: /onboarding/permissions
+  section: onboarding
+  spec: docs/screens/auth/onboarding.md
+  purpose: Уведомления, геолокация и календарь.
+  back_fallback: /onboarding/player
+- id: actor.switcher
+  title: Переключить профиль
+  route: system://actor-switcher
+  section: global
+  spec: docs/screens/profile/actor-switcher.md
+  purpose: Смена активного профиля без повторного входа.
+  back_fallback: system://dismiss
+- id: player.picker
+  title: Добавить игроков
+  route: system://player-picker
+  section: global
+  spec: docs/screens/shared/player-picker.md
+  purpose: Множественный выбор и приглашение игроков в конкретное событие.
+  variants:
+  - create_context
+  - manage_context
+  permission: entity_inviter
+  back_fallback: system://dismiss
+- id: global.notifications
+  title: Уведомления
+  route: /notifications
+  section: global
+  spec: docs/screens/shared/notifications.md
+  purpose: Все системные и событийные уведомления.
+  back_fallback: /
+- id: home.main
+  title: Профиль
+  route: /
+  section: home
+  spec: docs/screens/home/main.md
+  purpose: Профильная страница активного actor с личной информацией, тренерами, ближайшими событиями и задачами.
+  variants:
+  - player
+  - trainer
+  - organization
+  back_fallback: null
+- id: play.main
+  title: События
+  route: /play
+  section: play
+  spec: docs/screens/play/main.md
+  purpose: Каталог, участия и управление событиями через вкладки Все, Участвую и Управляю.
+  variants:
+  - player
+  - trainer
+  - organization
+  back_fallback: null
+- id: chats.main
+  title: Чаты
+  route: /chats
+  section: chats
+  spec: docs/screens/chats/main.md
+  purpose: Чаты игр, тренировок, турниров, сезонов, клубов, туров и личные сообщения.
+  variants:
+  - player
+  - trainer
+  - organization
+  back_fallback: null
+- id: chat.details
+  title: Чат
+  route: /chats/:chatId
+  section: chats
+  spec: docs/screens/chats/details.md
+  purpose: Общение и переход к связанной сущности.
+  back_fallback: /chats
+- id: clubs.main
+  title: Клубы
+  route: /clubs
+  section: clubs
+  spec: docs/screens/clubs/main.md
+  purpose: Публичный каталог клубов, площадок и кортов.
+  variants:
+  - player
+  - trainer
+  - organization
+  back_fallback: null
+- id: club.details
+  title: Клуб
+  route: /clubs/:clubId
+  section: clubs
+  spec: docs/screens/clubs/details.md
+  purpose: Публичная страница клуба и его расписание.
+  back_fallback: /clubs
+- id: club.manage
+  title: Управление клубом
+  route: /clubs/:clubId/manage
+  section: clubs
+  spec: docs/screens/clubs/manage.md
+  purpose: Площадки, сотрудники, расписание, события и финансы организации.
+  permission: organization_member
+  back_fallback: /profile
+- id: venue.details
+  title: Площадка
+  route: /venues/:venueId
+  section: clubs
+  spec: docs/screens/clubs/venue-details.md
+  purpose: Корты, расписание, адрес и бронирование площадки.
+  back_fallback: /clubs
+- id: player.public_profile
+  title: Игрок
+  route: /players/:playerId
+  section: clubs
+  spec: docs/screens/clubs/player-details.md
+  purpose: Публичный спортивный профиль игрока с учётом приватности.
+  variants:
+  - stranger
+  - saved_player
+  - owner
+  back_fallback: /profile/players
+- id: trainer.public_profile
+  title: Тренер
+  route: /trainers/:trainerId
+  section: clubs
+  spec: docs/screens/clubs/trainer-details.md
+  purpose: Публичный профиль, расписание и отзывы тренера.
+  variants:
+  - guest
+  - authenticated_player
+  - owner
+  - organization_manager
+  back_fallback: /clubs?category=trainers
+- id: trainer.search
+  title: Найти тренера
+  route: /trainers/search
+  section: home
+  spec: docs/screens/shared/trainer-search.md
+  purpose: Поиск тренеров и создание подтверждаемой связи игрока с одним или несколькими тренерами.
+  variants:
+  - player
+  permission: authenticated_player
+  back_fallback: /
+- id: profile.main
+  title: Настройки
+  route: /profile
+  section: profile
+  spec: docs/screens/profile/main.md
+  purpose: Список настроек аккаунта, профилей, архивов, платежей и служебных разделов.
+  variants:
+  - player
+  - trainer
+  - organization
+  back_fallback: null
+- id: profile.actor_profiles
+  title: Мои профили
+  route: /profile/actors
+  section: profile
+  spec: docs/screens/profile/actor-switcher.md
+  purpose: Добавление, редактирование и отключение actor-профилей.
+  back_fallback: /profile
+- id: profile.calendar
+  title: Мой календарь
+  route: /profile/calendar
+  section: profile
+  spec: docs/screens/profile/my-calendar.md
+  purpose: Все участия и управляемые события активного аккаунта.
+  variants:
+  - all_profiles
+  - active_profile
+  back_fallback: /profile
+- id: profile.my_games
+  title: Мои игры
+  route: /profile/games
+  section: profile
+  spec: docs/screens/profile/my-games.md
+  purpose: Участие и управление одноразовыми играми.
+  back_fallback: /profile
+- id: profile.competitions
+  title: Мои турниры и сезоны
+  route: /profile/competitions
+  section: profile
+  spec: docs/screens/profile/my-competitions.md
+  purpose: Участие, организация, черновики и завершённые соревнования.
+  back_fallback: /profile
+- id: profile.trainings
+  title: Мои тренировки
+  route: /profile/trainings
+  section: profile
+  spec: docs/screens/profile/my-trainings.md
+  purpose: Записи игрока и управляемые тренировки тренера или организации.
+  back_fallback: /profile
+- id: profile.players
+  title: Мои игроки
+  route: /profile/players
+  section: profile
+  spec: docs/screens/profile/my-players.md
+  purpose: Односторонний список игроков активного профиля и быстрый выбор для приглашений.
+  variants:
+  - player
+  - trainer
+  - organization
+  back_fallback: /profile
+- id: profile.trips
+  title: Мои туры и поездки
+  route: /profile/trips
+  section: profile
+  spec: docs/screens/profile/my-trips.md
+  purpose: Участие и организация поездок разных типов.
+  back_fallback: /profile
+- id: profile.statistics
+  title: Статистика
+  route: /profile/statistics
+  section: profile
+  spec: docs/screens/profile/statistics.md
+  purpose: Показатели игрока, тренера или организации.
+  variants:
+  - player
+  - trainer
+  - organization
+  back_fallback: /profile
+- id: profile.payments
+  title: Платежи
+  route: /profile/payments
+  section: profile
+  spec: docs/screens/profile/payments.md
+  purpose: Личные платежи, возвраты, выплаты и отчёты в зависимости от профиля.
+  variants:
+  - player
+  - trainer
+  - organization
+  back_fallback: /profile
+- id: profile.settings
+  title: Аккаунт и приложение
+  route: /profile/settings
+  section: profile
+  spec: docs/screens/profile/settings.md
+  purpose: Безопасность, уведомления, приватность, внешний вид и профильные параметры.
+  back_fallback: /profile
+- id: game.details
+  title: Игра
+  route: /games/:gameId
+  section: shared
+  spec: docs/screens/shared/game-details.md
+  purpose: Канонический экран одноразовой игры для гостя, участника и организатора.
+  variants:
+  - guest
+  - participant
+  - organizer
+  back_fallback: /play?category=games
+- id: game.create
+  title: Создание игры
+  route: /games/create
+  section: shared
+  spec: docs/screens/shared/game-create.md
+  purpose: Единый мастер с выбором «Создать как».
+  back_fallback: /play?category=games
+- id: game.manage
+  title: Управление игрой
+  route: /games/:gameId/manage
+  section: shared
+  spec: docs/screens/shared/game-manage.md
+  purpose: Участники, раунды, корты, результаты, оплаты, чат и настройки.
+  permission: entity_manager
+  back_fallback: /profile/games?tab=created
+- id: training.details
+  title: Тренировка
+  route: /trainings/:trainingId
+  section: shared
+  spec: docs/screens/shared/training-details.md
+  purpose: Канонический экран тренировки.
+  variants:
+  - guest
+  - participant
+  - trainer
+  - organization_manager
+  back_fallback: /play?category=trainings
+- id: training.create
+  title: Создание тренировки
+  route: /trainings/create
+  section: shared
+  spec: docs/screens/shared/training-create.md
+  purpose: Создание тренировки, приглашение игроков и настройка публичности.
+  permission: trainer_or_organization
+  back_fallback: /profile/trainings
+- id: training.manage
+  title: Управление тренировкой
+  route: /trainings/:trainingId/manage
+  section: shared
+  spec: docs/screens/shared/training-manage.md
+  purpose: Записи, программа, посещаемость, оплаты и сообщения.
+  permission: entity_manager
+  back_fallback: /profile/trainings?tab=created
+- id: training.attendance
+  title: Посещаемость
+  route: /trainings/:trainingId/attendance
+  section: shared
+  spec: docs/screens/shared/training-manage.md
+  purpose: Отметка присутствия, опозданий и пропусков.
+  permission: training_manager
+  back_fallback: /trainings/:trainingId/manage
+- id: tournament.details
+  title: Турнир
+  route: /tournaments/:tournamentId
+  section: shared
+  spec: docs/screens/shared/tournament-details.md
+  purpose: Динамические вкладки участника по формату турнира.
+  variants:
+  - guest
+  - participant
+  - organizer
+  back_fallback: /play?category=tournaments
+- id: tournament.create
+  title: Создание турнира
+  route: /tournaments/create
+  section: shared
+  spec: docs/screens/shared/tournament-create.md
+  purpose: Выбор профиля-создателя, формата, регистрации, правил и расписания.
+  back_fallback: /profile/competitions
+- id: tournament.manage
+  title: Управление турниром
+  route: /tournaments/:tournamentId/manage
+  section: shared
+  spec: docs/screens/shared/tournament-manage.md
+  purpose: Регистрация, формат, жеребьёвка, раунды, корты, результаты и выплаты.
+  permission: entity_manager
+  back_fallback: /profile/competitions?tab=organized
+- id: competition.match
+  title: Матч
+  route: /matches/:matchId
+  section: shared
+  spec: docs/screens/shared/competition-match.md
+  purpose: Состав, корт, счёт, статус и подтверждение результата.
+  back_fallback: /play
+- id: season.details
+  title: Сезон
+  route: /seasons/:seasonId
+  section: shared
+  spec: docs/screens/shared/season-details.md
+  purpose: Обзор, игровые дни, таблица, участники, правила и чат.
+  variants:
+  - guest
+  - participant
+  - organizer
+  back_fallback: /play?category=seasons
+- id: season.create
+  title: Создание сезона
+  route: /seasons/create
+  section: shared
+  spec: docs/screens/shared/season-create.md
+  purpose: Формат таблицы, расписание игровых дней и правила состава.
+  back_fallback: /profile/competitions
+- id: season.manage
+  title: Управление сезоном
+  route: /seasons/:seasonId/manage
+  section: shared
+  spec: docs/screens/shared/season-manage.md
+  purpose: Участники, игровые дни, таблица, результаты, оплаты и настройки.
+  permission: entity_manager
+  back_fallback: /profile/competitions?tab=organized
+- id: season.game_day
+  title: Игровой день
+  route: /seasons/:seasonId/game-days/:gameDayId
+  section: shared
+  spec: docs/screens/shared/season-game-day.md
+  purpose: Участники, корты, раунды, результаты и личное расписание.
+  back_fallback: /seasons/:seasonId
+- id: season.game_day_manage
+  title: Управление игровым днём
+  route: /seasons/:seasonId/game-days/:gameDayId/manage
+  section: shared
+  spec: docs/screens/shared/season-game-day.md
+  purpose: Вместимость, состав, генерация раундов, корты и результаты.
+  permission: entity_manager
+  back_fallback: /seasons/:seasonId/manage
+- id: tour.details
+  title: Тур
+  route: /tours/:tourId
+  section: shared
+  spec: docs/screens/shared/tour-details.md
+  purpose: Программа, проживание, тренеры, цена, участники и чат.
+  variants:
+  - informal
+  - training_camp
+  - organization_package
+  back_fallback: /clubs?category=tours
+- id: tour.create
+  title: Создание тура
+  route: /tours/create
+  section: shared
+  spec: docs/screens/shared/tour-create.md
+  purpose: Создание неформальной поездки, лагеря тренера или тура организации.
+  back_fallback: /profile/trips
+- id: tour.manage
+  title: Управление туром
+  route: /tours/:tourId/manage
+  section: shared
+  spec: docs/screens/shared/tour-manage.md
+  purpose: Заявки, бронирования, программа, участники, оплаты и сообщения.
+  permission: entity_manager
+  back_fallback: /profile/trips?tab=organized
+- id: tour.booking
+  title: Бронирование тура
+  route: /tours/:tourId/booking
+  section: shared
+  spec: docs/screens/shared/tour-details.md
+  purpose: Участники бронирования, варианты размещения, документы и оплата.
+  back_fallback: /tours/:tourId
+- id: payment.checkout
+  title: Оплата
+  route: /payments/checkout/:orderId
+  section: shared
+  spec: docs/screens/shared/payments.md
+  purpose: Проверка заказа и переход к платёжному провайдеру.
+  back_fallback: /profile/payments
+- id: payment.details
+  title: Детали платежа
+  route: /payments/:paymentId
+  section: shared
+  spec: docs/screens/shared/payments.md
+  purpose: Статус, чек, возврат и связанная сущность.
+  back_fallback: /profile/payments
+- id: invitation.details
+  title: Приглашение
+  route: /invitations/:invitationId
+  section: shared
+  spec: docs/screens/shared/invitations.md
+  purpose: Принятие или отклонение приглашения в событие или организацию.
+  back_fallback: /

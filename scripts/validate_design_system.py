@@ -38,11 +38,11 @@ def main() -> int:
     nav = load_yaml(DOCS / "NAVIGATION_RESOLVERS.yaml")
 
     expected_tabs = [
-        {"id": "home", "title": "Главная", "route": "/"},
+        {"id": "home", "title": "Профиль", "route": "/"},
         {"id": "play", "title": "События", "route": "/play"},
         {"id": "chats", "title": "Чаты", "route": "/chats"},
         {"id": "clubs", "title": "Клубы", "route": "/clubs"},
-        {"id": "profile", "title": "Профиль", "route": "/profile"},
+        {"id": "profile", "title": "Настройки", "route": "/profile"},
     ]
 
     if tokens.get("platforms") != ["ios", "android"]:

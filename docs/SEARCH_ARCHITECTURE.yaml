@@ -1,0 +1,34 @@
+version: 1
+scope: contextual_search
+universal_search_screen_in_mvp: false
+
+contexts:
+  events:
+    screen: play.main
+    entities: [game, training, tournament, season, tour]
+    tour_variants: [informal, training_camp, organization_package]
+    user_labels: [Игры, Тренировки, Турниры, Сезоны, Туры и кэмпы]
+  clubs:
+    screen: clubs.main
+    entities: [club, venue, court]
+  trainers:
+    screen: trainer.search
+    entry_points: [home.player_no_trainer, home.player_my_trainers, trainer.public_profile]
+    entities: [trainer_profile]
+  players:
+    screens: [profile.players, player.picker]
+    entities: [player_profile]
+  chats:
+    screen: chats.main
+    entities: [conversation, conversation_member]
+  personal_archive:
+    parent: profile.main
+    entities: [owned_or_related_entities]
+
+rules:
+  - search context determines initial entity type and filters
+  - tours and training camps are discoverable only in Events
+  - global Clubs catalog does not contain trainer or tour categories
+  - trainer search is available to player profile from the first Profile tab
+  - all result cards open canonical detail screens
+  - blocked, hidden or nonpublic entities are excluded according to permissions

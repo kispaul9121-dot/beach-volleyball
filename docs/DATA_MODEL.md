@@ -266,3 +266,14 @@ removed_at
 Для административных действий audit event дополнительно хранит `organization_id`, `membership_id`, роль на момент действия, `acting_user_id`, `acting_actor_id`, `action_id`, объект, diff, причину и correlation ID.
 
 RLS проверяет не только user_id, но actor ownership, entity relationship, organization membership и конкретный permission. Player directory не является основанием для доступа к закрытым данным игрока.
+
+## 14. Связь игрока и тренера
+
+Источник истины: `docs/TRAINER_RELATIONSHIPS.yaml`.
+
+- `player_trainer_relationships` — player profile, trainer actor, status, initiator and timestamps;
+- `player_trainer_relationship_events` — request, message permission, accept, decline and end audit;
+- `trainer_relationship_message_grants` — ограниченный контекст прямого диалога после запроса;
+- `trainer_search_documents` — поисковое представление публичных полей тренера.
+
+Статусы: `requested`, `active`, `declined`, `cancelled`, `ended_by_player`, `ended_by_trainer`. Надпись `Тренируется у` разрешена только для `active`. Один player profile может иметь несколько активных trainer relationships. Принятие обеспечивает наличие игрока в рабочем списке `Мои игроки` тренера, но сама связь остаётся отдельной подтверждаемой сущностью.

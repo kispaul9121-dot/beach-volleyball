@@ -146,3 +146,11 @@ out_of_scope_mvp:
   - mutual_partner_requests
   - automatic_activity_broadcasts
   - contact_import
+
+trainer_relationship_integration:
+  source_of_truth: docs/TRAINER_RELATIONSHIPS.yaml
+  rules:
+    - confirmed trainer relationship is separate from actor_player_links
+    - after trainer accepts, player is ensured in trainer actor My Players working list
+    - ending trainer relationship does not silently delete trainer saved-player entry; trainer may remove it separately
+    - unconfirmed request does not create event participation or access to event chats

@@ -127,6 +127,11 @@ def main() -> int:
         if overlay_id not in screen_by_id and not is_system(overlay_id):
             errors.append(f"Global overlay is neither a screen nor system overlay: {overlay_id}")
 
+    legacy_phrase = "Главная · События · Чаты · Клубы · Профиль"
+    for source in (DOCS / "NAVIGATION_RESOLVERS.yaml", DOCS / "DESIGN_TOKENS.yaml", DOCS / "UI_RULES.md"):
+        if legacy_phrase in source.read_text(encoding="utf-8"):
+            errors.append("Legacy bottom navigation title contract returned: " + str(source.relative_to(ROOT)))
+
     # One screen ↔ one route and valid navigation fallbacks.
     all_paths = set(route_by_path)
     for screen_id, screen in screen_by_id.items():

@@ -1,0 +1,69 @@
+version: 1
+concept: player_trainer_relationship
+source_of_truth: docs/TRAINER_RELATIONSHIPS.yaml
+
+principles:
+  - player may have multiple active trainers
+  - relationship is distinct from My Players and event participation
+  - player initiates a request from the Profile tab or trainer public profile
+  - label Trains with is shown only after trainer confirmation
+  - request grants the selected trainer permission to view the request context and send a direct message
+  - either side may end the relationship without deleting historical events, chats, payments or attendance
+  - blocked users cannot create, accept or message through a relationship
+
+statuses:
+  requested:
+    player_label: Запрос отправлен
+    trainer_label: Новый игрок
+    trainer_actions: [message, accept, decline]
+  active:
+    player_label: Тренируется у
+    trainer_label: Мой игрок
+    actions: [open_profile, message, remove]
+  declined:
+    visible_to_player: temporary
+  cancelled:
+    visible_to_trainer: false
+  ended_by_player:
+    active: false
+  ended_by_trainer:
+    active: false
+
+player_profile_block:
+  empty_title: Без тренера
+  empty_action: Найти тренера
+  pending_item: Запрос отправлен
+  active_item: Тренируется у {trainer_name}
+  multiple_relationships: true
+  order: [active, requested]
+
+trainer_notification:
+  title: Новый игрок
+  body: "{player_name} хочет добавить вас как тренера"
+  actions: [open_player_profile, message, accept, decline]
+
+search:
+  route: /trainers/search
+  fields: [name, city, distance, specialization, player_level, language, session_format, availability]
+  card: [photo, name, verification, city, specializations, player_levels, nearest_public_training]
+  ratings_forbidden: true
+  blocked_or_hidden_profiles_excluded: true
+  pagination: cursor
+  recent_queries: local_private
+  typo_tolerance: implementation_required
+
+side_effects:
+  on_request:
+    - create notification for trainer actor
+    - allow one direct conversation context between requester and trainer
+  on_accept:
+    - mark relationship active
+    - show trainer on player Profile tab
+    - ensure player is visible in trainer My Players working list
+    - notify player
+  on_decline:
+    - close request
+    - notify player without exposing a reason unless trainer supplies one
+  on_end:
+    - revoke relationship-only permissions
+    - preserve shared event history and allowed chat history

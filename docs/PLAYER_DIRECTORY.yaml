@@ -150,7 +150,8 @@ out_of_scope_mvp:
 trainer_relationship_integration:
   source_of_truth: docs/TRAINER_RELATIONSHIPS.yaml
   rules:
-    - confirmed trainer relationship is separate from actor_player_links
-    - after trainer accepts, player is ensured in trainer actor My Players working list
-    - ending trainer relationship does not silently delete trainer saved-player entry; trainer may remove it separately
-    - unconfirmed request does not create event participation or access to event chats
+    - active trainer relationship is separate from ordinary actor_player_links
+    - immediately after player adds trainer, player is visible in trainer actor My Players with source player_selected_trainer
+    - ending the relationship removes the relationship-derived row unless trainer separately saved the player
+    - trainer relationship does not create event participation or access to event chats
+    - relationship allows direct messaging only while privacy and blocking permit

@@ -29,6 +29,6 @@ rules:
   - search context determines initial entity type and filters
   - tours and training camps are discoverable only in Events
   - global Clubs catalog does not contain trainer or tour categories
-  - trainer search is available to player profile from the first Profile tab
+  - trainer search is available to player profile from the first Profile tab and creates an active relationship without trainer approval
   - all result cards open canonical detail screens
   - blocked, hidden or nonpublic entities are excluded according to permissions

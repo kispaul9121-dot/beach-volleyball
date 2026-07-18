@@ -683,11 +683,6 @@ actions:
   source: home.main
   destination: trainer.public_profile
   permission: authenticated_player
-- id: profile.cancel_trainer_request
-  label: Отменить запрос тренеру
-  source: home.main
-  destination: system.cancel_trainer_relationship_confirmation
-  permission: relationship_request_owner
 - id: profile.remove_trainer_relationship
   label: Убрать тренера
   source: home.main
@@ -708,28 +703,20 @@ actions:
   source: trainer.search
   destination: trainer.public_profile
   permission: authenticated_player
-- id: trainer.request_from_search
+- id: trainer.add_from_search
   label: Добавить тренера
   source: trainer.search
-  destination: system.create_trainer_relationship_request
+  destination: system.create_active_trainer_relationship
+  success: home.main
   permission: authenticated_player
-- id: trainer.request_from_profile
+- id: trainer.add_from_profile
   label: Добавить тренера
   source: trainer.public_profile
-  destination: system.create_trainer_relationship_request
+  destination: system.create_active_trainer_relationship
+  success: home.main
   permission: authenticated_player
-- id: trainer.accept_player_relationship
-  label: Подтвердить игрока
-  source: global.notifications
-  destination: system.accept_trainer_relationship
-  permission: relationship_target_trainer
-- id: trainer.decline_player_relationship
-  label: Отклонить запрос
-  source: global.notifications
-  destination: system.decline_trainer_relationship_confirmation
-  permission: relationship_target_trainer
-- id: trainer.message_requesting_player
+- id: trainer.message_new_player
   label: Написать игроку
   source: global.notifications
   destination: system.open_or_create_direct_chat
-  permission: trainer_relationship_request_recipient
+  permission: linked_trainer

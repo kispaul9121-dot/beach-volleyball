@@ -1,69 +1,91 @@
-version: 1
+version: 2
 concept: player_trainer_relationship
 source_of_truth: docs/TRAINER_RELATIONSHIPS.yaml
 
 principles:
-  - player may have multiple active trainers
+  - player may have zero, one or multiple active trainers
   - relationship is distinct from My Players and event participation
-  - player initiates a request from the Profile tab or trainer public profile
-  - label Trains with is shown only after trainer confirmation
-  - request grants the selected trainer permission to view the request context and send a direct message
+  - player adds a public trainer directly from the Profile tab or trainer public profile
+  - trainer confirmation is not required
+  - label Тренируется у appears immediately after successful creation
+  - trainer receives a New player notification and may send a direct message
   - either side may end the relationship without deleting historical events, chats, payments or attendance
-  - blocked users cannot create, accept or message through a relationship
+  - blocked users cannot create or message through a relationship
+  - relationship never exposes private statistics, payments or unrelated private events
 
 statuses:
-  requested:
-    player_label: Запрос отправлен
-    trainer_label: Новый игрок
-    trainer_actions: [message, accept, decline]
   active:
     player_label: Тренируется у
     trainer_label: Мой игрок
     actions: [open_profile, message, remove]
-  declined:
-    visible_to_player: temporary
-  cancelled:
-    visible_to_trainer: false
   ended_by_player:
     active: false
   ended_by_trainer:
+    active: false
+  blocked:
     active: false
 
 player_profile_block:
   empty_title: Без тренера
   empty_action: Найти тренера
-  pending_item: Запрос отправлен
   active_item: Тренируется у {trainer_name}
   multiple_relationships: true
-  order: [active, requested]
+  initial_visible_items: 2
+  show_all_when_more: true
 
 trainer_notification:
+  type: trainer_new_player
+  category: players_and_trainers
   title: Новый игрок
-  body: "{player_name} хочет добавить вас как тренера"
-  actions: [open_player_profile, message, accept, decline]
+  body: "{player_name} добавил(а) вас как тренера"
+  actions: [open_player_profile, message]
+  deduplicate_by: relationship_id
 
 search:
   route: /trainers/search
   fields: [name, city, distance, specialization, player_level, language, session_format, availability]
   card: [photo, name, verification, city, specializations, player_levels, nearest_public_training]
+  primary_action: add_trainer
   ratings_forbidden: true
   blocked_or_hidden_profiles_excluded: true
   pagination: cursor
   recent_queries: local_private
   typo_tolerance: implementation_required
 
-side_effects:
-  on_request:
-    - create notification for trainer actor
-    - allow one direct conversation context between requester and trainer
-  on_accept:
+creation:
+  actor: player
+  confirmation_required_from_trainer: false
+  requires_accepting_new_players: true
+  idempotent: true
+  effects:
     - mark relationship active
-    - show trainer on player Profile tab
-    - ensure player is visible in trainer My Players working list
-    - notify player
-  on_decline:
-    - close request
-    - notify player without exposing a reason unless trainer supplies one
-  on_end:
-    - revoke relationship-only permissions
-    - preserve shared event history and allowed chat history
+    - show trainer immediately on player Profile tab
+    - create one New player notification for trainer actor
+    - ensure player is visible in trainer My Players working list with source player_selected_trainer
+    - allow one direct conversation context while privacy and blocking permit
+  forbidden_effects:
+    - create event participation
+    - enroll in training
+    - expose private statistics
+    - expose payments
+    - expose private events
+
+ending:
+  allowed_by: [player, trainer]
+  effects:
+    - revoke relationship-only permission for new direct messages
+    - preserve shared event history
+    - preserve allowed chat history according to retention policy
+    - keep event participation unchanged
+
+trainer_player_directory:
+  source: player_selected_trainer
+  appears_in: profile.players
+  trainer_can: [open_public_profile, message_player, remove_relationship, invite_to_specific_event]
+  trainer_cannot: [see_private_statistics, see_unrelated_private_events, mark_payment_as_completed]
+
+privacy_and_safety:
+  - trainer may disable accepting new players in settings
+  - mass automatic trainer addition is forbidden
+  - create and end operations produce audit events
+  - report or block immediately disables addition and relationship messaging

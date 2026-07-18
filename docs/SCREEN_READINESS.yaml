@@ -33,8 +33,8 @@ criteria:
   name: Спецификация
 summary:
   screens: 58
-  ready: 29
-  partial: 28
+  ready: 30
+  partial: 27
   weak: 1
   average_score: 85
   by_criterion:
@@ -44,8 +44,8 @@ summary:
       ready: 41
       partial: 17
     purpose_data:
-      ready: 42
-      partial: 16
+      ready: 43
+      partial: 15
     blocks:
       partial: 21
       ready: 37
@@ -534,8 +534,8 @@ screens:
   section: global
   route: /notifications
   spec: docs/screens/shared/notifications.md
-  score: 83
-  status: частично
+  score: 89
+  status: готово
   criteria:
     identity_route:
       status: ready
@@ -544,18 +544,17 @@ screens:
       status: ready
       evidence: Доступ ограничен через route access=authenticated.
     purpose_data:
-      status: partial
-      evidence: Purpose задан, но источник данных описан неявно.
+      status: ready
+      evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 30 пунктов.
+      evidence: Есть структурный раздел и 32 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: notifications.open_target, trainer.accept_player_relationship, trainer.decline_player_relationship,
-        trainer.message_requesting_player; действия описаны в spec.'
+      evidence: 'ACTIONS.yaml: notifications.open_target, trainer.message_new_player; действия описаны в spec.'
     states:
       status: partial
-      evidence: 'Описана только часть состояний: error, offline.'
+      evidence: 'Описана только часть состояний: offline.'
     role_variants:
       status: na
       evidence: Различия участника и организатора для этого экрана не применяются.
@@ -567,7 +566,7 @@ screens:
       evidence: 'Связи: chat, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 38 непустых строк, 7 заголовков.'
+      evidence: 'Spec существует: 47 непустых строк, 7 заголовков.'
 - id: home.main
   title: Профиль
   section: home
@@ -587,7 +586,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: partial
-      evidence: 'Структура описана частично; пунктов: 51.'
+      evidence: 'Структура описана частично; пунктов: 53.'
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: home.open_managed_entity, home.open_participating_entity, profile.open_trainer_search, profile.open_linked_trainer…;
@@ -606,7 +605,7 @@ screens:
       evidence: 'Связи: calendar, chat, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 72 непустых строк, 9 заголовков.'
+      evidence: 'Spec существует: 73 непустых строк, 9 заголовков.'
 - id: play.main
   title: События
   section: play
@@ -935,7 +934,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 74 пунктов.
+      evidence: Есть структурный раздел и 77 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: trainer.open_training, trainer.open_schedule, trainer.open_tour, trainer.open_club…; действия
@@ -954,7 +953,7 @@ screens:
       evidence: 'Связи: calendar, chat, deep_link, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 116 непустых строк, 22 заголовков.'
+      evidence: 'Spec существует: 119 непустых строк, 22 заголовков.'
 - id: trainer.search
   title: Найти тренера
   section: home
@@ -977,11 +976,11 @@ screens:
       evidence: Есть структурный раздел и 53 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: trainer.search_query, trainer.search_filters, trainer.search_open_profile, trainer.request_from_search;
+      evidence: 'ACTIONS.yaml: trainer.search_query, trainer.search_filters, trainer.search_open_profile, trainer.add_from_search;
         действия описаны в spec.'
     states:
       status: partial
-      evidence: 'Описана только часть состояний: loading, error, offline.'
+      evidence: 'Описана только часть состояний: loading, offline.'
     role_variants:
       status: ready
       evidence: роли в spec=organization, player, trainer.
@@ -990,7 +989,7 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: chat, maps, notifications.'
+      evidence: 'Связи: chat, maps, notifications, payments.'
     spec:
       status: ready
       evidence: 'Spec существует: 71 непустых строк, 10 заголовков.'

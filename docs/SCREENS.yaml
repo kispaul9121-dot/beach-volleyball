@@ -204,13 +204,13 @@ screens:
   - authenticated_player
   - owner
   - organization_manager
-  back_fallback: /clubs?category=trainers
+  back_fallback: /
 - id: trainer.search
   title: Найти тренера
   route: /trainers/search
   section: home
   spec: docs/screens/shared/trainer-search.md
-  purpose: Поиск тренеров и создание подтверждаемой связи игрока с одним или несколькими тренерами.
+  purpose: Поиск тренеров и прямое добавление одного или нескольких тренеров игроку.
   variants:
   - player
   permission: authenticated_player

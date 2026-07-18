@@ -339,7 +339,7 @@ routes:
   access: public_preview_or_authenticated
   accepts_query:
   - tab
-  back_fallback: /clubs?category=tours
+  back_fallback: /play?category=tours
 - path: /tours/:tourId/manage
   screen: tour.manage
   navigator: entity_stack
@@ -380,7 +380,7 @@ routes:
   screen: trainer.public_profile
   navigator: entity_stack
   access: public_preview_or_authenticated
-  back_fallback: /clubs?category=trainers
+  back_fallback: /
 - path: /trainers/search
   screen: trainer.search
   navigator: home_stack

@@ -12,7 +12,11 @@
 - `organizations` — компании, клубы и проекты;
 - `organization_memberships` — user / actor, роль, статус;
 - `actor_verifications` — документы и статусы;
-- `active_actor_preferences` — последний активный профиль.
+- `active_actor_preferences` — последний активный профиль;
+- `player_trainer_relationships` — активные и завершённые связи player profile с trainer actor;
+- `player_trainer_relationship_events` — аудит создания, завершения и блокировки связи.
+
+`player_trainer_relationships` хранит `player_profile_id`, `trainer_actor_id`, status, source, created_at, ended_at и audit actors. Активная пара уникальна, но игрок может иметь несколько тренеров, а тренер — несколько игроков. Создание сразу устанавливает `active`; отдельного requested/approval состояния нет.
 
 Ключевой принцип: `user_account` отвечает за вход, `actor_profile` — от чьего имени пользователь действует. Каждый человек имеет player profile, даже когда активен trainer или organization actor.
 

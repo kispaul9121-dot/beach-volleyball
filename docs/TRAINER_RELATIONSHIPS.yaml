@@ -1,23 +1,34 @@
-version: 2
+version: 3
 concept: player_trainer_relationship
 source_of_truth: docs/TRAINER_RELATIONSHIPS.yaml
 
 principles:
   - player may have zero, one or multiple active trainers
   - relationship is distinct from My Players and event participation
-  - player adds a public trainer directly from the Profile tab or trainer public profile
-  - trainer confirmation is not required
-  - label Тренируется у appears immediately after successful creation
-  - trainer receives a New player notification and may send a direct message
-  - either side may end the relationship without deleting historical events, chats, payments or attendance
-  - blocked users cannot create or message through a relationship
+  - player sends a request from the Profile tab or trainer public profile
+  - trainer must explicitly add the player before the relationship becomes active
+  - pending request is visible to the trainer in notifications and My Players > Новые
+  - label Тренируется у appears only after trainer acceptance
+  - trainer may open the player profile or write from the request context
+  - either side may end an active relationship without deleting historical events, chats, payments or attendance
+  - blocked users cannot create requests or message through a relationship
   - relationship never exposes private statistics, payments or unrelated private events
 
 statuses:
+  pending:
+    player_label: Запрос отправлен
+    trainer_label: Новый игрок
+    trainer_actions: [open_profile, message, add, decline]
+    active: false
   active:
     player_label: Тренируется у
     trainer_label: Мой игрок
     actions: [open_profile, message, remove]
+    active: true
+  declined:
+    active: false
+  cancelled_by_player:
+    active: false
   ended_by_player:
     active: false
   ended_by_trainer:
@@ -28,47 +39,76 @@ statuses:
 player_profile_block:
   empty_title: Без тренера
   empty_action: Найти тренера
+  pending_item: Запрос отправлен · {trainer_name}
   active_item: Тренируется у {trainer_name}
   multiple_relationships: true
   initial_visible_items: 2
   show_all_when_more: true
 
 trainer_notification:
-  type: trainer_new_player
+  type: trainer_new_player_request
   category: players_and_trainers
   title: Новый игрок
-  body: "{player_name} добавил(а) вас как тренера"
-  actions: [open_player_profile, message]
-  deduplicate_by: relationship_id
+  body: "{player_name} хочет тренироваться у вас"
+  actions: [open_player_profile, message, add, decline]
+  deduplicate_by: relationship_request_id
+
+trainer_my_players:
+  screen_id: profile.players
+  pending_tab_title: Новые
+  pending_row: [avatar, display_name, public_level, city, request_time, message]
+  pending_actions: [open_profile, message, add, decline]
+  accepted_destination: saved
+  badge_count: pending_requests_count
 
 search:
   route: /trainers/search
   fields: [name, city, distance, specialization, player_level, language, session_format, availability]
   card: [photo, name, verification, city, specializations, player_levels, nearest_public_training]
-  primary_action: add_trainer
+  primary_action: send_request
   ratings_forbidden: true
   blocked_or_hidden_profiles_excluded: true
   pagination: cursor
   recent_queries: local_private
   typo_tolerance: implementation_required
 
-creation:
+request_creation:
   actor: player
-  confirmation_required_from_trainer: false
   requires_accepting_new_players: true
   idempotent: true
   effects:
-    - mark relationship active
-    - show trainer immediately on player Profile tab
-    - create one New player notification for trainer actor
-    - ensure player is visible in trainer My Players working list with source player_selected_trainer
+    - create pending trainer relationship request
+    - show Запрос отправлен immediately on player Profile tab
+    - create one Новый игрок notification for trainer actor
+    - show request in trainer My Players > Новые
+    - allow trainer to open player public profile
     - allow one direct conversation context while privacy and blocking permit
   forbidden_effects:
+    - mark relationship active
+    - add player to trainer saved list
     - create event participation
     - enroll in training
     - expose private statistics
     - expose payments
     - expose private events
+
+trainer_acceptance:
+  action_label: Добавить
+  idempotent: true
+  effects:
+    - mark relationship active
+    - show Тренируется у on player Profile tab
+    - move player from Новые to saved My Players list
+    - create actor_player_link with source trainer_accepted_request
+    - notify player that trainer added them
+    - keep direct conversation available while privacy and blocking permit
+
+trainer_decline:
+  action_label: Отклонить
+  effects:
+    - mark request declined
+    - remove request from Новые
+    - notify player without exposing trainer private notes
 
 ending:
   allowed_by: [player, trainer]
@@ -79,13 +119,15 @@ ending:
     - keep event participation unchanged
 
 trainer_player_directory:
-  source: player_selected_trainer
-  appears_in: profile.players
-  trainer_can: [open_public_profile, message_player, remove_relationship, invite_to_specific_event]
+  pending_source: player_requested_trainer
+  accepted_source: trainer_accepted_request
+  pending_appears_in: profile.players.new
+  accepted_appears_in: profile.players.saved
+  trainer_can: [open_public_profile, message_player, accept_request, decline_request, invite_active_player_to_specific_event]
   trainer_cannot: [see_private_statistics, see_unrelated_private_events, mark_payment_as_completed]
 
 privacy_and_safety:
   - trainer may disable accepting new players in settings
-  - mass automatic trainer addition is forbidden
-  - create and end operations produce audit events
-  - report or block immediately disables addition and relationship messaging
+  - mass automatic trainer requests are forbidden
+  - request, accept, decline and end operations produce audit events
+  - report or block immediately disables request and relationship messaging

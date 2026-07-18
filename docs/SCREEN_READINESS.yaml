@@ -54,8 +54,8 @@ summary:
       partial: 17
       missing: 1
     states:
-      partial: 29
-      ready: 9
+      partial: 28
+      ready: 10
       missing: 15
     role_variants:
       na: 13
@@ -573,7 +573,7 @@ screens:
   section: home
   route: /
   spec: docs/screens/home/main.md
-  score: 90
+  score: 95
   status: готово
   criteria:
     identity_route:
@@ -587,14 +587,14 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: partial
-      evidence: 'Структура описана частично; пунктов: 39.'
+      evidence: 'Структура описана частично; пунктов: 63.'
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: nav.open_profile_calendar, nav.open_profile_my_games, nav.open_profile_competitions, nav.open_profile_trainings…;
         действия описаны в spec.'
     states:
-      status: partial
-      evidence: 'Описана только часть состояний: loading, error, offline.'
+      status: ready
+      evidence: 'Описаны состояния: loading, empty, error, offline.'
     role_variants:
       status: ready
       evidence: variants=player, trainer, organization.
@@ -606,7 +606,7 @@ screens:
       evidence: 'Связи: chat, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 70 непустых строк, 10 заголовков.'
+      evidence: 'Spec существует: 107 непустых строк, 14 заголовков.'
 - id: play.main
   title: Игры
   section: play

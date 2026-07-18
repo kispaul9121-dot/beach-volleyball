@@ -32,46 +32,45 @@ criteria:
 - id: spec
   name: Спецификация
 summary:
-  screens: 56
-  ready: 25
-  partial: 29
-  weak: 2
-  average_score: 83
+  screens: 57
+  ready: 28
+  partial: 28
+  weak: 1
+  average_score: 84
   by_criterion:
     identity_route:
-      ready: 56
+      ready: 57
     actors_permissions:
-      ready: 38
+      ready: 39
       partial: 18
     purpose_data:
-      ready: 41
+      ready: 42
       partial: 15
     blocks:
       partial: 21
-      ready: 35
+      ready: 36
     actions:
-      ready: 34
-      partial: 21
+      ready: 39
+      partial: 17
       missing: 1
     states:
       partial: 29
-      ready: 7
-      missing: 20
+      ready: 9
+      missing: 19
     role_variants:
       na: 13
-      ready: 36
-      partial: 7
-    navigation:
       ready: 38
-      partial: 18
+      partial: 6
+    navigation:
+      ready: 40
+      partial: 17
     integrations:
       na: 4
-      ready: 45
+      ready: 47
       partial: 6
-      missing: 1
     spec:
-      ready: 51
-      partial: 5
+      ready: 53
+      partial: 4
 screens:
 - id: auth.welcome
   title: Добро пожаловать
@@ -535,7 +534,7 @@ screens:
   section: global
   route: /notifications
   spec: docs/screens/shared/notifications.md
-  score: 78
+  score: 83
   status: частично
   criteria:
     identity_route:
@@ -551,8 +550,8 @@ screens:
       status: ready
       evidence: Есть структурный раздел и 30 пунктов.
     actions:
-      status: partial
-      evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
+      status: ready
+      evidence: 'ACTIONS.yaml: notifications.open_target; действия описаны в spec.'
     states:
       status: partial
       evidence: 'Описана только часть состояний: error, offline.'
@@ -650,7 +649,7 @@ screens:
   section: chats
   route: /chats
   spec: docs/screens/chats/main.md
-  score: 80
+  score: 85
   status: частично
   criteria:
     identity_route:
@@ -666,8 +665,8 @@ screens:
       status: ready
       evidence: Есть структурный раздел и 39 пунктов.
     actions:
-      status: partial
-      evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
+      status: ready
+      evidence: 'ACTIONS.yaml: chats.open_chat; действия описаны в spec.'
     states:
       status: missing
       evidence: Нет loading, empty, error, offline и permission states.
@@ -726,8 +725,8 @@ screens:
   section: clubs
   route: /clubs
   spec: docs/screens/clubs/main.md
-  score: 80
-  status: частично
+  score: 85
+  status: готово
   criteria:
     identity_route:
       status: ready
@@ -742,8 +741,9 @@ screens:
       status: ready
       evidence: Есть структурный раздел и 21 пунктов.
     actions:
-      status: partial
-      evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
+      status: ready
+      evidence: 'ACTIONS.yaml: clubs.open_club, clubs.open_venue, clubs.open_trainer, clubs.open_tour; действия описаны в
+        spec.'
     states:
       status: partial
       evidence: 'Описана только часть состояний: offline.'
@@ -875,45 +875,85 @@ screens:
     spec:
       status: partial
       evidence: 'Spec существует, но краткий: 29 строк, 5 заголовков.'
+- id: player.public_profile
+  title: Игрок
+  section: clubs
+  route: /players/:playerId
+  spec: docs/screens/clubs/player-details.md
+  score: 95
+  status: готово
+  criteria:
+    identity_route:
+      status: ready
+      evidence: ID, route и запись ROUTES.yaml совпадают.
+    actors_permissions:
+      status: ready
+      evidence: variants=stranger, saved_player, owner.
+    purpose_data:
+      status: partial
+      evidence: Purpose задан, но источник данных описан неявно.
+    blocks:
+      status: ready
+      evidence: Есть структурный раздел и 35 пунктов.
+    actions:
+      status: ready
+      evidence: 'ACTIONS.yaml: players.save_from_public_profile, players.remove_from_public_profile, players.invite_from_public_profile,
+        player.open_shared_event…; действия описаны в spec.'
+    states:
+      status: ready
+      evidence: 'Описаны состояния: loading, empty, error, offline, permission.'
+    role_variants:
+      status: ready
+      evidence: variants=stranger, saved_player, owner.
+    navigation:
+      status: ready
+      evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
+    integrations:
+      status: ready
+      evidence: 'Связи: deep_link, notifications, payments.'
+    spec:
+      status: ready
+      evidence: 'Spec существует: 51 непустых строк, 11 заголовков.'
 - id: trainer.public_profile
   title: Тренер
   section: clubs
   route: /trainers/:trainerId
   spec: docs/screens/clubs/trainer-details.md
-  score: 50
-  status: слабо
+  score: 95
+  status: готово
   criteria:
     identity_route:
       status: ready
       evidence: ID, route и запись ROUTES.yaml совпадают.
     actors_permissions:
       status: partial
-      evidence: 'route access=public_preview_or_authenticated; роли упомянуты в spec: organization, trainer, но actor-правила
-        не формализованы.'
+      evidence: 'route access=public_preview_or_authenticated; роли упомянуты в spec: guest, manager, organization, participant,
+        player, trainer, но actor-правила не формализованы.'
     purpose_data:
-      status: partial
-      evidence: Purpose задан, но источник данных описан неявно.
+      status: ready
+      evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 22 пунктов.
+      evidence: Есть структурный раздел и 74 пунктов.
     actions:
-      status: partial
-      evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
+      status: ready
+      evidence: 'ACTIONS.yaml: trainer.open_training, trainer.open_schedule, trainer.open_tour, trainer.open_club…; действия
+        описаны в spec.'
     states:
-      status: missing
-      evidence: Нет loading, empty, error, offline и permission states.
+      status: ready
+      evidence: 'Описаны состояния: loading, empty, error, offline, permission.'
     role_variants:
-      status: partial
-      evidence: роли в spec=organization, trainer; различия описаны не полностью.
+      status: ready
+      evidence: роли в spec=guest, manager, organization, participant, player, trainer.
     navigation:
-      status: partial
-      evidence: Навигация определена только в реестре или только в spec.
+      status: ready
+      evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
-      status: missing
-      evidence: Не описаны связи с чатами, уведомлениями, календарём или оплатами.
+      status: ready
+      evidence: 'Связи: calendar, chat, deep_link, notifications, payments.'
     spec:
-      status: partial
-      evidence: 'Spec существует, но краткий: 28 строк, 5 заголовков.'
+      status: ready
+      evidence: 'Spec существует: 113 непустых строк, 21 заголовков.'
 - id: profile.main
   title: Профиль
   section: profile

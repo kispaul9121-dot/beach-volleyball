@@ -551,7 +551,8 @@ screens:
       evidence: Есть структурный раздел и 37 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: notifications.open_target, trainer.message_new_player; действия описаны в spec.'
+      evidence: 'ACTIONS.yaml: notifications.open_target, trainer.message_requesting_player, trainer.accept_player_request_notification,
+        trainer.decline_player_request_notification; действия описаны в spec.'
     states:
       status: partial
       evidence: 'Описана только часть состояний: offline.'
@@ -976,7 +977,7 @@ screens:
       evidence: Есть структурный раздел и 55 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: trainer.search_query, trainer.search_filters, trainer.search_open_profile, trainer.add_from_search;
+      evidence: 'ACTIONS.yaml: trainer.search_query, trainer.search_filters, trainer.search_open_profile, trainer.request_from_search;
         действия описаны в spec.'
     states:
       status: partial
@@ -1247,7 +1248,8 @@ screens:
       evidence: Есть структурный раздел и 60 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: players.add, players.remove, players.open_public_profile; действия описаны в spec.'
+      evidence: 'ACTIONS.yaml: players.add, players.remove, players.open_public_profile, trainer.open_pending_player…; действия
+        описаны в spec.'
     states:
       status: ready
       evidence: 'Описаны состояния: loading, empty, offline, permission.'

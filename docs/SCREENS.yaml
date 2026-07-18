@@ -204,7 +204,7 @@ screens:
   - authenticated_player
   - owner
   - organization_manager
-  back_fallback: /
+  back_fallback: /trainers/search
 - id: trainer.search
   title: Найти тренера
   route: /trainers/search

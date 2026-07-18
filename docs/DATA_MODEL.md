@@ -131,6 +131,16 @@ removed_at
 - приглашение всегда относится к конкретной сущности;
 - принятая заявка или приглашение создаёт либо изменяет `participation`.
 
+### Запрос игрока тренеру
+
+Источник истины: `docs/TRAINER_RELATIONSHIPS.yaml`.
+
+- `trainer_relationship_requests` — player profile, trainer actor, status `pending / accepted / declined / cancelled`, timestamps and optional message;
+- `player_trainer_relationships` — active or ended confirmed relationship created only after trainer acceptance;
+- `trainer_relationship_events` — audit of request, message, accept, decline, cancel and end actions.
+
+Pending-запрос не создаёт `actor_player_link`. После `Добавить` создаётся или восстанавливается `actor_player_link` trainer actor → player profile с source `trainer_accepted_request`, а запрос становится `accepted`.
+
 ## 5. Участие
 
 - `participations` — единый статус участия;

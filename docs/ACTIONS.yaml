@@ -703,20 +703,55 @@ actions:
   source: trainer.search
   destination: trainer.public_profile
   permission: authenticated_player
-- id: trainer.add_from_search
-  label: Добавить тренера
+- id: trainer.request_from_search
+  label: Отправить запрос
   source: trainer.search
-  destination: system.create_active_trainer_relationship
+  destination: system.create_trainer_relationship_request
   success: home.main
   permission: authenticated_player
-- id: trainer.add_from_profile
-  label: Добавить тренера
+- id: trainer.request_from_profile
+  label: Отправить запрос
   source: trainer.public_profile
-  destination: system.create_active_trainer_relationship
+  destination: system.create_trainer_relationship_request
   success: home.main
   permission: authenticated_player
-- id: trainer.message_new_player
+- id: trainer.message_requesting_player
   label: Написать игроку
   source: global.notifications
   destination: system.open_or_create_direct_chat
-  permission: linked_trainer
+  permission: trainer_relationship_request_recipient
+- id: profile.cancel_trainer_request
+  label: Отменить запрос тренеру
+  source: home.main
+  destination: system.cancel_trainer_relationship_request_confirmation
+  permission: relationship_request_owner
+- id: trainer.open_pending_player
+  label: Открыть профиль игрока
+  source: profile.players
+  destination: player.public_profile
+  permission: trainer_relationship_request_recipient
+- id: trainer.message_pending_player
+  label: Написать игроку
+  source: profile.players
+  destination: system.open_or_create_direct_chat
+  permission: trainer_relationship_request_recipient
+- id: trainer.accept_player_request
+  label: Добавить
+  source: profile.players
+  destination: system.accept_trainer_relationship_request
+  permission: relationship_target_trainer
+- id: trainer.decline_player_request
+  label: Отклонить
+  source: profile.players
+  destination: system.decline_trainer_relationship_request_confirmation
+  permission: relationship_target_trainer
+- id: trainer.accept_player_request_notification
+  label: Добавить
+  source: global.notifications
+  destination: system.accept_trainer_relationship_request
+  permission: relationship_target_trainer
+- id: trainer.decline_player_request_notification
+  label: Отклонить
+  source: global.notifications
+  destination: system.decline_trainer_relationship_request_confirmation
+  permission: relationship_target_trainer

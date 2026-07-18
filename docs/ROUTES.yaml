@@ -380,7 +380,7 @@ routes:
   screen: trainer.public_profile
   navigator: entity_stack
   access: public_preview_or_authenticated
-  back_fallback: /
+  back_fallback: /trainers/search
 - path: /trainers/search
   screen: trainer.search
   navigator: home_stack

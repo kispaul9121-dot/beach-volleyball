@@ -150,8 +150,9 @@ out_of_scope_mvp:
 trainer_relationship_integration:
   source_of_truth: docs/TRAINER_RELATIONSHIPS.yaml
   rules:
-    - active trainer relationship is separate from ordinary actor_player_links
-    - immediately after player adds trainer, player is visible in trainer actor My Players with source player_selected_trainer
-    - ending the relationship removes the relationship-derived row unless trainer separately saved the player
-    - trainer relationship does not create event participation or access to event chats
-    - relationship allows direct messaging only while privacy and blocking permit
+    - pending trainer request is separate from actor_player_links
+    - pending request appears in trainer My Players > Новые
+    - only trainer action Добавить creates or ensures actor_player_link with source trainer_accepted_request
+    - accepted player moves to trainer saved My Players list
+    - declining or cancelling a request does not create event participation
+    - ending active trainer relationship does not silently delete event history

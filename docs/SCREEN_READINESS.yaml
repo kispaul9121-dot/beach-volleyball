@@ -36,13 +36,13 @@ summary:
   ready: 28
   partial: 28
   weak: 1
-  average_score: 84
+  average_score: 85
   by_criterion:
     identity_route:
       ready: 57
     actors_permissions:
-      ready: 39
-      partial: 18
+      ready: 40
+      partial: 17
     purpose_data:
       ready: 42
       partial: 15
@@ -910,25 +910,24 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: deep_link, notifications, payments.'
+      evidence: 'Связи: chat, deep_link, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 51 непустых строк, 11 заголовков.'
+      evidence: 'Spec существует: 53 непустых строк, 12 заголовков.'
 - id: trainer.public_profile
   title: Тренер
   section: clubs
   route: /trainers/:trainerId
   spec: docs/screens/clubs/trainer-details.md
-  score: 95
+  score: 100
   status: готово
   criteria:
     identity_route:
       status: ready
       evidence: ID, route и запись ROUTES.yaml совпадают.
     actors_permissions:
-      status: partial
-      evidence: 'route access=public_preview_or_authenticated; роли упомянуты в spec: guest, manager, organization, participant,
-        player, trainer, но actor-правила не формализованы.'
+      status: ready
+      evidence: variants=guest, authenticated_player, owner, organization_manager.
     purpose_data:
       status: ready
       evidence: Purpose задан; в spec есть источник или модель данных.
@@ -944,7 +943,7 @@ screens:
       evidence: 'Описаны состояния: loading, empty, error, offline, permission.'
     role_variants:
       status: ready
-      evidence: роли в spec=guest, manager, organization, participant, player, trainer.
+      evidence: variants=guest, authenticated_player, owner, organization_manager.
     navigation:
       status: ready
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.

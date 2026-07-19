@@ -67,7 +67,7 @@
 | **Статистика**<br><code>profile.statistics</code> | <code>/profile/statistics</code> | ✅ | ✅ | ✅ | ◐ | ◐ | ◐ | ✅ | ✅ | ◐ | ✅ | **80% · частично** |
 | **Платежи**<br><code>profile.payments</code> | <code>/profile/payments</code> | ✅ | ✅ | ✅ | ◐ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
 | **Аккаунт и приложение**<br><code>profile.settings</code> | <code>/profile/settings</code> | ✅ | ◐ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
-| **Игра**<br><code>game.details</code> | <code>/games/:gameId</code> | ✅ | ✅ | ✅ | ◐ | ◐ | ✅ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
+| **Игра**<br><code>game.details</code> | <code>/games/:gameId</code> | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ | ✅ | **95% · готово** |
 | **Создание игры**<br><code>game.create</code> | <code>/games/create</code> | ✅ | ◐ | ✅ | ✅ | ◐ | ◐ | ✅ | ◐ | ✅ | ✅ | **80% · частично** |
 | **Управление игрой**<br><code>game.manage</code> | <code>/games/:gameId/manage</code> | ✅ | ✅ | ✅ | ✅ | ◐ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
 | **Тренировка**<br><code>training.details</code> | <code>/trainings/:trainingId</code> | ✅ | ✅ | ✅ | ✅ | ◐ | ◐ | ✅ | ✅ | ✅ | ✅ | **90% · готово** |
@@ -93,7 +93,7 @@
 | 1 | ID и маршрут | 54 | 0 | 0 | 0 |
 | 2 | Профили и права | 41 | 13 | 0 | 0 |
 | 3 | Назначение и данные | 42 | 12 | 0 | 0 |
-| 4 | Блоки | 35 | 19 | 0 | 0 |
+| 4 | Блоки | 36 | 18 | 0 | 0 |
 | 5 | Действия | 37 | 16 | 1 | 0 |
 | 6 | Состояния | 8 | 31 | 15 | 0 |
 | 7 | Варианты ролей | 32 | 9 | 0 | 13 |

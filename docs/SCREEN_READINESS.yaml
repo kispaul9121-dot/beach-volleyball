@@ -47,8 +47,8 @@ summary:
       ready: 42
       partial: 12
     blocks:
-      partial: 19
-      ready: 35
+      partial: 18
+      ready: 36
     actions:
       ready: 37
       partial: 16
@@ -1457,7 +1457,7 @@ screens:
   section: shared
   route: /games/:gameId
   spec: docs/screens/shared/game-details.md
-  score: 90
+  score: 95
   status: готово
   criteria:
     identity_route:
@@ -1470,8 +1470,8 @@ screens:
       status: ready
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
-      status: partial
-      evidence: 'Структура описана частично; пунктов: 52.'
+      status: ready
+      evidence: Есть структурный раздел и 56 пунктов.
     actions:
       status: partial
       evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
@@ -1489,7 +1489,7 @@ screens:
       evidence: 'Связи: calendar, chat, deep_link, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 84 непустых строк, 9 заголовков.'
+      evidence: 'Spec существует: 109 непустых строк, 12 заголовков.'
 - id: game.create
   title: Создание игры
   section: shared

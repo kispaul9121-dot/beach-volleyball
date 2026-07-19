@@ -1,4 +1,4 @@
-version: 4
+version: 5
 scope: entity_sections
 source_of_truth_for:
 - public entity navigation
@@ -7,6 +7,7 @@ source_of_truth_for:
 - type-specific sections
 - single chat identity across entity screen and global Chats
 - participant-list payment visibility and self-service action
+- organizer-only result entry for one-off games
 common_rules:
 - У каждого опубликованного события есть канонический экран и один связанный чат события.
 - Черновик не создаёт доступный участникам чат.
@@ -14,7 +15,7 @@ common_rules:
 - Подтверждённый участник, организатор и уполномоченный сотрудник получают доступ согласно политике чата.
 - Приглашённый или подавший заявку пользователь не получает доступ к чату до подтверждения участия.
 - Удаление из события или потеря права пересчитывает доступ на сервере.
-- Чат не заменяет карточку события, состав, счёт, расписание, результаты или статистику.
+- Чат не заменяет карточку события, состав, матчи, результаты или статистику.
 - Системные изменения события публикуются в чат как системные сообщения с action_id.
 - Встроенный раздел чата и карточка в глобальной вкладке Чаты всегда используют один conversationId.
 common_sections:
@@ -27,7 +28,8 @@ common_sections:
     participants_individual: Игроки
     participants_pairs: Пары
     participants_teams: Команды
-    scoring: Счёт
+    matches: Матчи
+    statistics: Статистика
     chat: Чат
   optional_by_state:
   - announcements
@@ -61,36 +63,48 @@ chat:
   - participant_removed
   - registration_changed
   - payment_required
-  - round_published
-  - court_assigned
-  - result_changed
+  - match_list_generated
+  - result_saved
+  - result_corrected
   - entity_cancelled
   completed_behavior: read_only_or_writable_by_entity_policy
   archived_behavior: read_only
 entity_types:
   game:
     mvp_contract: docs/GAME_MVP.yaml
+    match_contract: docs/GAME_MATCH_TABLE.yaml
     participant_sections:
     - overview
     - participants
-    - scoring
+    - matches
     - chat
     manager_sections:
     - overview
     - participants
-    - scoring
+    - matches
     - chat
     separate_manager_sections_forbidden:
     - payments
     - settings
-    scoring:
+    - tournament_bracket
+    matches:
       required_in_mvp: true
-      presentation_by_format:
-        standard_2x2: set_score_table
-        standard_4x4: set_score_table
-        fixed_team_match: set_score_table
-        rotation_five: round_court_cards_and_individual_standings
-      statistics_live_with_scoring: true
+      always_present: true
+      presentation: simple_ordered_match_table
+      local_views:
+      - matches
+      - statistics
+      generation_by_format:
+        standard_2x2: fixed_pairs_round_robin_or_manual
+        standard_4x4: fixed_teams_round_robin_or_manual
+        fixed_team_match: fixed_teams_round_robin_or_manual
+        rotation_five: five_generated_mixed_pair_rows
+      score_entry:
+        organizer_or_authorized_staff: editable
+        confirmed_participant: read_only
+        guest: read_only_when_public
+        participant_confirmation_required: false
+      statistics_derived_from_organizer_saved_results: true
     participants:
       identity_fields:
       - first_name
@@ -142,6 +156,10 @@ entity_types:
       placements: full_placement_or_completed
       statistics: statistics_available
       tournament_days: tournament_mode_is_seasonal
+    visual_direction:
+      simple_one_off_table_reuse_forbidden: false
+      rich_competition_map_allowed: true
+      bracket_and_round_cards_allowed: true
   tour:
     base_sections:
     - overview
@@ -155,9 +173,10 @@ entity_types:
       transport: transport_available
 implementation_rules:
 - Не создавать отдельные социальные группы вокруг события.
-- Не создавать отдельный чат для таблицы, раунда или списка игроков без явного продуктового решения.
+- Не создавать отдельный чат для таблицы, матча или списка игроков без явного продуктового решения.
 - Внутренние разделы зависят от типа, формата, статуса и роли пользователя.
 - На мобильном допускается горизонтальный tab bar или меню разделов, но глобальная нижняя навигация не заменяется.
 - Вкладка `Игроки`, `Пары` или `Команды` показывает состав и статусы участия, а не социальный список пользователя.
-- Для игры таблица счёта или карточки раундов выбираются по `GAME_FORMATS.yaml` и доступной ширине.
+- Разовая игра всегда использует простой список матчей и таблицу статистики, а не турнирную сетку.
+- Поля счёта разовой игры показываются только организатору или уполномоченному сотруднику.
 - Кнопка оплаты показывается только владельцу собственного payment record в его строке списка участников.

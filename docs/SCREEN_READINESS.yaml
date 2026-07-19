@@ -1503,14 +1503,14 @@ screens:
       evidence: ID, route и запись ROUTES.yaml совпадают.
     actors_permissions:
       status: partial
-      evidence: 'route access=authenticated_onboarded; роли упомянуты в spec: organization, organizer, player, trainer, но
-        actor-правила не формализованы.'
+      evidence: 'route access=authenticated_onboarded; роли упомянуты в spec: organizer, participant, player, но actor-правила
+        не формализованы.'
     purpose_data:
       status: ready
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 53 пунктов.
+      evidence: Есть структурный раздел и 44 пунктов.
     actions:
       status: partial
       evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
@@ -1519,7 +1519,7 @@ screens:
       evidence: 'Описана только часть состояний: loading, error, offline.'
     role_variants:
       status: ready
-      evidence: роли в spec=organization, organizer, player, trainer.
+      evidence: роли в spec=organizer, participant, player.
     navigation:
       status: partial
       evidence: Навигация определена только в реестре или только в spec.
@@ -1528,7 +1528,7 @@ screens:
       evidence: 'Связи: maps, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 110 непустых строк, 13 заголовков.'
+      evidence: 'Spec существует: 107 непустых строк, 11 заголовков.'
 - id: game.manage
   title: Управление игрой
   section: shared

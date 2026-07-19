@@ -1,4 +1,4 @@
-version: 3
+version: 4
 scope: game_mvp_creation_and_management
 product_status: approved
 source_of_truth_for:
@@ -6,7 +6,7 @@ source_of_truth_for:
 - participant capacity input and venue limit
 - MVP game management sections
 - participant payment status and self-service pay action
-- universal match table and statistics for one-off games
+- universal organizer-managed match table and statistics for one-off games
 - canonical game chat shared with Chats
 creation:
   screen: game.create
@@ -212,23 +212,29 @@ management:
     - score_b
     - side_b
     - result_status
-    score_inputs_live_in_row: true
+    score_fields:
+      organizer_or_authorized_staff: editable_inline
+      confirmed_participant: read_only
+      guest: read_only_when_public_policy_allows
     separate_match_screen_required: false
     manager_actions:
     - Сформировать игры
     - Добавить игру
+    - Ввести счёт
+    - Сохранить результат
     - Изменить игру
     - Удалить игру
     participant_permissions:
-      confirmed_participant_can_enter_score_for_assigned_match: true
-      participant_can_enter_score_for_other_match: false
+      participant_can_enter_score: false
+      participant_can_confirm_result: false
       participant_can_view_all_published_scores: true
-    result_confirmation:
-      initial_status: awaiting_opponent_confirmation
-      opposite_side_or_manager_confirms: true
-      matching_independent_submissions_auto_confirm: true
-      conflicting_submissions_create_score_conflict: true
-      manager_correction_requires_reason: true
+    result_entry:
+      permission: entity_manager
+      organizer_only_ui: true
+      initial_status: empty
+      save_directly_without_opponent_confirmation: true
+      correction_requires_reason: true
+      participant_conflict_flow_forbidden: true
     generation:
       fixed_pairs:
         default_schedule: round_robin
@@ -242,6 +248,7 @@ management:
       manual:
         add_matches_one_by_one: true
     statistics:
+      recalculation_trigger: organizer_saved_result
       fixed_pairs_or_teams:
       - played
       - wins
@@ -277,12 +284,12 @@ management:
     - venue_changed
     - payment_required
     - match_list_generated
-    - result_submitted
-    - result_confirmed
+    - result_saved_by_organizer
+    - result_corrected_by_organizer
     - game_cancelled
 completion:
   required_before_complete:
-  - required_match_rows_have_confirmed_results
+  - required_match_rows_have_saved_results
   - unresolved_critical_participant_state_acknowledged
   result:
   - game_moves_to_archive

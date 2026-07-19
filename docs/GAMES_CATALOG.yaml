@@ -1,4 +1,4 @@
-version: 4
+version: 5
 scope: games_catalog
 source_of_truth_for:
 - Игры bottom tab
@@ -7,6 +7,7 @@ source_of_truth_for:
 - empty-state recovery
 - contextual management mode
 - pull-down archive entry for managed games, trainings and tournaments
+- priority invitation block above the catalog
 bottom_tab:
   screen_id: play.main
   route: /play
@@ -27,6 +28,43 @@ bottom_tab:
   - switch_to_management_mode
   - create_in_section
   - reveal_archive_from_management_overscroll
+  - show_unresolved_invitations
+invitation_priority_block:
+  contract: docs/INVITATION_DISCOVERY.yaml
+  visible_only_when:
+  - mode_is_discovery
+  - active_unresolved_invitation_count_is_positive
+  position: above_category_chips_and_catalog
+  title: Вас пригласили
+  count_format: Вас пригласили · {count}
+  preview_limit: 2
+  ordering:
+  - expires_at_ascending
+  - starts_at_ascending
+  entity_types:
+  - game
+  - training
+  - tournament
+  card_variant: invitation
+  card_visual:
+    border_width_dp: 2
+    border_semantic_role: invitation.emphasis
+    accent_family_direction: green
+    top_badge: ПРИГЛАШЕНИЕ
+    icon: MailPlus
+    color_only_meaning_forbidden: true
+    pending_invitation_is_not_success: true
+  primary_action:
+    label: Открыть
+    destination: invitation.details
+  inline_accept_decline_forbidden: true
+  overflow:
+    label: Все приглашения · {count}
+    destination_status: definition_pending
+  bottom_tab_badge:
+    meaning: unresolved_invitation_count
+    count_cap: 9+
+    opening_without_resolution_does_not_clear: true
 categories:
   games:
     title: Игры
@@ -128,6 +166,7 @@ personal_activity:
   home_preview: home.main
   full_list: profile.activity
   participation_tabs_forbidden_in_catalog: true
+  unresolved_invitations_are_not_participation: true
 catalog_open_policy:
   action_id: games.open_entity
   resolver: dynamic.catalog_entity_entry
@@ -148,6 +187,7 @@ management_mode:
   - tournaments
   temporal_tabs: none
   excludes_completed: true
+  invitation_priority_block_visible: false
   status_filters:
   - all
   - draft

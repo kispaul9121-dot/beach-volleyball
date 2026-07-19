@@ -1471,7 +1471,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: partial
-      evidence: 'Структура описана частично; пунктов: 43.'
+      evidence: 'Структура описана частично; пунктов: 52.'
     actions:
       status: partial
       evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
@@ -1489,7 +1489,7 @@ screens:
       evidence: 'Связи: calendar, chat, deep_link, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 59 непустых строк, 8 заголовков.'
+      evidence: 'Spec существует: 84 непустых строк, 9 заголовков.'
 - id: game.create
   title: Создание игры
   section: shared

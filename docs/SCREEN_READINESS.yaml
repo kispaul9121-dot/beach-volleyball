@@ -1548,7 +1548,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 55 пунктов.
+      evidence: Есть структурный раздел и 43 пунктов.
     actions:
       status: partial
       evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
@@ -1563,10 +1563,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: audit, chat, maps, payments.'
+      evidence: 'Связи: audit, chat, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 162 непустых строк, 19 заголовков.'
+      evidence: 'Spec существует: 135 непустых строк, 16 заголовков.'
 - id: training.details
   title: Тренировка
   section: shared

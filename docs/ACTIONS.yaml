@@ -130,11 +130,6 @@ actions:
   source: home.main
   destination: dynamic.entity_details
   permission: authenticated
-- id: global.open_create_menu
-  label: Создать и управлять
-  source: home.main
-  destination: system.create_menu
-  permission: authenticated
 - id: create.choose_actor
   label: Создать как
   source: dynamic.create_wizard
@@ -641,30 +636,6 @@ actions:
   source: play.main
   destination: venue.details
   permission: public
-- id: games.create_game
-  label: Создать игру
-  source: system.create_menu
-  destination: game.create
-  permission: authenticated
-  context:
-    actorId: active_actor
-    returnTo: /manage?tab=active&type=games
-- id: games.create_training
-  label: Создать тренировку
-  source: system.create_menu
-  destination: training.create
-  permission: trainer_or_organization
-  context:
-    actorId: active_actor
-    returnTo: /manage?tab=active&type=trainings
-- id: games.create_tournament
-  label: Создать турнир
-  source: system.create_menu
-  destination: tournament.create
-  permission: authenticated
-  context:
-    actorId: active_actor
-    returnTo: /manage?tab=active&type=tournaments
 - id: camps.open_search
   label: Поиск кэмпов
   source: camps.main
@@ -675,14 +646,6 @@ actions:
   source: camps.main
   destination: dynamic.catalog_entity_entry
   permission: public
-- id: camps.create
-  label: Создать кэмп
-  source: system.create_menu
-  destination: tour.create
-  permission: authenticated
-  context:
-    actorId: active_actor
-    returnTo: /manage?tab=active&type=camps
 - id: home.open_activity
   label: Вся моя активность
   source: home.main
@@ -716,52 +679,75 @@ actions:
   source: profile.activity
   destination: dynamic.entity_details
   permission: authenticated
-- id: management.open_center
-  label: Мои события
-  source: system.create_menu
-  destination: management.center
+- id: games.change_mode
+  label: Режим управления / Вернуться к подбору
+  source: play.main
+  destination: system.local_state
   permission: authenticated
-- id: management.change_tab
+- id: games.change_management_tab
   label: Активные / Завершённые
-  source: management.center
+  source: play.main
   destination: system.local_filter
   permission: authenticated
-- id: management.change_type
-  label: Все / Игры / Тренировки / Турниры / Кэмпы
-  source: management.center
-  destination: system.local_filter
+- id: games.open_management_filters
+  label: Фильтры управления
+  source: play.main
+  destination: system.search_filters
   permission: authenticated
-- id: management.open_entity
+- id: games.open_managed_entity
   label: Управлять
-  source: management.center
+  source: play.main
   destination: dynamic.entity_manage
   permission: entity_manager
-- id: management.open_create_menu
-  label: Создать событие
-  source: management.center
-  destination: system.create_menu
+- id: games.create_game
+  label: Создать игру
+  source: play.main
+  destination: game.create
   permission: authenticated
-- id: management.open_drafts
-  label: Черновики
-  source: system.create_menu
-  destination: management.center
   context:
-    tab: active
-    status: draft
-  permission: authenticated
-- id: management.open_requests
-  label: Заявки и участники
-  source: system.create_menu
-  destination: management.center
+    actorId: active_actor
+    returnTo: /play?mode=manage&category=games&manageTab=active
+- id: games.create_training
+  label: Создать тренировку
+  source: play.main
+  destination: training.create
+  permission: trainer_or_organization
   context:
-    tab: active
-    status: requires_action
+    actorId: active_actor
+    returnTo: /play?mode=manage&category=trainings&manageTab=active
+- id: games.create_tournament
+  label: Создать турнир
+  source: play.main
+  destination: tournament.create
   permission: authenticated
-- id: management.open_payments
-  label: Оплаты
-  source: system.create_menu
-  destination: management.center
   context:
-    tab: active
-    status: payment_attention
+    actorId: active_actor
+    returnTo: /play?mode=manage&category=tournaments&manageTab=active
+- id: camps.change_mode
+  label: Режим управления / Вернуться к подбору
+  source: camps.main
+  destination: system.local_state
   permission: authenticated
+- id: camps.change_management_tab
+  label: Активные / Завершённые
+  source: camps.main
+  destination: system.local_filter
+  permission: authenticated
+- id: camps.open_management_filters
+  label: Фильтры управления
+  source: camps.main
+  destination: system.search_filters
+  permission: authenticated
+- id: camps.open_managed_camp
+  label: Управлять кэмпом
+  source: camps.main
+  destination: tour.manage
+  permission: entity_manager
+- id: camps.create
+  label: Создать кэмп
+  source: camps.main
+  destination: tour.create
+  permission: authenticated
+  context:
+    actorId: active_actor
+    returnTo: /camps?mode=manage&manageTab=active

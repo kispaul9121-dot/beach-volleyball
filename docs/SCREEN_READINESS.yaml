@@ -32,45 +32,45 @@ criteria:
 - id: spec
   name: Спецификация
 summary:
-  screens: 55
-  ready: 30
+  screens: 54
+  ready: 29
   partial: 25
   weak: 0
   average_score: 85
   by_criterion:
     identity_route:
-      ready: 55
+      ready: 54
     actors_permissions:
-      ready: 42
+      ready: 41
       partial: 13
     purpose_data:
-      ready: 42
+      ready: 41
       partial: 13
     blocks:
       partial: 19
-      ready: 36
+      ready: 35
     actions:
-      ready: 38
+      ready: 37
       partial: 16
       missing: 1
     states:
-      partial: 30
+      partial: 29
       ready: 8
       missing: 17
     role_variants:
       na: 13
-      ready: 33
+      ready: 32
       partial: 9
     navigation:
-      ready: 47
+      ready: 46
       partial: 8
     integrations:
       na: 4
-      ready: 47
+      ready: 46
       partial: 4
     spec:
       ready: 47
-      partial: 8
+      partial: 7
 screens:
 - id: auth.welcome
   title: Добро пожаловать
@@ -590,7 +590,7 @@ screens:
       evidence: 'Структура описана частично; пунктов: 32.'
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: nav.open_profile_calendar, nav.open_profile_players, home.open_participating_entity, global.open_create_menu…;
+      evidence: 'ACTIONS.yaml: nav.open_profile_calendar, nav.open_profile_players, home.open_participating_entity, profile.open_trainer_search…;
         действия описаны в spec.'
     states:
       status: partial
@@ -606,7 +606,7 @@ screens:
       evidence: 'Связи: chat, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 65 непустых строк, 9 заголовков.'
+      evidence: 'Spec существует: 61 непустых строк, 9 заголовков.'
 - id: profile.activity
   title: Вся моя активность
   section: home
@@ -645,45 +645,6 @@ screens:
     spec:
       status: ready
       evidence: 'Spec существует: 41 непустых строк, 8 заголовков.'
-- id: management.center
-  title: Центр управления
-  section: management
-  route: /manage
-  spec: docs/screens/shared/management-center.md
-  score: 95
-  status: готово
-  criteria:
-    identity_route:
-      status: ready
-      evidence: ID, route и запись ROUTES.yaml совпадают.
-    actors_permissions:
-      status: ready
-      evidence: variants=player, trainer, organization; permission=authenticated_with_manageable_entities_or_create_capability.
-    purpose_data:
-      status: ready
-      evidence: Purpose задан; в spec есть источник или модель данных.
-    blocks:
-      status: ready
-      evidence: Есть структурный раздел и 29 пунктов.
-    actions:
-      status: ready
-      evidence: 'ACTIONS.yaml: management.change_tab, management.change_type, management.open_entity, management.open_create_menu;
-        действия описаны в spec.'
-    states:
-      status: partial
-      evidence: 'Описана только часть состояний: offline.'
-    role_variants:
-      status: ready
-      evidence: variants=player, trainer, organization.
-    navigation:
-      status: ready
-      evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
-    integrations:
-      status: ready
-      evidence: 'Связи: notifications, payments.'
-    spec:
-      status: ready
-      evidence: 'Spec существует: 52 непустых строк, 9 заголовков.'
 - id: play.main
   title: Игры
   section: play
@@ -703,14 +664,14 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 22 пунктов.
+      evidence: Есть структурный раздел и 17 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: games.change_category, games.change_tournament_mode, games.open_search, games.open_filters…;
         действия описаны в spec.'
     states:
       status: partial
-      evidence: 'Описана только часть состояний: loading, empty, offline.'
+      evidence: 'Описана только часть состояний: empty.'
     role_variants:
       status: ready
       evidence: variants=player, trainer, organization.
@@ -719,10 +680,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: maps, notifications, payments.'
+      evidence: 'Связи: notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 48 непустых строк, 9 заголовков.'
+      evidence: 'Spec существует: 69 непустых строк, 8 заголовков.'
 - id: chats.main
   title: Чаты
   section: chats
@@ -804,7 +765,7 @@ screens:
   section: camps
   route: /camps
   spec: docs/screens/camps/main.md
-  score: 85
+  score: 90
   status: готово
   criteria:
     identity_route:
@@ -818,13 +779,14 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 17 пунктов.
+      evidence: Есть структурный раздел и 12 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: camps.open_search, camps.open_camp; действия описаны в spec.'
+      evidence: 'ACTIONS.yaml: camps.open_search, camps.open_camp, camps.change_mode, camps.change_management_tab…; действия
+        описаны в spec.'
     states:
       status: partial
-      evidence: 'Описана только часть состояний: loading, empty, offline.'
+      evidence: 'Описана только часть состояний: empty.'
     role_variants:
       status: ready
       evidence: variants=player, trainer, organization.
@@ -835,8 +797,8 @@ screens:
       status: partial
       evidence: 'Указана одна связь: payments.'
     spec:
-      status: partial
-      evidence: 'Spec существует, но краткий: 28 строк, 7 заголовков.'
+      status: ready
+      evidence: 'Spec существует: 37 непустых строк, 8 заголовков.'
 - id: club.details
   title: Клуб
   section: discovery

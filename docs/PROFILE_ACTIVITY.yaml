@@ -1,42 +1,43 @@
-version: 2
+version: 3
 scope: profile_activity
 source_of_truth_for:
 - personal participation preview on home.main
 - unified personal activity list
-- management outside Profile
+- contextual creation and management in Games and Camps
 - post-join Profile tab feedback
-- discovery-only boundaries for Games and Camps
 catalog_boundaries:
   games:
     screen: play.main
     route: /play
-    mode: discovery_only
+    mode: discovery_and_contextual_management
     allows:
     - browse
     - search
     - filter
     - open_by_capability
     - start_join_flow
+    - switch_to_management_mode
+    - create_in_section
     forbids:
     - participating_tab
-    - managing_tab
     - personal_archive
-    - management_dashboard
+    - profile_management_entry
   camps:
     screen: camps.main
     route: /camps
-    mode: discovery_only
+    mode: discovery_and_contextual_management
     allows:
     - browse
     - search
     - filter
     - open_by_capability
     - start_join_flow
+    - switch_to_management_mode
+    - create_in_section
     forbids:
     - participating_tab
-    - managing_tab
     - personal_archive
-    - management_dashboard
+    - profile_management_entry
 profile_root:
   screen: home.main
   route: /
@@ -128,10 +129,22 @@ legacy_filtered_activity_screens:
 management:
   source_of_truth: docs/MANAGEMENT_CENTER.yaml
   profile_embedding_forbidden: true
-  center_screen: management.center
-  center_route: /manage
-  primary_entry: system.create_menu
-  catalog_entry: dynamic.catalog_entity_entry
+  profile_entry_forbidden: true
+  standalone_center_removed: true
+  games:
+    screen: play.main
+    route: /play
+    mode_query: manage
+    entity_types:
+    - game
+    - training
+    - tournament
+  camps:
+    screen: camps.main
+    route: /camps
+    mode_query: manage
+    entity_types:
+    - camp
 join_flow:
   product_status: definition_pending
   entry_action_id: entity.start_join_flow

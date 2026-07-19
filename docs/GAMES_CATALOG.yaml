@@ -1,10 +1,11 @@
-version: 1
+version: 2
 scope: games_catalog
 source_of_truth_for:
 - Игры bottom tab
 - catalog categories and ordering
 - followed organizers and saved players
 - empty-state recovery
+- contextual management mode
 bottom_tab:
   screen_id: play.main
   route: /play
@@ -15,13 +16,15 @@ bottom_tab:
   - tournaments
   default_sort: starts_at_ascending
   sorting_rule: nearest_upcoming_first_then_later_dates
-  mode: discovery_only
+  mode: discovery_and_contextual_management
   capabilities:
   - browse
   - search
   - filter
   - open_by_capability
   - start_join_flow
+  - switch_to_management_mode
+  - create_in_section
 categories:
   games:
     title: Игры
@@ -122,10 +125,7 @@ card:
 personal_activity:
   home_preview: home.main
   full_list: profile.activity
-  management: management.center
-  catalog_tabs_forbidden:
-  - participating
-  - managing
+  participation_tabs_forbidden_in_catalog: true
 catalog_open_policy:
   action_id: games.open_entity
   resolver: dynamic.catalog_entity_entry
@@ -135,3 +135,19 @@ catalog_open_policy:
   - canManageHint is only an optimization and must be revalidated by the server
   - revoked permission falls back to public details with a clear notice
   - returning from manage restores catalog category, filters and scroll position
+management_mode:
+  contract: docs/MANAGEMENT_CENTER.yaml
+  query: mode=manage
+  button_label: Режим управления
+  shows_only: entities_manageable_by_active_actor
+  categories:
+  - games
+  - trainings
+  - tournaments
+  tabs:
+  - active
+  - completed
+  create:
+  - game
+  - training
+  - tournament

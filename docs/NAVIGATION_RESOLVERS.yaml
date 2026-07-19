@@ -30,7 +30,6 @@ bottom_navigation:
 dynamic_sources:
 - global.header
 - dynamic.onboarding_optional_profile
-- dynamic.global_or_section_header
 - dynamic.create_wizard
 - dynamic.entity_create_or_manage
 - dynamic.entity_details

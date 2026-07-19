@@ -9,7 +9,6 @@ global_overlays:
 - actor.switcher
 - player.picker
 - global.notifications
-- system.create_menu
 - system.search_filters
 screens:
 - id: auth.welcome
@@ -114,8 +113,8 @@ screens:
   route: /
   section: home
   spec: docs/screens/home/main.md
-  purpose: 'Личный профиль active actor: компактные связи, ближайшие участия и переход ко всей личной активности
-    без управления событиями.'
+  purpose: 'Личный профиль active actor: связи, ближайшие участия и переход ко всей личной активности без создания
+    и управления событиями.'
   variants:
   - player
   - trainer
@@ -131,24 +130,12 @@ screens:
   - player
   - trainer_as_player
   back_fallback: /
-- id: management.center
-  title: Центр управления
-  route: /manage
-  section: management
-  spec: docs/screens/shared/management-center.md
-  purpose: Единый список управляемых игр, тренировок, турниров и кэмпов с переходом в кабинет конкретной сущности.
-  variants:
-  - player
-  - trainer
-  - organization
-  permission: authenticated_with_manageable_entities_or_create_capability
-  back_fallback: /
 - id: play.main
   title: Игры
   route: /play
   section: play
   spec: docs/screens/play/main.md
-  purpose: Публичный подбор, поиск, фильтрация и начало вступления в игры, тренировки и турниры без личных вкладок.
+  purpose: Подбор игр, тренировок и турниров; контекстное создание и режим управления своими событиями.
   variants:
   - player
   - trainer
@@ -177,7 +164,7 @@ screens:
   route: /camps
   section: camps
   spec: docs/screens/camps/main.md
-  purpose: Публичный подбор, поиск, фильтрация и начало вступления в кэмпы без личных вкладок.
+  purpose: Подбор кэмпов; контекстное создание и режим управления своими кэмпами.
   variants:
   - player
   - trainer

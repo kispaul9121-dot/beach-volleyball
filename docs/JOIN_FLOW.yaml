@@ -1,4 +1,4 @@
-version: 1
+version: 2
 scope: entity_join_flow
 product_status: approved
 source_of_truth_for:
@@ -7,6 +7,7 @@ source_of_truth_for:
 - independent payment policy
 - capacity and waitlist resolution
 - participation status created after join
+- self-service payment action in participant lists
 principles:
 - enrollment confirmation and payment are independent dimensions
 - a free event may require organizer approval
@@ -14,6 +15,7 @@ principles:
 - unresolved invitations use invitation.details and are not participation
 - server state is authoritative for capacity, permission, price and policy
 - the user sees one entry action and the resolver chooses the required flow
+- a participant can pay only for their own participation record from the participant list
 entry:
   action_id: entity.start_join_flow
   default_label: Вступить
@@ -77,6 +79,53 @@ resolution:
     accepted_free: confirmed
     accepted_online: payment_required
     accepted_external: confirmed_external_payment_unverified
+participant_payment_surface:
+  placement: participants_section_payment_cell
+  visible_to:
+  - confirmed_participants
+  - entity_managers
+  row_identity_fields:
+  - first_name
+  - last_name
+  other_participant_rows:
+    paid: Оплачено
+    unpaid_or_payment_required: Не оплачено
+    free: Бесплатно
+    action_forbidden: true
+  own_row:
+    online_unpaid:
+      control: button
+      label: Оплатить
+      action_id: entity.open_payment
+      permission: payment_owner
+    payment_processing:
+      control: status
+      label: Оплата обрабатывается
+    paid:
+      control: status
+      label: Оплачено
+    free:
+      control: status
+      label: Бесплатно
+    payment_failed:
+      control: button
+      label: Повторить оплату
+      action_id: entity.open_payment
+      permission: payment_owner
+    external_unverified:
+      control: status
+      label: Не оплачено
+      helper: Оплата организатору вне приложения
+  transition_after_success:
+    replace_button_without_layout_jump: true
+    from: Оплатить
+    to: Оплачено
+    refresh_all_participant_views: true
+  rules:
+  - paying_for_another_participant_is_forbidden
+  - opening_the_participant_list_does_not_start_checkout
+  - payment_status_text_is_visible_without_relying_on_color
+  - guests_and_unconfirmed_users_do_not_see_participant_payment_statuses
 status_model:
 - requested
 - payment_required
@@ -112,7 +161,10 @@ edge_cases:
 - idempotent_repeated_submission
 - offline_submission_not_optimistically_confirmed
 - permission_revoked_returns_to_public_details_with_notice
+- payment_success_webhook_is_idempotent_and_authoritative
+- stale_unpaid_rows_refresh_after_payment_confirmation
 accessibility:
   result_announced_with_text: true
   color_only_status_forbidden: true
   loading_preserves_action_layout: true
+  pay_button_has_participant_specific_accessibility_label: true

@@ -1,4 +1,4 @@
-version: 5
+version: 6
 scope: game_mvp_creation_and_management
 product_status: approved
 source_of_truth_for:
@@ -42,7 +42,7 @@ creation:
         validation:
         - must_be_at_least_format_minimum
         - must_not_exceed_selected_venue_or_reserved_court_limit
-        - must_respect_exact_or_multiple_rule_when_format_requires_it
+        - must_respect_format_rule_when_applicable
       venue_limit:
         source_priority:
         - reserved_venue_slot_capacity
@@ -63,8 +63,13 @@ creation:
           minimum_players_per_court: 8
           capacity_can_exceed_active_players_for_substitutions_or_reserve: true
         rotation_five:
-          exact_players_per_group: 5
-          maximum_formula: reserved_court_count_times_5
+          technical_id_status: legacy_name_kept_for_compatibility
+          product_label: Смешанные пары
+          minimum_players: 4
+          fixed_to_five: false
+          exact_multiple_rule: none
+          maximum_players: venue_capacity
+          generated_match_count_formula: participant_capacity
         fixed_team_match:
           minimum_teams: 2
           participant_capacity_derived_from_team_size_but_confirmed_by_organizer: true
@@ -141,7 +146,7 @@ management:
     - last_name
     - participation_status
     - payment_cell
-    - pair_team_or_rotation_group_when_assigned
+    - pair_team_or_rotation_assignment
     payment_cell:
       public_status_for_confirmed_participants:
         paid: Оплачено
@@ -245,9 +250,22 @@ management:
       fixed_teams:
         default_schedule: round_robin_when_more_than_two_teams
       rotation_five:
-        generated_rows: 5
-        each_round_has_two_pairs_and_one_resting_player: true
-        each_player_partners_each_other_once: true
+        technical_id_status: legacy_name_kept_for_compatibility
+        product_label: Смешанные пары
+        generated_rows_formula: participant_count
+        minimum_participant_count: 4
+        fixed_to_five: false
+        target_appearances_per_player: 4
+        partner_repetitions: minimize
+        opponent_repetitions: minimize
+        waiting_time: balance
+        special_case_five_players:
+          generated_rows: 5
+          each_player_rests_once: true
+          each_player_partners_every_other_player_once: true
+        example_fifteen_players:
+          generated_rows: 15
+          target_appearances_per_player: 4
       manual:
         add_matches_one_by_one: true
     statistics:
@@ -259,7 +277,7 @@ management:
       - points_for
       - points_against
       - point_difference
-      rotation_five_individual:
+      mixed_pairs_individual:
       - played
       - wins
       - points_for

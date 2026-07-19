@@ -1,4 +1,4 @@
-version: 3
+version: 4
 shared_configuration:
   participant_unit:
     values:
@@ -227,37 +227,6 @@ formats:
     - standings
     - participants
     - chat
-  seasonal_tournament:
-    title: Сезонный турнир
-    entity_types:
-    - tournament
-    mvp: true
-    purpose: Один турнир с несколькими игровыми днями и общей накопительной таблицей.
-    configuration:
-      schedule_model:
-      - fixed_dates
-      - recurring_tournament_days
-      scoring_model:
-      - match_points
-      - personal_points
-      - hybrid
-      participant_roster:
-      - fixed
-      - flexible_by_tournament_day
-      court_count: per_tournament_day
-    standings_default_order:
-    - series_points
-    - wins
-    - point_difference
-    - games_played
-    - head_to_head
-    tabs:
-    - overview
-    - tournament_days
-    - standings
-    - participants
-    - rules
-    - chat
 validation_rules:
 - competition_format must be compatible with entity_type
 - every participant must have a stable participant_id
@@ -266,6 +235,8 @@ validation_rules:
 - next round generation is blocked while required results are missing
 - standings are calculated from immutable result events, not manually typed totals
 - organizer overrides require reason and actor_id
+- seasonal tournaments, season entities and recurring tournament-day containers are not supported
+- Tunisian ladder belongs to one-off games through docs/GAME_TUNISIAN_LADDER.yaml
 catalog_modes:
   classic:
     title: Классика
@@ -279,7 +250,3 @@ catalog_modes:
     title: Король пляжа
     formats:
     - king_of_the_beach
-  seasonal:
-    title: Сезонные
-    formats:
-    - seasonal_tournament

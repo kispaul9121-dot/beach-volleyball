@@ -1,4 +1,4 @@
-version: 6
+version: 7
 scope: entity_sections
 source_of_truth_for:
 - public entity navigation
@@ -98,7 +98,13 @@ entity_types:
         standard_2x2: fixed_pairs_round_robin_or_manual
         standard_4x4: fixed_teams_round_robin_or_manual
         fixed_team_match: fixed_teams_round_robin_or_manual
-        rotation_five: five_generated_mixed_pair_rows
+        rotation_five: exactly_five_players_with_configurable_match_count
+      rotation_five_rules:
+        participant_count: 5
+        match_count_entered_by_organizer: true
+        default_match_count: 15
+        unique_match_compositions: 15
+        larger_groups_are_tournaments: true
       score_entry:
         entity_owner_actor: editable
         delegated_event_manager: read_only
@@ -152,16 +158,18 @@ entity_types:
     conditional_sections:
       matches: format_has_matches
       bracket: elimination_or_groups_playoff_or_placement
-      rounds: swiss_or_placement
-      schedule: round_robin_or_timed_matches
+      rounds: swiss_or_placement_or_court_ladder
+      schedule: round_robin_or_timed_matches_or_court_ladder
       standings: round_robin_or_swiss_or_groups_or_king_of_the_beach_or_seasonal
       placements: full_placement_or_completed
       statistics: statistics_available
       tournament_days: tournament_mode_is_seasonal
+      court_ladder: format_is_king_of_the_beach_court_ladder
+    court_ladder_contract: docs/TOURNAMENT_COURT_LADDER.yaml
     visual_direction:
-      simple_one_off_table_reuse_forbidden: false
       rich_competition_map_allowed: true
       bracket_and_round_cards_allowed: true
+      stacked_grid_cards_allowed: true
   tour:
     base_sections:
     - overview
@@ -178,8 +186,8 @@ implementation_rules:
 - Не создавать отдельный чат для таблицы, матча или списка игроков без явного продуктового решения.
 - Внутренние разделы зависят от типа, формата, статуса и роли пользователя.
 - На мобильном допускается горизонтальный tab bar или меню разделов, но глобальная нижняя навигация не заменяется.
-- Вкладка `Игроки`, `Пары` или `Команды` показывает состав и статусы участия, а не социальный список пользователя.
-- Разовая игра всегда использует простой список матчей и таблицу статистики, а не турнирную сетку.
-- Поля счёта разовой игры показываются только actor-владельцу, который создал игру.
+- Разовая игра на смешанные пары содержит ровно пять игроков, но количество матчей задаётся отдельно.
+- Две или три пятёрки с переходами между сетками являются турниром, а не разовой игрой.
+- Поля счёта разовой игры показываются только actor-владельцу.
 - Делегированный менеджер, капитан и участник видят результаты только для чтения.
-- Кнопка оплаты показывается только владельцу собственного payment record в его строке списка участников.
+- Кнопка оплаты показывается только владельцу собственного payment record.

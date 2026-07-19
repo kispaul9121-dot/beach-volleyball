@@ -36,7 +36,7 @@ summary:
   ready: 29
   partial: 25
   weak: 0
-  average_score: 85
+  average_score: 86
   by_criterion:
     identity_route:
       ready: 54
@@ -44,8 +44,8 @@ summary:
       ready: 41
       partial: 13
     purpose_data:
-      ready: 41
-      partial: 13
+      ready: 42
+      partial: 12
     blocks:
       partial: 19
       ready: 35
@@ -54,9 +54,9 @@ summary:
       partial: 16
       missing: 1
     states:
-      partial: 29
+      partial: 30
       ready: 8
-      missing: 17
+      missing: 16
     role_variants:
       na: 13
       ready: 32
@@ -69,8 +69,8 @@ summary:
       ready: 46
       partial: 4
     spec:
-      ready: 47
-      partial: 7
+      ready: 48
+      partial: 6
 screens:
 - id: auth.welcome
   title: Добро пожаловать
@@ -2109,7 +2109,7 @@ screens:
   section: shared
   route: /invitations/:invitationId
   spec: docs/screens/shared/invitations.md
-  score: 60
+  score: 75
   status: частично
   criteria:
     identity_route:
@@ -2117,28 +2117,28 @@ screens:
       evidence: ID, route и запись ROUTES.yaml совпадают.
     actors_permissions:
       status: partial
-      evidence: 'route access=authenticated; роли упомянуты в spec: organization, но actor-правила не формализованы.'
+      evidence: 'route access=authenticated; роли упомянуты в spec: organization, organizer, но actor-правила не формализованы.'
     purpose_data:
-      status: partial
-      evidence: Purpose задан, но источник данных описан неявно.
+      status: ready
+      evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 26 пунктов.
+      evidence: Есть структурный раздел и 42 пунктов.
     actions:
       status: partial
       evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
     states:
-      status: missing
-      evidence: Нет loading, empty, error, offline и permission states.
+      status: partial
+      evidence: 'Описана только часть состояний: loading, error, offline.'
     role_variants:
       status: partial
-      evidence: роли в spec=organization; различия описаны не полностью.
+      evidence: роли в spec=organization, organizer; различия описаны не полностью.
     navigation:
       status: partial
       evidence: Навигация определена только в реестре или только в spec.
     integrations:
       status: ready
-      evidence: 'Связи: maps, payments.'
+      evidence: 'Связи: maps, notifications, payments.'
     spec:
-      status: partial
-      evidence: 'Spec существует, но краткий: 31 строк, 5 заголовков.'
+      status: ready
+      evidence: 'Spec существует: 57 непустых строк, 8 заголовков.'

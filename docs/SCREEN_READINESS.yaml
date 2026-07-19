@@ -798,7 +798,7 @@ screens:
       evidence: 'Указана одна связь: payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 37 непустых строк, 8 заголовков.'
+      evidence: 'Spec существует: 43 непустых строк, 9 заголовков.'
 - id: club.details
   title: Клуб
   section: discovery

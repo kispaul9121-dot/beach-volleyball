@@ -664,7 +664,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 31 пунктов.
+      evidence: Есть структурный раздел и 43 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: games.change_category, games.change_tournament_mode, games.open_search, games.open_filters…;
@@ -683,7 +683,7 @@ screens:
       evidence: 'Связи: notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 108 непустых строк, 10 заголовков.'
+      evidence: 'Spec существует: 134 непустых строк, 11 заголовков.'
 - id: chats.main
   title: Чаты
   section: chats

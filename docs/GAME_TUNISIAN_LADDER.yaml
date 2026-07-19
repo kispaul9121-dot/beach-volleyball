@@ -1,0 +1,153 @@
+version: 1
+scope: one_off_tunisian_ladder_game
+product_status: approved
+source_of_truth_for:
+- Tunisian ladder as a one-off game
+- one, two or three courts in one event
+- five players per court
+- organizer-defined matches per court
+- same-day court movement between cycles
+- prohibition of seasonal behavior
+research_note:
+  russian_community_terms:
+  - Тунисский формат
+  - Тунисская лестница
+  official_fivb_or_vfv_standard: false
+  international_generic_description: court ladder with mixed pairs
+  rule_variation_warning: community implementations differ, so the application always shows the configured rules
+format:
+  technical_id: rotation_five
+  product_label: Тунисская лестница
+  aliases:
+  - Тунисский формат
+  entity_type: game
+  event_duration: one_off_single_date
+  season_mode_forbidden: true
+  recurring_game_days_forbidden: true
+  cumulative_season_standings_forbidden: true
+configuration:
+  court_count:
+    entered_by_organizer: true
+    allowed_values:
+    - 1
+    - 2
+    - 3
+    default: 1
+  participant_count:
+    derived_formula: court_count_times_5
+    editable_independently: false
+    supported_values:
+    - 5
+    - 10
+    - 15
+    exactly_five_players_per_court: true
+  planned_match_count_per_court:
+    entered_by_organizer: true
+    input: positive_integer
+    default: 15
+    minimum: 1
+    unique_five_player_compositions: 15
+  cycle_count:
+    entered_by_organizer: true
+    input: positive_integer
+    default: 1
+    minimum: 1
+    all_cycles_must_fit_single_event_time_window: true
+  venue_validation:
+    reserved_court_count_must_cover_configured_courts: true
+    venue_player_limit_must_cover_participants: true
+    publish_blocked_on_failure: true
+initial_distribution:
+  one_court: all_five_players_on_court_1
+  multiple_courts:
+    methods:
+    - manual
+    - rating
+    - random
+    requirement: exactly_five_players_per_court
+cycle:
+  pairing_engine: five_player_mixed_pairs
+  generation_per_court:
+    fewer_than_fifteen: balanced_unique_subset
+    exactly_fifteen: all_unique_match_compositions_once
+    more_than_fifteen: append_shuffled_repeat_cycles
+  full_fifteen_match_properties:
+  - each_player_plays_12_matches
+  - each_player_rests_3_times
+  - each_player_partners_every_other_player_3_times
+  results_create_individual_table_per_court: true
+movement_after_cycle:
+  applies_when:
+  - court_count_is_greater_than_1
+  - another_cycle_remains
+  enabled: true
+  calculation_basis: individual_table_of_completed_cycle
+  movement_count_per_boundary: 1
+  upward:
+    source: rank_1_of_lower_court
+    destination: next_higher_court
+    label: Лидер поднимается
+  downward:
+    source: rank_5_of_higher_court
+    destination: next_lower_court
+    label: Последний опускается
+  simultaneous_across_boundaries: true
+  organizer_preview_required: true
+  organizer_confirmation_required: true
+  next_cycle_pairings_regenerated_after_movement: true
+  one_court_behavior: no_movement
+  final_cycle_behavior: show_final_positions_without_creating_another_cycle
+match_and_result_permissions:
+  owner_actor:
+    generate_cycles: true
+    enter_results: true
+    correct_results_with_reason: true
+    confirm_movements: true
+  delegated_manager:
+    view_only: true
+  participant:
+    view_matches_results_and_statistics: true
+    result_entry_forbidden: true
+management_presentation:
+  root_section: Матчи
+  local_views:
+  - Матчи
+  - Статистика
+  court_selector_visible_when_more_than_one: true
+  cycle_selector_visible_when_more_than_one: true
+  match_rows_are_simple_list_not_tournament_bracket: true
+  each_court_summary_shows:
+  - five_players
+  - configured_matches
+  - current_individual_table
+  - movement_preview_when_applicable
+statistics:
+  per_court_and_cycle:
+  - rank
+  - player
+  - played
+  - wins
+  - points_for
+  - points_against
+  - point_difference
+  final_order:
+  - court_priority_top_to_bottom
+  - rank_inside_final_court
+completion:
+  required_results_saved: true
+  unresolved_movement_preview_forbidden: true
+  result:
+  - game_is_completed
+  - final_statistics_become_read_only
+  - game_moves_to_archive
+boundaries:
+  entity_type_must_be_game: true
+  tournament_entity_for_this_format_forbidden: true
+  season_entity_or_mode_forbidden: true
+  multi_month_duration_forbidden: true
+  recurring_dates_forbidden: true
+accessibility:
+  court_rank_has_text_label: true
+  movement_has_text_equivalent: true
+  result_status_is_textual: true
+  color_only_court_rank_forbidden: true

@@ -1,4 +1,4 @@
-version: 5
+version: 6
 
 formats:
   standard_2x2:
@@ -36,7 +36,8 @@ formats:
       - score
       - pair_b
       - result_status
-      score_entry_permission: entity_manager
+      score_entry_permission: entity_owner_actor
+      delegated_manager_score_view: read_only
       participant_score_view: read_only
       statistics:
       - played
@@ -76,7 +77,8 @@ formats:
       - score
       - team_b
       - result_status
-      score_entry_permission: entity_manager
+      score_entry_permission: entity_owner_actor
+      delegated_manager_score_view: read_only
       participant_score_view: read_only
       statistics:
       - played
@@ -139,7 +141,8 @@ formats:
       - pair_b
       - resting_player
       - result_status
-      score_entry_permission: entity_manager
+      score_entry_permission: entity_owner_actor
+      delegated_manager_score_view: read_only
       participant_score_view: read_only
       aggregate: individual_statistics_table
       statistics:
@@ -193,7 +196,8 @@ formats:
       - score
       - fixed_team_b
       - result_status
-      score_entry_permission: entity_manager
+      score_entry_permission: entity_owner_actor
+      delegated_manager_score_view: read_only
       participant_score_view: read_only
       statistics:
       - played
@@ -210,8 +214,8 @@ format_engine_rules:
 - participant_capacity is entered by the organizer and validated against format and venue constraints.
 - fixed pairs or teams generate a round-robin list by default when more than two sides exist.
 - rotation_five generates five match rows; every player partners every other player exactly once and rests once.
-- only the organizer or authorized organizer staff can enter, change or publish scores in a one-off game.
-- participants can view published match rows and statistics but never receive score inputs.
+- only the owner actor that created the game can enter, change or publish scores in a one-off game.
+- delegated managers, captains and participants can view published match rows and statistics but never receive score inputs.
 - published lineups cannot be silently regenerated.
 - every lineup change after publication creates a notification and audit record.
-- one-off game statistics are derived from organizer-saved rows in the match table.
+- one-off game statistics are derived from owner-organizer-saved rows in the match table.

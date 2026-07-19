@@ -1,4 +1,4 @@
-version: 6
+version: 7
 scope: games_catalog
 source_of_truth_for:
 - Игры bottom tab
@@ -75,6 +75,7 @@ categories:
     rules:
     - public games are discoverable even when creator is not followed
     - followed and saved sources improve relevance but do not hide the open public catalog
+    - user-facing Король пляжа wording resolves to the Tunisian ladder game and never creates a tournament
     format_examples:
     - 2×2
     - 4×4
@@ -93,14 +94,20 @@ categories:
     mode_chips:
     - all
     - classic
-    - king_of_the_beach
     mode_labels:
       all: Все
       classic: Классика
-      king_of_the_beach: Король пляжа
+    supported_formats:
+    - single_elimination
+    - round_robin
+    - swiss
+    - full_placement
+    forbidden_formats:
+    - groups_then_playoff
+    - king_of_the_beach
     rules:
     - seasonal mode is not supported
-    - Tunisian ladder belongs to one-off games, not tournaments
+    - Tunisian ladder and King of the Beach wording belong to one-off games, not tournaments
     - every list is ordered from nearest date to latest date
 following:
   organizer_follow:
@@ -116,7 +123,7 @@ following:
     - allow notification preferences per category
     forbidden_effects:
     - automatic participation
-    - access to private events
+    - access_to_private_events
   saved_players:
     source: docs/PLAYER_DIRECTORY.yaml
     effects:

@@ -1,4 +1,4 @@
-version: 3
+version: 4
 scope: profile_activity
 source_of_truth_for:
 - personal participation preview on home.main
@@ -43,6 +43,7 @@ profile_root:
   route: /
   mode: personal_profile_and_participation
   management_controls_forbidden: true
+  creation_controls_forbidden: true
   connections_contract: docs/PROFILE_CONNECTIONS.yaml
   upcoming_timeline:
     title: Ближайшее
@@ -131,6 +132,10 @@ management:
   profile_embedding_forbidden: true
   profile_entry_forbidden: true
   standalone_center_removed: true
+  temporal_tabs_forbidden: true
+  current_lists_exclude_completed: true
+  completed_entities_destination: archive
+  archive_placement_status: placement_pending
   games:
     screen: play.main
     route: /play

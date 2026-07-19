@@ -191,7 +191,7 @@ def main() -> int:
     if (step_two.get("venue_limit", {}) or {}).get("publish_blocked_when_exceeded") is not True:
         errors.append("Venue player limit must block publication")
 
-    # One-off game management and universal match table.
+    # One-off game management and strict owner-only result controls.
     game_management = game_mvp.get("management", {}) or {}
     if game_management.get("sections") != ["overview", "participants", "matches", "chat"]:
         errors.append("Game MVP sections must be Overview, Participants, Matches and Chat")
@@ -204,41 +204,66 @@ def main() -> int:
         errors.append("Every one-off game must have a match table")
     if matches.get("tournament_visual_map_forbidden") is not True:
         errors.append("One-off games must not use tournament visual maps")
-    participant_permissions = matches.get("participant_permissions", {}) or {}
-    if participant_permissions.get("participant_can_enter_score") is not False:
-        errors.append("Participants must not enter one-off game scores")
-    if participant_permissions.get("participant_can_confirm_result") is not False:
-        errors.append("Participants must not confirm one-off game results")
+    score_fields = matches.get("score_fields", {}) or {}
+    if score_fields.get("entity_owner_actor") != "editable_inline":
+        errors.append("Only the owner actor must receive editable one-off score fields")
+    if score_fields.get("delegated_event_manager") != "read_only":
+        errors.append("Delegated event managers must remain read-only for results")
+    if score_fields.get("confirmed_participant") != "read_only":
+        errors.append("Participants must remain read-only for results")
+    if matches.get("organizer_action_permission") != "entity_owner_actor":
+        errors.append("One-off match actions must be restricted to the owner actor")
+    non_owner = matches.get("non_owner_permissions", {}) or {}
+    if non_owner.get("delegated_manager_can_enter_score") is not False:
+        errors.append("Delegated managers must not enter one-off scores")
+    if non_owner.get("participant_can_enter_score") is not False:
+        errors.append("Participants must not enter one-off scores")
+    if non_owner.get("participant_can_confirm_result") is not False:
+        errors.append("Participants must not confirm one-off results")
     result_entry = matches.get("result_entry", {}) or {}
-    if result_entry.get("permission") != "entity_manager" or result_entry.get("organizer_only_ui") is not True:
-        errors.append("One-off game result entry must be organizer-only")
+    if result_entry.get("permission") != "entity_owner_actor" or result_entry.get("organizer_owner_only_ui") is not True:
+        errors.append("One-off result entry must be strictly owner-organizer-only")
+    if result_entry.get("delegated_manager_entry_forbidden") is not True:
+        errors.append("One-off result entry must explicitly forbid delegated managers")
     if result_entry.get("save_directly_without_opponent_confirmation") is not True:
-        errors.append("Organizer results must not require opponent confirmation")
+        errors.append("Owner results must not require opponent confirmation")
     if result_entry.get("participant_conflict_flow_forbidden") is not True:
         errors.append("Participant score conflict flow must remain forbidden")
 
     if game_matches.get("product_status") != "approved":
         errors.append("One-off match table must be approved")
     result_permissions = game_matches.get("result_permissions", {}) or {}
+    owner_result = result_permissions.get("organizer_owner_actor", {}) or {}
+    delegated_result = result_permissions.get("delegated_event_manager", {}) or {}
     participant_result = result_permissions.get("confirmed_participant", {}) or {}
-    manager_result = result_permissions.get("organizer_or_authorized_staff", {}) or {}
+    if owner_result.get("can_enter_any_match") is not True:
+        errors.append("Owner actor must be able to enter every one-off result")
+    if delegated_result.get("can_enter") is not False or delegated_result.get("can_confirm") is not False:
+        errors.append("Delegated managers must not enter or confirm one-off results")
     if participant_result.get("can_enter") is not False or participant_result.get("can_confirm") is not False:
-        errors.append("Match-table participants must remain read-only")
-    if manager_result.get("can_enter_any_match") is not True:
-        errors.append("Organizer must be able to enter every one-off match result")
+        errors.append("Participants must remain read-only")
     lifecycle = game_matches.get("result_lifecycle", {}) or {}
     if lifecycle.get("participant_confirmation_required") is not False:
         errors.append("One-off results must not require participant confirmation")
+    if lifecycle.get("delegated_manager_confirmation_required") is not False:
+        errors.append("One-off results must not require delegated manager confirmation")
     if lifecycle.get("participant_score_conflict_flow_forbidden") is not True:
         errors.append("One-off result contract must forbid participant score conflicts")
+    for state_name in ("empty", "editing"):
+        if (lifecycle.get(state_name, {}) or {}).get("editable_by") != "entity_owner_actor":
+            errors.append(f"{state_name} result state must be editable only by owner actor")
+    if (lifecycle.get("correction", {}) or {}).get("permission") != "entity_owner_actor":
+        errors.append("Saved result correction must be owner-only")
 
     formats = game_formats.get("formats", {}) or {}
     for format_id in ("standard_2x2", "standard_4x4", "rotation_five", "fixed_team_match"):
         view = (formats.get(format_id, {}) or {}).get("one_off_game_view", {}) or {}
         if view.get("primary") != "match_table":
             errors.append(f"{format_id} must use the one-off match table")
-        if view.get("score_entry_permission") != "entity_manager":
-            errors.append(f"{format_id} score entry must be organizer-only")
+        if view.get("score_entry_permission") != "entity_owner_actor":
+            errors.append(f"{format_id} score entry must be owner-organizer-only")
+        if view.get("delegated_manager_score_view") != "read_only":
+            errors.append(f"{format_id} delegated manager score view must be read-only")
         if view.get("participant_score_view") != "read_only":
             errors.append(f"{format_id} participant score view must be read-only")
 
@@ -246,8 +271,14 @@ def main() -> int:
     if game_sections.get("manager_sections") != ["overview", "participants", "matches", "chat"]:
         errors.append("Entity sections must mirror the game MVP sections")
     score_entry = ((game_sections.get("matches", {}) or {}).get("score_entry", {}) or {})
+    if score_entry.get("entity_owner_actor") != "editable":
+        errors.append("Entity section must expose editable results only to owner actor")
+    if score_entry.get("delegated_event_manager") != "read_only":
+        errors.append("Entity section must keep delegated managers read-only")
     if score_entry.get("confirmed_participant") != "read_only":
-        errors.append("Entity section must keep participant results read-only")
+        errors.append("Entity section must keep participants read-only")
+    if score_entry.get("delegated_manager_entry_forbidden") is not True:
+        errors.append("Entity section must forbid delegated manager result entry")
     if score_entry.get("participant_confirmation_required") is not False:
         errors.append("Entity section must not require participant result confirmation")
 
@@ -287,9 +318,11 @@ def main() -> int:
             errors.append(f"{name} spec must include accessibility archive action")
 
     if "результаты вводит только организатор" not in game_manage_text.lower():
-        errors.append("Game manage spec must explicitly restrict result entry to organizer")
-    if "обычный участник не вводит и не подтверждает счёт" not in game_details_text.lower():
-        errors.append("Game details spec must explicitly keep participant results read-only")
+        errors.append("Game manage spec must explicitly restrict results to organizer")
+    if "результаты вводит только actor-владелец" not in game_details_text.lower():
+        errors.append("Game details spec must explicitly restrict results to owner actor")
+    if "делегированные менеджеры события" not in game_manage_text.lower():
+        errors.append("Game manage spec must explicitly keep delegated managers read-only")
 
     feedback = tokens.get("motion", {}).get("one_shot_feedback", {}).get("profile_activity_confirmation", {})
     if feedback.get("tab_id") != "home" or feedback.get("repetitions") != 1:

@@ -1,4 +1,4 @@
-version: 7
+version: 8
 scope: entity_sections
 source_of_truth_for:
 - public entity navigation
@@ -18,6 +18,7 @@ common_rules:
 - Чат не заменяет карточку события, состав, матчи, результаты или статистику.
 - Системные изменения события публикуются в чат как системные сообщения с action_id.
 - Встроенный раздел чата и карточка в глобальной вкладке Чаты всегда используют один conversationId.
+- Сезонная сущность, сезонный режим и накопительные игровые дни не поддерживаются.
 common_sections:
   required:
   - overview
@@ -64,6 +65,7 @@ chat:
   - registration_changed
   - payment_required
   - match_list_generated
+  - court_movement_confirmed
   - result_saved
   - result_corrected
   - entity_cancelled
@@ -73,6 +75,7 @@ entity_types:
   game:
     mvp_contract: docs/GAME_MVP.yaml
     match_contract: docs/GAME_MATCH_TABLE.yaml
+    tunisian_contract: docs/GAME_TUNISIAN_LADDER.yaml
     participant_sections:
     - overview
     - participants
@@ -87,6 +90,8 @@ entity_types:
     - payments
     - settings
     - tournament_bracket
+    - season
+    - game_days
     matches:
       required_in_mvp: true
       always_present: true
@@ -98,13 +103,24 @@ entity_types:
         standard_2x2: fixed_pairs_round_robin_or_manual
         standard_4x4: fixed_teams_round_robin_or_manual
         fixed_team_match: fixed_teams_round_robin_or_manual
-        rotation_five: exactly_five_players_with_configurable_match_count
-      rotation_five_rules:
-        participant_count: 5
-        match_count_entered_by_organizer: true
-        default_match_count: 15
-        unique_match_compositions: 15
-        larger_groups_are_tournaments: true
+        rotation_five: one_to_three_court_tunisian_ladder
+      tunisian_rules:
+        entity_type: game
+        event_duration: one_off_single_date
+        court_count_allowed:
+        - 1
+        - 2
+        - 3
+        participant_count_formula: court_count_times_5
+        supported_participant_counts:
+        - 5
+        - 10
+        - 15
+        match_count_per_court_entered_by_organizer: true
+        default_match_count_per_court: 15
+        cycle_count_entered_by_organizer: true
+        movements_only_between_cycles_inside_same_event: true
+        season_mode_forbidden: true
       score_entry:
         entity_owner_actor: editable
         delegated_event_manager: read_only
@@ -158,18 +174,18 @@ entity_types:
     conditional_sections:
       matches: format_has_matches
       bracket: elimination_or_groups_playoff_or_placement
-      rounds: swiss_or_placement_or_court_ladder
-      schedule: round_robin_or_timed_matches_or_court_ladder
-      standings: round_robin_or_swiss_or_groups_or_king_of_the_beach_or_seasonal
+      rounds: swiss_or_placement
+      schedule: round_robin_or_timed_matches
+      standings: round_robin_or_swiss_or_groups_or_king_of_the_beach
       placements: full_placement_or_completed
       statistics: statistics_available
-      tournament_days: tournament_mode_is_seasonal
-      court_ladder: format_is_king_of_the_beach_court_ladder
-    court_ladder_contract: docs/TOURNAMENT_COURT_LADDER.yaml
+    forbidden_formats_and_sections:
+    - seasonal
+    - tournament_days
+    - tunisian_court_ladder
     visual_direction:
       rich_competition_map_allowed: true
       bracket_and_round_cards_allowed: true
-      stacked_grid_cards_allowed: true
   tour:
     base_sections:
     - overview
@@ -186,8 +202,10 @@ implementation_rules:
 - Не создавать отдельный чат для таблицы, матча или списка игроков без явного продуктового решения.
 - Внутренние разделы зависят от типа, формата, статуса и роли пользователя.
 - На мобильном допускается горизонтальный tab bar или меню разделов, но глобальная нижняя навигация не заменяется.
-- Разовая игра на смешанные пары содержит ровно пять игроков, но количество матчей задаётся отдельно.
-- Две или три пятёрки с переходами между сетками являются турниром, а не разовой игрой.
+- Тунисская лестница является разовой игрой на одну дату с одной, двумя или тремя площадками по пять игроков.
+- Количество матчей на площадку и количество циклов задаются отдельно.
+- Переходы между площадками происходят только между циклами внутри этой же игры.
+- Сезоны, повторяющиеся игровые дни и накопительная сезонная таблица запрещены.
 - Поля счёта разовой игры показываются только actor-владельцу.
 - Делегированный менеджер, капитан и участник видят результаты только для чтения.
 - Кнопка оплаты показывается только владельцу собственного payment record.

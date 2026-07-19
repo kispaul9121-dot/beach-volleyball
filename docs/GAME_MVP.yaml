@@ -1,11 +1,11 @@
-version: 1
+version: 2
 scope: game_mvp_creation_and_management
 product_status: approved
 source_of_truth_for:
 - four-step game creation
 - participant capacity input and venue limit
 - MVP game management sections
-- participant payment indicators
+- participant payment status and self-service pay action
 - format-aware score and statistics UI
 - canonical game chat shared with Chats
 creation:
@@ -123,38 +123,67 @@ management:
       label: Редактировать игру
       destination: game_core_edit_flow
   participants:
+    source_of_truth: docs/JOIN_FLOW.yaml
     presentation: responsive_table_or_rows
+    visible_to:
+    - confirmed_participants
+    - entity_managers
     columns_or_fields:
-    - player
+    - first_name
+    - last_name
     - participation_status
-    - payment_status_icon
+    - payment_cell
     - team_pair_or_court_when_assigned
-    payment_icons:
-      paid:
-        icon: CircleCheck
-        label: Оплачено
-      unpaid:
-        icon: CircleX
-        label: Не оплачено
-      payment_required:
-        icon: Clock3
-        label: Ожидает оплаты
-      free:
-        icon: Minus
-        label: Бесплатно
-      external_unverified:
-        icon: CircleHelp
-        label: Оплата организатору · не подтверждена
-      color_only_meaning_forbidden: true
-    edit_mode:
+    payment_cell:
+      public_status_for_confirmed_participants:
+        paid: Оплачено
+        unpaid_or_payment_required: Не оплачено
+        free: Бесплатно
+      own_row:
+        online_unpaid:
+          control: button
+          label: Оплатить
+          action_id: entity.open_payment
+        processing:
+          control: status
+          label: Оплата обрабатывается
+        paid:
+          control: status
+          label: Оплачено
+        failed:
+          control: button
+          label: Повторить оплату
+          action_id: entity.open_payment
+        free:
+          control: status
+          label: Бесплатно
+        external_unverified:
+          control: status
+          label: Не оплачено
+          helper: Оплата организатору вне приложения
+      other_rows:
+        actions_forbidden: true
+        shows_only_status: true
+      after_success:
+        replace_button_with_status: Оплачено
+        preserve_cell_width: true
+        update_visible_rows_realtime: true
+      rules:
+      - only_payment_owner_can_start_checkout
+      - paying_for_another_participant_is_forbidden
+      - guests_and_unconfirmed_users_do_not_see_payment_statuses
+      - color_only_meaning_forbidden
+    manager_edit_mode:
       entry_label: Редактировать
       actions:
       - Добавить игрока
       - Убрать игрока
-      - Изменить статус участия
-      - Отметить оплату
       destructive_remove_requires_confirmation: true
       add_uses: player.picker
+      payment_editing_forbidden: true
+    pending_request_actions:
+    - Подтвердить заявку
+    - Отклонить заявку
     separate_payments_screen_for_mvp: false
   scoring:
     purpose:

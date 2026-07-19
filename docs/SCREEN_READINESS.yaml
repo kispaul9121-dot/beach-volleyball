@@ -1777,7 +1777,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 25 пунктов.
+      evidence: Есть структурный раздел и 26 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: tournament.choose_format; действия описаны в spec.'
@@ -1795,7 +1795,7 @@ screens:
       evidence: 'Связи: chat, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 37 непустых строк, 7 заголовков.'
+      evidence: 'Spec существует: 46 непустых строк, 7 заголовков.'
 - id: tournament.manage
   title: Управление турниром
   section: shared

@@ -20,118 +20,136 @@ def load_yaml(name: str) -> dict[str, Any]:
 
 def main() -> int:
     errors: list[str] = []
+    ladder = load_yaml("GAME_TUNISIAN_LADDER.yaml")
     matches = load_yaml("GAME_MATCH_TABLE.yaml")
     formats = load_yaml("GAME_FORMATS.yaml")
     game_mvp = load_yaml("GAME_MVP.yaml")
-    tournament = load_yaml("TOURNAMENT_COURT_LADDER.yaml")
+    catalog = load_yaml("GAMES_CATALOG.yaml")
+    competitions = load_yaml("COMPETITION_FORMATS.yaml")
     visual = load_yaml("TOURNAMENT_VISUAL_MAP.yaml")
 
+    fmt = ladder.get("format", {}) or {}
+    if fmt.get("technical_id") != "rotation_five":
+        errors.append("Tunisian ladder technical id must remain rotation_five")
+    if fmt.get("product_label") != "Тунисская лестница":
+        errors.append("Product label must be Тунисская лестница")
+    if fmt.get("entity_type") != "game":
+        errors.append("Tunisian ladder must be a game, not a tournament")
+    if fmt.get("event_duration") != "one_off_single_date":
+        errors.append("Tunisian ladder must be one-off and single-date")
+    if fmt.get("season_mode_forbidden") is not True:
+        errors.append("Tunisian ladder must forbid season mode")
+
+    config = ladder.get("configuration", {}) or {}
+    court_count = config.get("court_count", {}) or {}
+    if court_count.get("allowed_values") != [1, 2, 3]:
+        errors.append("Tunisian ladder must support exactly one, two or three courts")
+    participant_count = config.get("participant_count", {}) or {}
+    if participant_count.get("derived_formula") != "court_count_times_5":
+        errors.append("Participant count must be derived as court_count × 5")
+    if participant_count.get("supported_values") != [5, 10, 15]:
+        errors.append("Supported participant counts must be 5, 10 and 15")
+    if participant_count.get("editable_independently") is not False:
+        errors.append("Tunisian participant count must not be independently editable")
+
+    planned = config.get("planned_match_count_per_court", {}) or {}
+    if planned.get("entered_by_organizer") is not True or planned.get("default") != 15:
+        errors.append("Matches per court must be organizer-defined and default to 15")
+    cycle_count = config.get("cycle_count", {}) or {}
+    if cycle_count.get("entered_by_organizer") is not True or cycle_count.get("default") != 1:
+        errors.append("Cycle count must be organizer-defined and default to one")
+    if cycle_count.get("all_cycles_must_fit_single_event_time_window") is not True:
+        errors.append("All cycles must fit one event time window")
+
+    movement = ladder.get("movement_after_cycle", {}) or {}
+    if movement.get("enabled") is not True:
+        errors.append("Court movement must be enabled when applicable")
+    if movement.get("simultaneous_across_boundaries") is not True:
+        errors.append("Court movements must be simultaneous")
+    if movement.get("organizer_confirmation_required") is not True:
+        errors.append("Organizer must confirm court movement")
+    if movement.get("final_cycle_behavior") != "show_final_positions_without_creating_another_cycle":
+        errors.append("Final cycle must not create another cycle")
+
     rotation = ((matches.get("lineup_modes", {}) or {}).get("rotation_five", {}) or {})
-    participant_count = rotation.get("participant_count", {}) or {}
-    if participant_count.get("exact") != 5:
-        errors.append("One-off mixed-pair game must have exactly five participants")
-
-    planned = rotation.get("planned_match_count", {}) or {}
-    if planned.get("entered_by_organizer") is not True:
-        errors.append("Five-player match count must be entered separately by organizer")
-    if planned.get("default") != 15 or planned.get("minimum") != 1:
-        errors.append("Five-player match count must default to 15 and allow positive integers")
-
-    unique_cycle = rotation.get("unique_cycle", {}) or {}
-    if unique_cycle.get("unique_match_count") != 15:
-        errors.append("Five-player game must define fifteen unique match compositions")
-    generation = rotation.get("generation", {}) or {}
-    if generation.get("when_exactly_fifteen") != "complete_unique_cycle":
-        errors.append("Fifteen matches must generate the complete unique cycle")
-    if generation.get("when_more_than_fifteen") != "append_new_shuffled_cycles_with_repeats":
-        errors.append("More than fifteen matches must be represented as repeated shuffled cycles")
+    if rotation.get("entity_type") != "game":
+        errors.append("Match table must keep Tunisian ladder inside games")
+    if (rotation.get("court_count", {}) or {}).get("allowed") != [1, 2, 3]:
+        errors.append("Match table must support one to three courts")
+    if (rotation.get("participant_count", {}) or {}).get("supported") != [5, 10, 15]:
+        errors.append("Match table must support 5, 10 and 15 participants")
+    if rotation.get("season_mode_forbidden") is not True:
+        errors.append("Match table must forbid season mode")
+    if rotation.get("tournament_entity_forbidden") is not True:
+        errors.append("Match table must forbid a Tunisian tournament entity")
 
     game_format = ((formats.get("formats", {}) or {}).get("rotation_five", {}) or {})
+    if game_format.get("entity_type") != "game":
+        errors.append("GAME_FORMATS must classify Tunisian ladder as a game")
     capacity = game_format.get("capacity", {}) or {}
-    if capacity.get("exact_players") != 5 or capacity.get("publish_blocked_when_not_exactly_five") is not True:
-        errors.append("GAME_FORMATS must block non-five-player one-off rotation")
-    match_count = game_format.get("match_count", {}) or {}
-    if match_count.get("entered_by_organizer") is not True or match_count.get("default") != 15:
-        errors.append("GAME_FORMATS must keep participant count and match count independent")
+    if capacity.get("court_count_allowed") != [1, 2, 3]:
+        errors.append("GAME_FORMATS court count differs")
+    if capacity.get("supported_participant_counts") != [5, 10, 15]:
+        errors.append("GAME_FORMATS participant counts differ")
+    if game_format.get("seasonal_mode_forbidden") is not True:
+        errors.append("GAME_FORMATS must forbid seasonal mode")
+    if game_format.get("tournament_entity_forbidden") is not True:
+        errors.append("GAME_FORMATS must forbid Tunisian tournaments")
 
-    mvp_rotation = (((game_mvp.get("creation", {}) or {}).get("steps", {}) or {}).get(2, {}) or {}).get("format_capacity_rules", {}) or {}
-    mvp_rotation = mvp_rotation.get("rotation_five", {}) or {}
-    if mvp_rotation.get("exact_players") != 5:
-        errors.append("Game creation must require exactly five players for mixed pairs")
-    mvp_matches = ((((game_mvp.get("management", {}) or {}).get("matches", {}) or {}).get("generation", {}) or {}).get("rotation_five", {}) or {})
-    if mvp_matches.get("planned_match_count_entered_by_organizer") is not True:
-        errors.append("Game MVP must expose a separate planned match count")
-    if mvp_matches.get("unique_cycle_match_count") != 15:
-        errors.append("Game MVP must preserve the fifteen-match unique cycle")
-    if mvp_matches.get("more_than_five_players_forbidden") is not True:
-        errors.append("One-off game must forbid more than five participants in this format")
+    step_two = (((game_mvp.get("creation", {}) or {}).get("steps", {}) or {}).get(2, {}) or {})
+    mvp_rotation = ((step_two.get("format_capacity_rules", {}) or {}).get("rotation_five", {}) or {})
+    if mvp_rotation.get("entity_type") != "game":
+        errors.append("Game creation must create Tunisian ladder as a game")
+    if (mvp_rotation.get("court_count", {}) or {}).get("allowed") != [1, 2, 3]:
+        errors.append("Game creation must expose one to three courts")
+    if (mvp_rotation.get("participant_count", {}) or {}).get("supported") != [5, 10, 15]:
+        errors.append("Game creation participant counts differ")
+    if mvp_rotation.get("season_mode_forbidden") is not True:
+        errors.append("Game creation must forbid season mode")
 
-    tournament_format = tournament.get("format", {}) or {}
-    if tournament_format.get("id") != "tunisian_court_ladder":
-        errors.append("Multi-court tournament id must be tunisian_court_ladder")
-    if tournament_format.get("product_label") != "Тунисский формат":
-        errors.append("Russian product label must be Тунисский формат")
-    if tournament_format.get("minimum_court_count") != 2:
-        errors.append("Tunisian tournament must require more than one court")
+    tournament_modes = (((catalog.get("categories", {}) or {}).get("tournaments", {}) or {}).get("mode_chips", []) or [])
+    if "seasonal" in tournament_modes:
+        errors.append("Games catalog must not expose Seasonal")
+    if set(tournament_modes) != {"all", "classic", "king_of_the_beach"}:
+        errors.append("Tournament catalog modes must be All, Classic and King of the Beach")
 
-    configurations = tournament_format.get("supported_mvp_configurations", {}) or {}
-    expected = {
-        "ten_players": (10, 2),
-        "fifteen_players": (15, 3),
-    }
-    for name, (players, courts) in expected.items():
-        config = configurations.get(name, {}) or {}
-        if config.get("participant_count") != players or config.get("court_count") != courts:
-            errors.append(f"{name} configuration must be {players} players on {courts} courts")
-        if config.get("players_per_court") != 5:
-            errors.append(f"{name} must keep exactly five players per court")
+    competition_formats = competitions.get("formats", {}) or {}
+    if "seasonal_tournament" in competition_formats:
+        errors.append("Seasonal tournament format must be removed")
+    if "seasonal" in (competitions.get("catalog_modes", {}) or {}):
+        errors.append("Seasonal tournament catalog mode must be removed")
 
-    one_court = tournament_format.get("one_court_destination", {}) or {}
-    if one_court.get("entity_type") != "game" or one_court.get("format") != "rotation_five":
-        errors.append("One court with five players must resolve to a one-off game")
+    visual_formats = visual.get("format_presentations", {}) or {}
+    if "seasonal" in visual_formats:
+        errors.append("Tournament visual map must not contain seasonal presentation")
+    if "tunisian_court_ladder" in visual_formats:
+        errors.append("Tournament visual map must not contain Tunisian ladder")
 
-    cycle = tournament.get("cycle", {}) or {}
-    cycle_matches = cycle.get("planned_match_count_per_court", {}) or {}
-    if cycle_matches.get("entered_by_organizer") is not True or cycle_matches.get("default") != 15:
-        errors.append("Each Tunisian court cycle must have organizer-defined matches, default 15")
+    forbidden_path = DOCS / "TOURNAMENT_COURT_LADDER.yaml"
+    if forbidden_path.exists():
+        errors.append("Old Tunisian tournament contract must be deleted")
+    if (DOCS / "screens/shared/season-details.md").exists():
+        errors.append("Season details screen must be deleted")
 
-    movement = tournament.get("movement_after_cycle", {}) or {}
-    if movement.get("enabled") is not True or movement.get("simultaneous_across_boundaries") is not True:
-        errors.append("Court movements must be enabled and simultaneous")
-    upward = movement.get("upward", {}) or {}
-    downward = movement.get("downward", {}) or {}
-    if upward.get("source") != "rank_1_of_lower_court" or upward.get("destination") != "next_higher_court":
-        errors.append("Leader of the lower court must move upward")
-    if downward.get("source") != "rank_5_of_higher_court" or downward.get("destination") != "next_lower_court":
-        errors.append("Last player of the higher court must move downward")
-
-    research = tournament.get("research_note", {}) or {}
-    if research.get("official_fivb_or_vfv_standard") is not False:
-        errors.append("Tunisian format must be documented as a community, not official, standard")
-    if research.get("rule_variation_warning") is None:
-        errors.append("Tunisian format must warn that community rules vary")
-
-    visual_format = ((visual.get("format_presentations", {}) or {}).get("tunisian_court_ladder", {}) or {})
-    if visual_format.get("primary") != "stacked_court_ladder":
-        errors.append("Tournament visual map must include the stacked Tunisian court ladder")
-
-    create_text = (DOCS / "screens/shared/game-create.md").read_text(encoding="utf-8")
-    tournament_text = (DOCS / "screens/shared/tournament-details.md").read_text(encoding="utf-8")
-    manage_text = (DOCS / "screens/shared/tournament-manage.md").read_text(encoding="utf-8")
-    if "Количество игроков: 5" not in create_text or "Количество матчей: 15" not in create_text:
-        errors.append("Game creation spec must show separate five-player and match-count fields")
-    if "Тунисский формат" not in tournament_text or "10 игроков → 2 площадки по 5" not in tournament_text:
-        errors.append("Tournament details must describe the Tunisian format")
-    if "Подтвердить переходы" not in manage_text:
-        errors.append("Tournament management must explicitly confirm court movements")
+    game_create_text = (DOCS / "screens/shared/game-create.md").read_text(encoding="utf-8")
+    game_manage_text = (DOCS / "screens/shared/game-manage.md").read_text(encoding="utf-8")
+    play_text = (DOCS / "screens/play/main.md").read_text(encoding="utf-8")
+    if "1 площадка → 5 игроков" not in game_create_text or "3 площадки → 15 игроков" not in game_create_text:
+        errors.append("Game creation spec must show all Tunisian court configurations")
+    if "Циклов за игру" not in game_create_text:
+        errors.append("Game creation spec must expose same-day cycle count")
+    if "Подтвердить переходы" not in game_manage_text:
+        errors.append("Game management must confirm court movements")
+    if "Сезонной категории и сезонного режима нет" not in play_text:
+        errors.append("Games catalog spec must explicitly remove seasons")
 
     if errors:
-        print("Tunisian format validation failed:")
+        print("Tunisian one-off game validation failed:")
         for error in errors:
             print(f"  - {error}")
         return 1
 
-    print("Tunisian format validation passed.")
+    print("Tunisian one-off game validation passed.")
     return 0
 
 

@@ -1,4 +1,4 @@
-version: 6
+version: 7
 scope: game_mvp_creation_and_management
 product_status: approved
 source_of_truth_for:
@@ -63,13 +63,13 @@ creation:
           minimum_players_per_court: 8
           capacity_can_exceed_active_players_for_substitutions_or_reserve: true
         rotation_five:
-          technical_id_status: legacy_name_kept_for_compatibility
-          product_label: Смешанные пары
-          minimum_players: 4
-          fixed_to_five: false
-          exact_multiple_rule: none
-          maximum_players: venue_capacity
-          generated_match_count_formula: participant_capacity
+          product_label: Смешанные пары на 5 игроков
+          exact_players: 5
+          minimum_players: 5
+          maximum_players: 5
+          generated_match_count: 5
+          publish_blocked_when_not_exactly_five: true
+          larger_counts_destination: docs/TOURNAMENT_COURT_LADDER.yaml
         fixed_team_match:
           minimum_teams: 2
           participant_capacity_derived_from_team_size_but_confirmed_by_organizer: true
@@ -250,22 +250,14 @@ management:
       fixed_teams:
         default_schedule: round_robin_when_more_than_two_teams
       rotation_five:
-        technical_id_status: legacy_name_kept_for_compatibility
-        product_label: Смешанные пары
-        generated_rows_formula: participant_count
-        minimum_participant_count: 4
-        fixed_to_five: false
-        target_appearances_per_player: 4
-        partner_repetitions: minimize
-        opponent_repetitions: minimize
-        waiting_time: balance
-        special_case_five_players:
-          generated_rows: 5
-          each_player_rests_once: true
-          each_player_partners_every_other_player_once: true
-        example_fifteen_players:
-          generated_rows: 15
-          target_appearances_per_player: 4
+        product_label: Смешанные пары на 5 игроков
+        exact_participant_count: 5
+        generated_rows: 5
+        each_round_has_two_pairs_and_one_resting_player: true
+        each_player_rests_once: true
+        each_player_partners_every_other_player_once: true
+        more_than_five_forbidden: true
+        ten_or_fifteen_players_destination: docs/TOURNAMENT_COURT_LADDER.yaml
       manual:
         add_matches_one_by_one: true
     statistics:
@@ -277,7 +269,7 @@ management:
       - points_for
       - points_against
       - point_difference
-      mixed_pairs_individual:
+      rotation_five_individual:
       - played
       - wins
       - points_for

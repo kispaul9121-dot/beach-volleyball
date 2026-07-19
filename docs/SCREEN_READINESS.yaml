@@ -664,14 +664,14 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 43 пунктов.
+      evidence: Есть структурный раздел и 10 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: games.change_category, games.change_tournament_mode, games.open_search, games.open_filters…;
         действия описаны в spec.'
     states:
       status: partial
-      evidence: 'Описана только часть состояний: empty, error.'
+      evidence: 'Описана только часть состояний: empty.'
     role_variants:
       status: ready
       evidence: variants=player, trainer, organization.
@@ -680,10 +680,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: notifications, payments.'
+      evidence: 'Связи: chat, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 134 непустых строк, 11 заголовков.'
+      evidence: 'Spec существует: 74 непустых строк, 11 заголовков.'
 - id: chats.main
   title: Чаты
   section: chats

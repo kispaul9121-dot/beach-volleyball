@@ -1,4 +1,4 @@
-version: 8
+version: 9
 
 formats:
   standard_2x2:
@@ -96,8 +96,7 @@ formats:
     participant_unit: individual
     players_on_court: 4
     team_size: 2
-    resting_players_per_round: 1
-    canonical_round_count: 5
+    resting_players_per_match: 1
     capacity:
       organizer_enters_participant_capacity: true
       exact_players: 5
@@ -105,18 +104,33 @@ formats:
       maximum_players: 5
       must_not_exceed_venue_limit: true
       publish_blocked_when_not_exactly_five: true
+    match_count:
+      entered_by_organizer: true
+      input: positive_integer
+      default: 15
+      minimum: 1
+      hard_maximum: none
+    unique_cycle:
+      unique_match_compositions: 15
+      formula: five_resting_player_choices_times_three_pair_splits
+      full_cycle:
+        matches: 15
+        appearances_per_player: 12
+        rests_per_player: 3
+        partner_occurrences_per_pair: 3
     generation:
-      generated_match_count: 5
-      appearances_per_player: 4
-      each_player_rests_once: true
-      every_pair_of_players_are_partners_once: true
-      no_player_appears_twice_in_one_match: true
-    purpose: Одна разовая игра ровно на пять участников с пятью смешанными матчами.
+      rows_equal_entered_match_count: true
+      fewer_than_fifteen: balanced_unique_subset
+      exactly_fifteen: all_unique_compositions_once
+      more_than_fifteen: repeat_new_shuffled_cycles
+      warn_about_repeats_after: 15
+      balance_waiting_time: true
+    purpose: Одна разовая игра ровно на пять участников с настраиваемым количеством матчей; стандартный полный цикл содержит 15 матчей.
     one_off_game_view:
       primary: match_table
-      generated_rows: 5
+      generated_rows_formula: planned_match_count
       each_row:
-      - round_number
+      - match_number
       - pair_a
       - score
       - pair_b
@@ -190,8 +204,9 @@ format_engine_rules:
 - tournament and seasonal modes may use brackets, groups, schedules and rich visual maps through tournament-specific contracts.
 - participant_capacity is entered by the organizer and validated against format and venue constraints.
 - fixed pairs or teams generate a round-robin list by default when more than two sides exist.
-- rotation_five is a one-off game with exactly five participants and exactly five match rows.
-- ten or fifteen players with five-player grids belong to the separate tournament contract docs/TOURNAMENT_COURT_LADDER.yaml.
+- rotation_five is a one-off game with exactly five participants, but its match count is entered independently by the organizer.
+- a complete non-repeating five-player cycle contains fifteen unique match compositions.
+- ten or fifteen players with two or three five-player grids belong to docs/TOURNAMENT_COURT_LADDER.yaml.
 - only the owner actor that created the game can enter, change or publish scores in a one-off game.
 - delegated managers, captains and participants can view published match rows and statistics but never receive score inputs.
 - published lineups cannot be silently regenerated.

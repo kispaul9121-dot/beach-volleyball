@@ -1,15 +1,18 @@
-version: 2
+version: 3
 scope: contextual_section_management
 source_of_truth_for:
 - management mode in Games and Camps
 - contextual creation entry points
 - capability-aware event opening
 - return paths from entity management
+- archive boundary for completed managed entities
 principles:
 - Profile has no creation or event-management controls
 - Games owns creation and management of games, trainings and tournaments
 - Camps owns creation and management of camps
 - management mode behaves as a reversible list filter, not a separate bottom tab
+- management mode shows current manageable entities in one list without Active or Completed tabs
+- completed managed entities belong to an archive whose placement is not yet approved
 - server authorization is authoritative; client capability hints are never sufficient
 - public detail and entity management remain separate routes
 catalog_tap:
@@ -40,18 +43,21 @@ games_section:
   - games
   - trainings
   - tournaments
-  management_tabs:
-  - active
-  - completed
-  tab_labels:
-    active: Активные
-    completed: Завершённые
-  active_status_filters:
-  - all
-  - draft
-  - requires_action
-  - published
-  - in_progress
+  current_list:
+    temporal_tabs: none
+    excludes_completed: true
+    visible_statuses:
+    - draft
+    - requires_action
+    - published
+    - in_progress
+    - cancelled_not_archived
+    status_filters:
+    - all
+    - draft
+    - requires_action
+    - published
+    - in_progress
   create_action_ids:
   - games.create_game
   - games.create_training
@@ -68,21 +74,44 @@ camps_section:
     presentation: header_button
   managed_types:
   - camps
-  management_tabs:
-  - active
-  - completed
-  tab_labels:
-    active: Активные
-    completed: Завершённые
-  active_status_filters:
-  - all
-  - draft
-  - requires_action
-  - published
-  - in_progress
+  current_list:
+    temporal_tabs: none
+    excludes_completed: true
+    visible_statuses:
+    - draft
+    - requires_action
+    - published
+    - in_progress
+    - cancelled_not_archived
+    status_filters:
+    - all
+    - draft
+    - requires_action
+    - published
+    - in_progress
   create_action_ids:
   - camps.create
   create_presentation: primary_contextual_button
+archive:
+  product_status: placement_pending
+  purpose: completed managed entities
+  membership_rule: completion_status_derived
+  includes:
+  - completed_games
+  - completed_trainings
+  - completed_tournaments
+  - completed_camps
+  entry_point: null
+  route: null
+  exposed_in_games_management_mode: false
+  exposed_in_camps_management_mode: false
+  top_level_control_forbidden_until_placement_approved: true
+  data_retention_rule: completion moves the entity out of the current management list without deleting it
+  decision_pending:
+  - archive location
+  - archive navigation entry
+  - archive filters and grouping
+  - whether manual archiving is allowed
 managed_card_fields:
 - actor_profile
 - type
@@ -98,14 +127,13 @@ multi_actor:
   actor_filter_when_multiple: true
   all_actors_option: true
 return_policy:
-  game: /play?mode=manage&category=games&manageTab=active
-  training: /play?mode=manage&category=trainings&manageTab=active
-  tournament: /play?mode=manage&category=tournaments&manageTab=active
-  camp: /camps?mode=manage&manageTab=active
+  game: /play?mode=manage&category=games
+  training: /play?mode=manage&category=trainings
+  tournament: /play?mode=manage&category=tournaments
+  camp: /camps?mode=manage
   restore:
   - mode
   - category
-  - manageTab
   - filters
   - actor
   - scroll_position

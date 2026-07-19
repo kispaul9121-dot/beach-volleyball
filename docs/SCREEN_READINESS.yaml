@@ -54,16 +54,16 @@ summary:
       partial: 16
       missing: 1
     states:
-      partial: 30
+      partial: 31
       ready: 8
-      missing: 16
+      missing: 15
     role_variants:
       na: 13
       ready: 32
       partial: 9
     navigation:
-      ready: 46
-      partial: 8
+      ready: 45
+      partial: 9
     integrations:
       na: 4
       ready: 46
@@ -1503,32 +1503,32 @@ screens:
       evidence: ID, route и запись ROUTES.yaml совпадают.
     actors_permissions:
       status: partial
-      evidence: 'route access=authenticated_onboarded; роли упомянуты в spec: organization, organizer, participant, player,
-        trainer, но actor-правила не формализованы.'
+      evidence: 'route access=authenticated_onboarded; роли упомянуты в spec: organization, organizer, player, trainer, но
+        actor-правила не формализованы.'
     purpose_data:
       status: ready
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 35 пунктов.
+      evidence: Есть структурный раздел и 52 пунктов.
     actions:
       status: partial
       evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
     states:
-      status: missing
-      evidence: Нет loading, empty, error, offline и permission states.
+      status: partial
+      evidence: 'Описана только часть состояний: loading, error, offline.'
     role_variants:
       status: ready
-      evidence: роли в spec=organization, organizer, participant, player, trainer.
+      evidence: роли в spec=organization, organizer, player, trainer.
     navigation:
-      status: ready
-      evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
+      status: partial
+      evidence: Навигация определена только в реестре или только в spec.
     integrations:
       status: ready
-      evidence: 'Связи: chat, deep_link, maps, payments.'
+      evidence: 'Связи: maps, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 52 непустых строк, 10 заголовков.'
+      evidence: 'Spec существует: 101 непустых строк, 13 заголовков.'
 - id: game.manage
   title: Управление игрой
   section: shared

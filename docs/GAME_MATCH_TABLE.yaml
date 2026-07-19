@@ -1,24 +1,23 @@
-version: 1
+version: 2
 scope: one_off_game_match_table
 product_status: approved
 source_of_truth_for:
 - the always-present match list for a one-off game
 - pre-generation of pairs, teams and matches
-- score entry by confirmed participants
-- result confirmation and conflict handling
-- statistics derived from confirmed match scores
+- organizer-only score and result entry
+- statistics derived from organizer-saved match results
 - separation between a simple game table and tournament visual brackets
 principles:
 - every one-off game has a match list even when only one match is planned
 - a one-off game never uses a tournament bracket or decorative competition map
 - the default mobile presentation is an ordered list of match rows
 - the same match list is visible to participants and managers according to permissions
-- confirmed participants can enter the score of matches in which they are assigned
-- statistics are calculated only from confirmed results
+- only the organizer or authorized organizer staff can enter, change or publish a result
+- ordinary participants never receive editable score fields
+- statistics are calculated only from organizer-saved results
 section:
   id: matches
   label: Матчи
-  replaces_old_label: Счёт
   local_views:
   - matches
   - statistics
@@ -39,8 +38,11 @@ match_table:
   - score_b
   - side_b
   - result_status
-  row_example: '1 | Пара 1 | 21 : 17 | Пара 2 | Подтверждено'
-  score_inputs_live_in_row: true
+  row_example: '1 | Пара 1 | 21 : 17 | Пара 2 | Сохранено'
+  score_fields:
+    organizer_view: editable_inline
+    participant_view: read_only_text
+    guest_view: read_only_when_public_policy_allows
   open_separate_match_screen_required: false
   tournament_bracket_forbidden: true
 manager_controls:
@@ -49,7 +51,14 @@ manager_controls:
     available_when: enough_confirmed_participants_and_lineup_mode_selected
   add_match:
     label: Добавить игру
-    placement: directly_below_or_above_match_table
+    placement: directly_above_or_below_match_table
+    permission: entity_manager
+  enter_result:
+    label: Ввести счёт
+    presentation: inline_score_fields_in_match_row
+    permission: entity_manager
+  save_result:
+    label: Сохранить
     permission: entity_manager
   edit_match:
     permission: entity_manager
@@ -57,8 +66,8 @@ manager_controls:
     permission: entity_manager
     confirmation_required: true
   regenerate:
-    allowed_before_first_confirmed_score: true
-    after_first_confirmed_score: forbidden_without_full_reset_confirmation
+    allowed_before_first_saved_result: true
+    after_first_saved_result: forbidden_without_full_reset_confirmation
     participant_change_after_generation_requires_review: true
 lineup_modes:
   fixed_pairs:
@@ -96,38 +105,39 @@ lineup_modes:
     label: Вручную
     use_case: organizer_builds_pairs_or_teams_and_adds_matches_one_by_one
     match_table_still_required: true
-score_permissions:
-  confirmed_participant:
-    can_enter_when:
-    - participant_is_assigned_to_side_a_or_side_b
-    cannot_enter_for_other_matches: true
-    can_view_all_published_scores: true
-  entity_manager:
+result_permissions:
+  organizer_or_authorized_staff:
     can_enter_any_match: true
-    can_correct_confirmed_result_with_reason: true
+    can_change_unsaved_result: true
+    can_correct_saved_result_with_reason: true
+    can_publish_statistics: true
+  confirmed_participant:
+    can_enter: false
+    can_confirm: false
+    can_dispute_inside_score_table: false
+    can_view_all_published_scores: true
   guest_or_unconfirmed:
     can_enter: false
-    public_score_visibility_follows_entity_policy: true
-score_submission:
-  initial_entry:
-    status: awaiting_opponent_confirmation
-    editable_by_submitter_until_confirmed: true
-  confirmation:
-    allowed_for:
-    - participant_from_opposite_side
-    - entity_manager
-    matching_independent_submission_auto_confirms: true
-  conflict:
-    trigger: opposite_sides_submit_different_scores
-    status: score_conflict
-    show_both_submissions_to_manager: true
-    resolution_requires:
-    - manager_choice_or_corrected_score
-    - audit_reason
-  confirmed_result:
-    locks_normal_participant_editing: true
+    can_view: public_score_visibility_follows_entity_policy
+result_lifecycle:
+  empty:
+    label: Счёт не введён
+    editable_by: entity_manager
+  editing:
+    label: Не сохранено
+    editable_by: entity_manager
+  saved:
+    label: Сохранено
     recalculates_statistics: true
     publishes_system_message_to_game_chat: true
+  correction:
+    permission: entity_manager
+    reason_required: true
+    audit_record_required: true
+    recalculates_statistics: true
+  participant_confirmation_required: false
+  opposite_side_confirmation_required: false
+  participant_score_conflict_flow_forbidden: true
 statistics:
   fixed_pair_or_team_table:
     columns:
@@ -154,12 +164,12 @@ statistics:
   - point_difference_descending
   - points_for_descending
   - head_to_head_when_applicable
-  provisional_label_until_all_required_matches_confirmed: true
+  provisional_label_until_all_required_results_saved: true
 completion:
-  required_match_rows_must_have_confirmed_result: true
+  required_match_rows_must_have_saved_result: true
   optional_manually_added_matches_may_be_excluded_by_manager: true
   after_completion:
-  - match_table_becomes_read_only_for_participants
+  - match_table_is_read_only_for_participants
   - authorized_manager_correction_remains_available_with_audit
   - final_statistics_are_saved
 one_off_vs_tournament:
@@ -171,7 +181,8 @@ one_off_vs_tournament:
     inspiration_direction: rich_sports_event_visualization_similar_to_major_search_sports_widgets
     separate_contract: tournament_specs
 accessibility:
-  score_fields_have_side_and_match_number_in_label: true
+  organizer_score_fields_have_side_and_match_number_in_label: true
+  participant_result_is_announced_as_read_only: true
   result_status_is_textual: true
   table_reading_order_matches_visual_order: true
   horizontal_scroll_does_not_hide_current_score_context: true

@@ -1,0 +1,122 @@
+version: 1
+scope: tournament_visual_competition_map
+product_status: approved_direction
+source_of_truth_for:
+- rich visual presentation of tournament progress
+- separation from one-off game match table
+- bracket, group, round and placement map behavior
+principles:
+- tournaments may use a rich sports visualization while one-off games remain a simple match list
+- the visual direction may be inspired by major search sports widgets but must not copy proprietary branding or exact layouts
+- every visual node has an equivalent accessible list representation
+- live status, score, court and next-stage path are visible without opening every match
+- the visualization adapts to tournament format
+entry:
+  public_screen: tournament.details
+  manage_screen: tournament.manage
+  local_sections:
+  - overview
+  - matches
+  - competition_map
+  - standings
+  - participants
+  - chat
+  label: Карта турнира
+format_presentations:
+  elimination:
+    primary: horizontal_bracket
+    shows:
+    - rounds
+    - match_cards
+    - winner_path
+    - bronze_match_when_enabled
+  groups_playoff:
+    primary: group_cards_then_bracket
+    shows:
+    - group_tables
+    - qualification_lines
+    - playoff_path
+  round_robin:
+    primary: schedule_and_standings_dashboard
+    shows:
+    - rounds
+    - match_cards
+    - live_table
+  swiss:
+    primary: round_cards_and_live_standings
+    shows:
+    - score_groups
+    - current_pairings
+    - standings
+    - bye
+  king_of_the_beach:
+    primary: court_round_map_and_individual_standings
+    shows:
+    - court_cards
+    - mixed_pairings
+    - individual_points
+    - movement_between_courts_when_enabled
+  full_placement:
+    primary: placement_path_map
+    shows:
+    - winner_and_loser_paths
+    - placement_matches
+    - final_places
+  seasonal:
+    primary: tournament_day_timeline_and_cumulative_table
+    shows:
+    - game_days
+    - day_results
+    - cumulative_standings
+match_card:
+  required_fields:
+  - stage_or_round
+  - participants_or_teams
+  - score
+  - status
+  optional_fields:
+  - court
+  - scheduled_time
+  - live_marker
+  - winner_marker
+  - next_destination
+statuses:
+- scheduled
+- check_in
+- live
+- delayed
+- completed
+- technical_result
+- disputed
+- cancelled
+interaction:
+  tap_match: opens_competition_match_details
+  pinch_zoom_optional_on_large_brackets: true
+  horizontal_pan_for_bracket: true
+  focus_my_path:
+    label: Мой путь
+    available_to_participant: true
+  live_auto_scroll_for_current_round: optional
+mobile_behavior:
+  never_shrink_entire_bracket_to_unreadable_scale: true
+  use_round_columns_or_stage_carousel: true
+  sticky_round_header: true
+  current_participant_matches_emphasized: true
+  list_fallback_always_available: true
+manager_behavior:
+  result_entry: tournament_specific_permissions
+  unpublished_changes_have_preview_state: true
+  publishing_round_updates_public_map: true
+  correction_updates_paths_and_standings_with_audit: true
+accessibility:
+  equivalent_linear_match_list: required
+  screen_reader_announces_stage_participants_score_and_status: true
+  path_connections_have_text_equivalent: true
+  color_only_advancement_forbidden: true
+boundaries:
+  one_off_game_contract: docs/GAME_MATCH_TABLE.yaml
+  one_off_game_visual_bracket_forbidden: true
+  tournament_map_not_reused_as_game_manage_table: true
+pending_decisions:
+- exact visual styling and animation language
+- whether live match cards use court photography or abstract court diagrams

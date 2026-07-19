@@ -1,4 +1,4 @@
-version: 3
+version: 4
 
 formats:
   standard_2x2:
@@ -11,20 +11,35 @@ formats:
       minimum_players_per_court: 4
       may_exceed_active_players_for_rotation_or_reserve: true
       must_not_exceed_venue_limit: true
+    lineup_modes:
+      fixed_pairs:
+        organizer_assigns_pairs: true
+        auto_pairing_optional: true
+        default_match_generation: round_robin
+        example_six_players:
+          players: 6
+          pairs: 3
+          matches: 3
+          explanation: Каждая из трёх пар играет с двумя другими парами.
+      manual:
+        organizer_adds_matches_one_by_one: true
     configuration:
-      sets: configurable
-      points_per_set: configurable
+      sets_or_single_score: configurable
+      points_per_set_or_match: configurable
       fixed_pairs: configurable
       rating_effect: configurable
-    scoring_ui:
-      primary: set_score_table
-      rows: sets
-      columns:
-      - pair_or_team_a
-      - pair_or_team_b
+    one_off_game_view:
+      primary: match_table
+      each_row:
+      - match_number
+      - pair_a
+      - score_inputs
+      - pair_b
+      - result_status
       statistics:
-      - match_winner
-      - sets_won
+      - played
+      - wins
+      - losses
       - points_for
       - points_against
       - point_difference
@@ -39,26 +54,39 @@ formats:
       minimum_players_per_court: 8
       may_exceed_active_players_for_substitutions_or_reserve: true
       must_not_exceed_venue_limit: true
+    lineup_modes:
+      fixed_teams:
+        organizer_assigns_teams: true
+        default_match_generation: round_robin_when_more_than_two_teams
+        two_teams_generate_one_match: true
+      manual:
+        organizer_adds_matches_one_by_one: true
     configuration:
-      sets: configurable
-      points_per_set: configurable
+      sets_or_single_score: configurable
+      points_per_set_or_match: configurable
       substitutions: configurable
       rating_effect: configurable
-    scoring_ui:
-      primary: set_score_table
-      rows: sets
-      columns:
+    one_off_game_view:
+      primary: match_table
+      each_row:
+      - match_number
       - team_a
+      - score_inputs
       - team_b
+      - result_status
       statistics:
-      - match_winner
-      - sets_won
+      - played
+      - wins
+      - losses
       - points_for
       - points_against
       - point_difference
 
   rotation_five:
     title: Ротация пяти игроков
+    aliases:
+    - Смешанные пары на 5
+    - Король площадки на 5
     participant_unit: individual
     court_group_size: 5
     players_on_court: 4
@@ -67,11 +95,11 @@ formats:
     capacity_formula: court_count_times_5
     capacity:
       organizer_enters_participant_capacity: true
-      exact_multiple_of: 5
+      exact_players_per_group: 5
       maximum_formula: reserved_court_count_times_5
       must_not_exceed_venue_limit: true
       publish_blocked_when_rule_fails: true
-    purpose: За пять раундов каждый игрок один раз отдыхает и по одному разу играет в паре с каждым другим игроком своей пятёрки.
+    purpose: За пять игр каждый игрок один раз отдыхает и по одному разу играет в паре с каждым другим игроком своей пятёрки.
     invariants:
     - each_group_contains_exactly_5_players
     - each_round_contains_4_active_and_1_resting_player
@@ -81,7 +109,7 @@ formats:
     per_game_configuration:
     - court_count
     - participant_capacity
-    - points_per_round
+    - points_per_match
     - scoring_model
     - initial_grouping
     - movement_between_courts
@@ -94,20 +122,22 @@ formats:
       note: Переход между кортами — настройка экземпляра, а не отдельный формат.
     results:
       supported_models:
-        individual_points: Очки каждого игрока суммируются по раундам.
+        individual_points: Очки каждого игрока суммируются по играм.
         wins_and_point_difference: Победы, затем разница очков.
         custom_season_points: Правило сезона.
-    scoring_ui:
-      primary: round_and_court_cards
-      each_card:
+    one_off_game_view:
+      primary: match_table
+      generated_rows: 5
+      each_row:
       - round_number
-      - court
       - pair_a
+      - score_inputs
       - pair_b
       - resting_player
-      - score_inputs
-      aggregate: individual_standings_table
+      - result_status
+      aggregate: individual_statistics_table
       statistics:
+      - played
       - wins
       - points_for
       - points_against
@@ -122,11 +152,11 @@ formats:
       - resting_round
       - personal_points
       organizer:
-      - all_courts
+      - all_match_rows
       - all_rounds
       - conflicts
       - missing_results
-      - regenerate_before_publish
+      - regenerate_before_first_confirmed_score
 
   fixed_team_match:
     title: Матч фиксированных команд
@@ -137,29 +167,42 @@ formats:
       derived_from_team_size_and_team_count: true
       organizer_confirms_final_capacity: true
       must_not_exceed_venue_limit: true
+    lineup_modes:
+      fixed_teams:
+        organizer_assigns_players: true
+        two_teams_generate_one_match: true
+        multiple_teams_default_match_generation: round_robin
+      manual:
+        organizer_adds_matches_one_by_one: true
     configuration:
-      best_of_sets: configurable
-      points_per_set: configurable
+      sets_or_single_score: configurable
+      points_per_set_or_match: configurable
       deciding_set_points: configurable
       side_change_rules: configurable
-    scoring_ui:
-      primary: set_score_table
-      rows: sets
-      columns:
+    one_off_game_view:
+      primary: match_table
+      each_row:
+      - match_number
       - fixed_team_a
+      - score_inputs
       - fixed_team_b
+      - result_status
       statistics:
-      - match_winner
-      - sets_won
+      - played
+      - wins
+      - losses
       - points_for
       - points_against
       - point_difference
 
 format_engine_rules:
-- game_format controls one playable session, not the tournament progression.
-- tournament and season formats may schedule matches that use standard_2x2 or another compatible game format.
-- rotation_five may be used by a one-off game or by a season game day.
+- game_format controls one playable session, not tournament progression.
+- every one-off game uses docs/GAME_MATCH_TABLE.yaml and displays a simple ordered match table.
+- tournament and seasonal modes may use brackets, groups, schedules and rich visual maps through tournament-specific contracts.
 - participant_capacity is entered by the organizer and validated against format and venue constraints.
+- fixed pairs or teams generate a round-robin list by default when more than two sides exist.
+- rotation_five generates five match rows; every player partners every other player exactly once and rests once.
+- confirmed participants can submit scores only for match rows in which they are assigned.
 - published lineups cannot be silently regenerated.
 - every lineup change after publication creates a notification and audit record.
-- score UI uses a set table for team formats and round/court cards plus standings for rotation_five.
+- one-off game statistics are derived from confirmed rows in the match table.

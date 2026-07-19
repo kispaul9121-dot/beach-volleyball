@@ -36,10 +36,26 @@ def main() -> int:
         errors.append("Profile must forbid creation and management controls")
     if management.get("principles", [""])[0] != "Profile has no creation or event-management controls":
         errors.append("Management contract must keep Profile clean")
-    if management.get("games_section", {}).get("mode_control", {}).get("label") != "Режим управления":
-        errors.append("Games management mode label differs")
-    if management.get("camps_section", {}).get("mode_control", {}).get("label") != "Режим управления":
-        errors.append("Camps management mode label differs")
+
+    for section_name in ("games_section", "camps_section"):
+        section = management.get(section_name, {}) or {}
+        if section.get("mode_control", {}).get("label") != "Режим управления":
+            errors.append(f"{section_name} management mode label differs")
+        if "management_tabs" in section or "tab_labels" in section:
+            errors.append(f"{section_name} must not restore Active/Completed tabs")
+        current_list = section.get("current_list", {}) or {}
+        if current_list.get("temporal_tabs") != "none":
+            errors.append(f"{section_name} must declare no temporal tabs")
+        if current_list.get("excludes_completed") is not True:
+            errors.append(f"{section_name} must exclude completed entities")
+
+    archive = management.get("archive", {}) or {}
+    if archive.get("product_status") != "placement_pending":
+        errors.append("Archive placement must remain pending")
+    if archive.get("entry_point") is not None or archive.get("route") is not None:
+        errors.append("Archive must not expose an entry point or route yet")
+    if archive.get("top_level_control_forbidden_until_placement_approved") is not True:
+        errors.append("Archive control must remain hidden until placement is approved")
 
     if find(routes, "path", "/manage"):
         errors.append("Standalone /manage route must be removed")
@@ -49,8 +65,10 @@ def main() -> int:
     for path in ("/play", "/camps"):
         route = find(routes, "path", path)
         accepted = set((route or {}).get("accepts_query", []) or [])
-        if not {"mode", "manageTab", "actorId"}.issubset(accepted):
+        if not {"mode", "actorId"}.issubset(accepted):
             errors.append(f"{path} must accept contextual management queries")
+        if "manageTab" in accepted:
+            errors.append(f"{path} must not accept obsolete manageTab")
 
     fallbacks = {
         "/games/:gameId/manage": ("/play?", "category=games"),
@@ -63,6 +81,8 @@ def main() -> int:
         fallback = str((route or {}).get("back_fallback", ""))
         if not fallback.startswith(prefix) or token not in fallback or "mode=manage" not in fallback:
             errors.append(f"Manage fallback is not contextual for {path}")
+        if "manageTab" in fallback:
+            errors.append(f"Manage fallback still contains manageTab for {path}")
 
     action_ids = {str(item.get("id", "")) for item in actions}
     required = {
@@ -71,7 +91,10 @@ def main() -> int:
     }
     for action_id in sorted(required - action_ids):
         errors.append(f"Missing action {action_id}")
-    for obsolete in {"global.open_create_menu", "management.open_center", "management.open_entity"}:
+    for obsolete in {
+        "global.open_create_menu", "management.open_center", "management.open_entity",
+        "games.change_management_tab", "camps.change_management_tab",
+    }:
         if obsolete in action_ids:
             errors.append(f"Obsolete management entry remains: {obsolete}")
 
@@ -84,6 +107,9 @@ def main() -> int:
         action = find(actions, "id", action_id)
         if not action or action.get("source") != expected_source:
             errors.append(f"{action_id} must be owned by {expected_source}")
+        return_to = str(((action or {}).get("context", {}) or {}).get("returnTo", ""))
+        if "manageTab" in return_to:
+            errors.append(f"{action_id} returnTo still contains manageTab")
 
     if games.get("bottom_tab", {}).get("mode") != "discovery_and_contextual_management":
         errors.append("Games catalog must support contextual management")
@@ -97,6 +123,11 @@ def main() -> int:
         errors.append("Games spec must expose management and creation")
     if "Режим управления" not in camps_text or "+ Создать кэмп" not in camps_text:
         errors.append("Camps spec must expose management and creation")
+    for name, text in (("Games", play_text), ("Camps", camps_text)):
+        if "Активные · Завершённые" in text:
+            errors.append(f"{name} spec restored Active/Completed controls")
+        if "placement_pending" not in text and "не утвержден" not in text.lower() and "не утверждены" not in text.lower():
+            errors.append(f"{name} spec must keep archive placement pending")
 
     feedback = tokens.get("motion", {}).get("one_shot_feedback", {}).get("profile_activity_confirmation", {})
     if feedback.get("tab_id") != "home" or feedback.get("repetitions") != 1:

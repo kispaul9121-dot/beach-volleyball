@@ -1,4 +1,4 @@
-version: 4
+version: 5
 scope: one_off_game_match_table
 product_status: approved
 source_of_truth_for:
@@ -85,44 +85,27 @@ lineup_modes:
     default_schedule: round_robin_when_more_than_two_teams
     two_teams_result: one_initial_match
   rotation_five:
-    technical_id_status: legacy_name_kept_for_compatibility
-    product_label: Смешанные пары
+    label: Смешанные пары на 5 игроков
     aliases:
-    - Ротация
-    - Король площадки
-    - Смешанные пары на 5 игроков
+    - Ротация пяти
+    - Король площадки на 5
     participant_count:
-      minimum: 4
-      maximum: venue_capacity
-      fixed_to_five: false
-      exact_multiple_rule: none
-    generated_match_count_formula: participant_count
+      exact: 5
+      minimum: 5
+      maximum: 5
+    generated_match_count: 5
+    rounds: 5
     active_players_per_match: 4
-    teams_per_match: 2
-    players_per_team: 2
-    target_appearances_per_player: 4
-    explanation: При N игроках создаётся N матчей. В N матчах есть 4N игровых мест, поэтому генератор распределяет по четыре участия на каждого игрока.
-    balancing_goals:
-    - each_player_appears_four_times
-    - partner_repetitions_are_minimized
-    - opponent_repetitions_are_minimized
-    - consecutive_matches_and_long_waits_are_balanced
-    - no_player_appears_twice_in_the_same_match
-    - no_player_appears_on_two_courts_in_the_same_time_slot
-    court_scheduling:
-      total_match_rows_remains_participant_count: true
-      simultaneous_matches_limited_by_reserved_court_count: true
-      time_slots_generated_after_pairings: true
-    special_case_five_players:
-      generated_match_count: 5
-      appearances_per_player: 4
-      each_player_rests_exactly_once: true
-      each_player_partners_each_other_player_exactly_once: true
-    example_fifteen_players:
-      participant_count: 15
-      generated_match_count: 15
-      target_appearances_per_player: 4
-    presentation: participant_count_rows_in_the_same_match_table
+    resting_players_per_match: 1
+    schedule_rules:
+    - each_round_has_two_pairs_and_one_resting_player
+    - each_player_rests_exactly_once
+    - each_player_partners_each_other_player_exactly_once
+    - no_player_appears_twice_in_one_round
+    presentation: five_rows_in_the_same_match_table
+    larger_participant_counts:
+      forbidden_in_one_off_game: true
+      destination: docs/TOURNAMENT_COURT_LADDER.yaml
   manual:
     label: Вручную
     use_case: organizer_builds_pairs_or_teams_and_adds_matches_one_by_one
@@ -176,7 +159,7 @@ statistics:
     - points_for
     - points_against
     - point_difference
-  mixed_pairs_individual_table:
+  rotation_five_individual_table:
     columns:
     - rank
     - player
@@ -201,11 +184,12 @@ completion:
   - final_statistics_are_saved
 one_off_vs_tournament:
   one_off_game:
+    five_player_mixed_pairs_limit: exactly_5
     presentation: simple_match_list_and_statistics_table
     bracket_or_visual_map: forbidden
   tournament:
+    ten_or_fifteen_player_grid_ladder: docs/TOURNAMENT_COURT_LADDER.yaml
     presentation: format_specific_schedule_bracket_groups_or_visual_competition_map
-    inspiration_direction: rich_sports_event_visualization_similar_to_major_search_sports_widgets
     separate_contract: tournament_specs
 accessibility:
   organizer_score_fields_have_side_and_match_number_in_label: true

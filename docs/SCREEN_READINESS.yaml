@@ -1510,7 +1510,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 52 пунктов.
+      evidence: Есть структурный раздел и 53 пунктов.
     actions:
       status: partial
       evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
@@ -1528,7 +1528,7 @@ screens:
       evidence: 'Связи: maps, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 101 непустых строк, 13 заголовков.'
+      evidence: 'Spec существует: 110 непустых строк, 13 заголовков.'
 - id: game.manage
   title: Управление игрой
   section: shared

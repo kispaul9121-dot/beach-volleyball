@@ -1,4 +1,4 @@
-version: 4
+version: 5
 
 formats:
   standard_2x2:
@@ -33,9 +33,11 @@ formats:
       each_row:
       - match_number
       - pair_a
-      - score_inputs
+      - score
       - pair_b
       - result_status
+      score_entry_permission: entity_manager
+      participant_score_view: read_only
       statistics:
       - played
       - wins
@@ -71,9 +73,11 @@ formats:
       each_row:
       - match_number
       - team_a
-      - score_inputs
+      - score
       - team_b
       - result_status
+      score_entry_permission: entity_manager
+      participant_score_view: read_only
       statistics:
       - played
       - wins
@@ -131,10 +135,12 @@ formats:
       each_row:
       - round_number
       - pair_a
-      - score_inputs
+      - score
       - pair_b
       - resting_player
       - result_status
+      score_entry_permission: entity_manager
+      participant_score_view: read_only
       aggregate: individual_statistics_table
       statistics:
       - played
@@ -156,7 +162,7 @@ formats:
       - all_rounds
       - conflicts
       - missing_results
-      - regenerate_before_first_confirmed_score
+      - regenerate_before_first_saved_result
 
   fixed_team_match:
     title: Матч фиксированных команд
@@ -184,9 +190,11 @@ formats:
       each_row:
       - match_number
       - fixed_team_a
-      - score_inputs
+      - score
       - fixed_team_b
       - result_status
+      score_entry_permission: entity_manager
+      participant_score_view: read_only
       statistics:
       - played
       - wins
@@ -202,7 +210,8 @@ format_engine_rules:
 - participant_capacity is entered by the organizer and validated against format and venue constraints.
 - fixed pairs or teams generate a round-robin list by default when more than two sides exist.
 - rotation_five generates five match rows; every player partners every other player exactly once and rests once.
-- confirmed participants can submit scores only for match rows in which they are assigned.
+- only the organizer or authorized organizer staff can enter, change or publish scores in a one-off game.
+- participants can view published match rows and statistics but never receive score inputs.
 - published lineups cannot be silently regenerated.
 - every lineup change after publication creates a notification and audit record.
-- one-off game statistics are derived from confirmed rows in the match table.
+- one-off game statistics are derived from organizer-saved rows in the match table.

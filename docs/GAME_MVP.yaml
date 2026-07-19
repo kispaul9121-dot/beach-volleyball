@@ -1,4 +1,4 @@
-version: 7
+version: 8
 scope: game_mvp_creation_and_management
 product_status: approved
 source_of_truth_for:
@@ -35,6 +35,7 @@ creation:
       - game_format
       - participant_capacity
       - lineup_mode
+      - planned_match_count_when_required
       participant_capacity:
         input: positive_integer_text_or_stepper
         entered_by_organizer: true
@@ -67,8 +68,13 @@ creation:
           exact_players: 5
           minimum_players: 5
           maximum_players: 5
-          generated_match_count: 5
           publish_blocked_when_not_exactly_five: true
+          planned_match_count:
+            entered_by_organizer: true
+            input: positive_integer
+            default: 15
+            minimum: 1
+            unique_compositions_before_repeats: 15
           larger_counts_destination: docs/TOURNAMENT_COURT_LADDER.yaml
         fixed_team_match:
           minimum_teams: 2
@@ -90,7 +96,7 @@ creation:
       - compact_event_preview
       - capacity_and_venue_validation
       - enrollment_and_payment_summary
-      - format_and_lineup_summary
+      - format_lineup_and_match_count_summary
       - publish_errors
       primary_action: Опубликовать
       secondary_action: Сохранить черновик
@@ -131,6 +137,7 @@ management:
     - enrollment_policy
     - price_or_free
     - match_generation_status
+    - planned_match_count_when_applicable
     - attention_summary
     edit_core_game_action:
       label: Редактировать игру
@@ -252,11 +259,14 @@ management:
       rotation_five:
         product_label: Смешанные пары на 5 игроков
         exact_participant_count: 5
-        generated_rows: 5
-        each_round_has_two_pairs_and_one_resting_player: true
-        each_player_rests_once: true
-        each_player_partners_every_other_player_once: true
-        more_than_five_forbidden: true
+        planned_match_count_entered_by_organizer: true
+        default_planned_match_count: 15
+        generated_rows_formula: planned_match_count
+        unique_cycle_match_count: 15
+        when_less_than_fifteen: balanced_unique_subset
+        when_exactly_fifteen: complete_unique_cycle
+        when_more_than_fifteen: append_shuffled_repeat_cycles
+        more_than_five_players_forbidden: true
         ten_or_fifteen_players_destination: docs/TOURNAMENT_COURT_LADDER.yaml
       manual:
         add_matches_one_by_one: true

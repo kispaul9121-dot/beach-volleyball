@@ -1,4 +1,4 @@
-version: 3
+version: 4
 route_rules:
 - unauthenticated users are redirected to /auth except public deep links that may show a preview
 - authenticated users with incomplete onboarding are redirected to the next onboarding step
@@ -118,7 +118,6 @@ routes:
   - trainerId
   - followed
   - mode
-  - manageTab
   - manageStatus
   - actorId
 - path: /chats
@@ -141,7 +140,6 @@ routes:
   - level
   - price
   - mode
-  - manageTab
   - manageStatus
   - actorId
 - path: /profile
@@ -242,7 +240,7 @@ routes:
   - actorId
   - draftId
   - templateId
-  back_fallback: /play?mode=manage&category=games&manageTab=active
+  back_fallback: /play?mode=manage&category=games
 - path: /games/:gameId
   screen: game.details
   navigator: entity_stack
@@ -254,7 +252,7 @@ routes:
   permission: entity_manager
   accepts_query:
   - tab
-  back_fallback: /play?mode=manage&category=games&manageTab=active
+  back_fallback: /play?mode=manage&category=games
 - path: /trainings/create
   screen: training.create
   navigator: modal_stack
@@ -264,7 +262,7 @@ routes:
   - actorId
   - draftId
   - templateId
-  back_fallback: /play?mode=manage&category=trainings&manageTab=active
+  back_fallback: /play?mode=manage&category=trainings
 - path: /trainings/:trainingId
   screen: training.details
   navigator: entity_stack
@@ -276,7 +274,7 @@ routes:
   permission: entity_manager
   accepts_query:
   - tab
-  back_fallback: /play?mode=manage&category=trainings&manageTab=active
+  back_fallback: /play?mode=manage&category=trainings
 - path: /trainings/:trainingId/attendance
   screen: training.attendance
   navigator: entity_stack
@@ -291,7 +289,7 @@ routes:
   - actorId
   - draftId
   - templateId
-  back_fallback: /play?mode=manage&category=tournaments&manageTab=active
+  back_fallback: /play?mode=manage&category=tournaments
 - path: /tournaments/:tournamentId
   screen: tournament.details
   navigator: entity_stack
@@ -311,7 +309,7 @@ routes:
   - dayId
   - round
   - mode
-  back_fallback: /play?mode=manage&category=tournaments&manageTab=active
+  back_fallback: /play?mode=manage&category=tournaments
 - path: /matches/:matchId
   screen: competition.match
   navigator: entity_stack
@@ -326,7 +324,7 @@ routes:
   - actorId
   - draftId
   - mode
-  back_fallback: /camps?mode=manage&manageTab=active
+  back_fallback: /camps?mode=manage
 - path: /tours/:tourId
   screen: tour.details
   navigator: entity_stack
@@ -340,7 +338,7 @@ routes:
   permission: entity_manager
   accepts_query:
   - tab
-  back_fallback: /camps?mode=manage&manageTab=active
+  back_fallback: /camps?mode=manage
 - path: /tours/:tourId/booking
   screen: tour.booking
   navigator: modal_stack

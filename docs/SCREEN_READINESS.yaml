@@ -782,7 +782,7 @@ screens:
       evidence: Есть структурный раздел и 12 пунктов.
     actions:
       status: ready
-      evidence: 'ACTIONS.yaml: camps.open_search, camps.open_camp, camps.change_mode, camps.change_management_tab…; действия
+      evidence: 'ACTIONS.yaml: camps.open_search, camps.open_camp, camps.change_mode, camps.open_management_filters…; действия
         описаны в spec.'
     states:
       status: partial

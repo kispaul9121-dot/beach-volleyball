@@ -1,4 +1,4 @@
-version: 3
+version: 4
 action_rules:
 - every tappable control must have an action_id
 - destination screen must exist or be a declared system action
@@ -684,11 +684,6 @@ actions:
   source: play.main
   destination: system.local_state
   permission: authenticated
-- id: games.change_management_tab
-  label: Активные / Завершённые
-  source: play.main
-  destination: system.local_filter
-  permission: authenticated
 - id: games.open_management_filters
   label: Фильтры управления
   source: play.main
@@ -706,7 +701,7 @@ actions:
   permission: authenticated
   context:
     actorId: active_actor
-    returnTo: /play?mode=manage&category=games&manageTab=active
+    returnTo: /play?mode=manage&category=games
 - id: games.create_training
   label: Создать тренировку
   source: play.main
@@ -714,7 +709,7 @@ actions:
   permission: trainer_or_organization
   context:
     actorId: active_actor
-    returnTo: /play?mode=manage&category=trainings&manageTab=active
+    returnTo: /play?mode=manage&category=trainings
 - id: games.create_tournament
   label: Создать турнир
   source: play.main
@@ -722,16 +717,11 @@ actions:
   permission: authenticated
   context:
     actorId: active_actor
-    returnTo: /play?mode=manage&category=tournaments&manageTab=active
+    returnTo: /play?mode=manage&category=tournaments
 - id: camps.change_mode
   label: Режим управления / Вернуться к подбору
   source: camps.main
   destination: system.local_state
-  permission: authenticated
-- id: camps.change_management_tab
-  label: Активные / Завершённые
-  source: camps.main
-  destination: system.local_filter
   permission: authenticated
 - id: camps.open_management_filters
   label: Фильтры управления
@@ -750,4 +740,4 @@ actions:
   permission: authenticated
   context:
     actorId: active_actor
-    returnTo: /camps?mode=manage&manageTab=active
+    returnTo: /camps?mode=manage

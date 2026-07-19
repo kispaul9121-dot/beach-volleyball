@@ -26,6 +26,11 @@ def main() -> int:
     contract = load_yaml(DOCS / "PROFILE_ACTIVITY.yaml")
     management = load_yaml(DOCS / "MANAGEMENT_CENTER.yaml")
     games = load_yaml(DOCS / "GAMES_CATALOG.yaml")
+    join = load_yaml(DOCS / "JOIN_FLOW.yaml")
+    game_mvp = load_yaml(DOCS / "GAME_MVP.yaml")
+    game_matches = load_yaml(DOCS / "GAME_MATCH_TABLE.yaml")
+    game_formats = load_yaml(DOCS / "GAME_FORMATS.yaml")
+    entity_sections = load_yaml(DOCS / "ENTITY_SECTIONS.yaml")
     routes = load_yaml(DOCS / "ROUTES.yaml").get("routes", []) or []
     screens = load_yaml(DOCS / "SCREENS.yaml").get("screens", []) or []
     actions = load_yaml(DOCS / "ACTIONS.yaml").get("actions", []) or []
@@ -36,6 +41,12 @@ def main() -> int:
         errors.append("Profile must forbid creation and management controls")
     if management.get("principles", [""])[0] != "Profile has no creation or event-management controls":
         errors.append("Management contract must keep Profile clean")
+
+    upcoming = profile_root.get("upcoming_timeline", {}) or {}
+    if "invited" in set(upcoming.get("statuses", []) or []):
+        errors.append("Unresolved invitations must not appear in Profile participation")
+    if "unresolved_invitation" not in set(upcoming.get("excludes", []) or []):
+        errors.append("Profile timeline must explicitly exclude unresolved invitations")
 
     for section_name in ("games_section", "camps_section"):
         section = management.get(section_name, {}) or {}
@@ -120,6 +131,7 @@ def main() -> int:
     required = {
         "games.change_mode", "games.create_game", "games.create_training", "games.create_tournament",
         "camps.change_mode", "camps.create", "games.open_entity", "camps.open_camp",
+        "entity.start_join_flow", "entity.open_payment", "entity.open_chat", "players.open_picker",
     }
     for action_id in sorted(required - action_ids):
         errors.append(f"Missing action {action_id}")
@@ -151,9 +163,107 @@ def main() -> int:
     if games_archive.get("visible_button_forbidden") is not True:
         errors.append("Games archive must not add a visible button")
 
+    # Approved join policy and own-row payment.
+    if join.get("product_status") != "approved":
+        errors.append("Join flow must be approved")
+    enrollment = (((join.get("organizer_configuration", {}) or {}).get("enrollment_policy", {}) or {}).get("values", {}) or {})
+    payment = (((join.get("organizer_configuration", {}) or {}).get("payment_policy", {}) or {}).get("values", {}) or {})
+    if set(enrollment) != {"immediate", "approval", "invitation_only"}:
+        errors.append("Join enrollment policies differ")
+    if set(payment) != {"free", "online", "external"}:
+        errors.append("Join payment policies differ")
+    payment_surface = join.get("participant_payment_surface", {}) or {}
+    own_online = ((payment_surface.get("own_row", {}) or {}).get("online_unpaid", {}) or {})
+    if own_online.get("label") != "Оплатить" or own_online.get("permission") != "payment_owner":
+        errors.append("Own participant row must expose payment-owner-only Оплатить")
+    if "paying_for_another_participant_is_forbidden" not in set(payment_surface.get("rules", []) or []):
+        errors.append("Paying for another participant must remain forbidden")
+
+    # Four-step game creation with explicit capacity and venue validation.
+    creation = game_mvp.get("creation", {}) or {}
+    steps = creation.get("steps", {}) or {}
+    if set(steps) != {1, 2, 3, 4}:
+        errors.append("Game creation must contain exactly four steps")
+    step_two = steps.get(2, {}) or {}
+    capacity = step_two.get("participant_capacity", {}) or {}
+    if capacity.get("entered_by_organizer") is not True or capacity.get("auto_only_forbidden") is not True:
+        errors.append("Game participant capacity must be entered by the organizer")
+    if (step_two.get("venue_limit", {}) or {}).get("publish_blocked_when_exceeded") is not True:
+        errors.append("Venue player limit must block publication")
+
+    # One-off game management and universal match table.
+    game_management = game_mvp.get("management", {}) or {}
+    if game_management.get("sections") != ["overview", "participants", "matches", "chat"]:
+        errors.append("Game MVP sections must be Overview, Participants, Matches and Chat")
+    forbidden_sections = set(game_management.get("forbidden_separate_sections", []) or [])
+    if not {"settings", "payments", "tournament_bracket"}.issubset(forbidden_sections):
+        errors.append("Game MVP must forbid separate Settings, Payments and tournament bracket")
+
+    matches = game_management.get("matches", {}) or {}
+    if matches.get("mandatory_for_every_one_off_game") is not True:
+        errors.append("Every one-off game must have a match table")
+    if matches.get("tournament_visual_map_forbidden") is not True:
+        errors.append("One-off games must not use tournament visual maps")
+    participant_permissions = matches.get("participant_permissions", {}) or {}
+    if participant_permissions.get("participant_can_enter_score") is not False:
+        errors.append("Participants must not enter one-off game scores")
+    if participant_permissions.get("participant_can_confirm_result") is not False:
+        errors.append("Participants must not confirm one-off game results")
+    result_entry = matches.get("result_entry", {}) or {}
+    if result_entry.get("permission") != "entity_manager" or result_entry.get("organizer_only_ui") is not True:
+        errors.append("One-off game result entry must be organizer-only")
+    if result_entry.get("save_directly_without_opponent_confirmation") is not True:
+        errors.append("Organizer results must not require opponent confirmation")
+    if result_entry.get("participant_conflict_flow_forbidden") is not True:
+        errors.append("Participant score conflict flow must remain forbidden")
+
+    if game_matches.get("product_status") != "approved":
+        errors.append("One-off match table must be approved")
+    result_permissions = game_matches.get("result_permissions", {}) or {}
+    participant_result = result_permissions.get("confirmed_participant", {}) or {}
+    manager_result = result_permissions.get("organizer_or_authorized_staff", {}) or {}
+    if participant_result.get("can_enter") is not False or participant_result.get("can_confirm") is not False:
+        errors.append("Match-table participants must remain read-only")
+    if manager_result.get("can_enter_any_match") is not True:
+        errors.append("Organizer must be able to enter every one-off match result")
+    lifecycle = game_matches.get("result_lifecycle", {}) or {}
+    if lifecycle.get("participant_confirmation_required") is not False:
+        errors.append("One-off results must not require participant confirmation")
+    if lifecycle.get("participant_score_conflict_flow_forbidden") is not True:
+        errors.append("One-off result contract must forbid participant score conflicts")
+
+    formats = game_formats.get("formats", {}) or {}
+    for format_id in ("standard_2x2", "standard_4x4", "rotation_five", "fixed_team_match"):
+        view = (formats.get(format_id, {}) or {}).get("one_off_game_view", {}) or {}
+        if view.get("primary") != "match_table":
+            errors.append(f"{format_id} must use the one-off match table")
+        if view.get("score_entry_permission") != "entity_manager":
+            errors.append(f"{format_id} score entry must be organizer-only")
+        if view.get("participant_score_view") != "read_only":
+            errors.append(f"{format_id} participant score view must be read-only")
+
+    game_sections = ((entity_sections.get("entity_types", {}) or {}).get("game", {}) or {})
+    if game_sections.get("manager_sections") != ["overview", "participants", "matches", "chat"]:
+        errors.append("Entity sections must mirror the game MVP sections")
+    score_entry = ((game_sections.get("matches", {}) or {}).get("score_entry", {}) or {})
+    if score_entry.get("confirmed_participant") != "read_only":
+        errors.append("Entity section must keep participant results read-only")
+    if score_entry.get("participant_confirmation_required") is not False:
+        errors.append("Entity section must not require participant result confirmation")
+
+    game_chat = game_management.get("chat", {}) or {}
+    if game_chat.get("mandatory_in_mvp") is not True:
+        errors.append("Game chat must be mandatory in MVP")
+    if game_chat.get("also_visible_in_global_chats") is not True:
+        errors.append("Game chat must also appear in global Chats")
+    if game_chat.get("duplicate_conversation_creation_forbidden") is not True:
+        errors.append("Game manage and global Chats must share one conversation")
+
     home_text = (DOCS / "screens/home/main.md").read_text(encoding="utf-8")
     play_text = (DOCS / "screens/play/main.md").read_text(encoding="utf-8")
     camps_text = (DOCS / "screens/camps/main.md").read_text(encoding="utf-8")
+    game_manage_text = (DOCS / "screens/shared/game-manage.md").read_text(encoding="utf-8")
+    game_details_text = (DOCS / "screens/shared/game-details.md").read_text(encoding="utf-8")
     if "кнопка `+` отсутствует" not in home_text:
         errors.append("Profile spec must explicitly remove +")
     if "Режим управления" not in play_text or "+ Создать" not in play_text:
@@ -175,6 +285,11 @@ def main() -> int:
             errors.append(f"{name} spec must resolve pull-to-refresh conflict")
         if "Открыть архив" not in text:
             errors.append(f"{name} spec must include accessibility archive action")
+
+    if "результаты вводит только организатор" not in game_manage_text.lower():
+        errors.append("Game manage spec must explicitly restrict result entry to organizer")
+    if "обычный участник не вводит и не подтверждает счёт" not in game_details_text.lower():
+        errors.append("Game details spec must explicitly keep participant results read-only")
 
     feedback = tokens.get("motion", {}).get("one_shot_feedback", {}).get("profile_activity_confirmation", {})
     if feedback.get("tab_id") != "home" or feedback.get("repetitions") != 1:

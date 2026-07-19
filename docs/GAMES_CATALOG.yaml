@@ -1,4 +1,4 @@
-version: 7
+version: 8
 scope: games_catalog
 source_of_truth_for:
 - Игры bottom tab
@@ -99,15 +99,16 @@ categories:
       classic: Классика
     supported_formats:
     - single_elimination
-    - round_robin
-    - swiss
     - full_placement
     forbidden_formats:
+    - round_robin
+    - swiss
     - groups_then_playoff
     - king_of_the_beach
     rules:
     - seasonal mode is not supported
     - Tunisian ladder and King of the Beach wording belong to one-off games, not tournaments
+    - the tournament creator offers only playoff and full placement
     - every list is ordered from nearest date to latest date
 following:
   organizer_follow:

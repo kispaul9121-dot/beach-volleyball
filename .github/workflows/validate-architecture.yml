@@ -64,7 +64,7 @@ jobs:
       - name: Validate Profile activity and discovery boundaries
         run: python scripts/validate_profile_activity.py
 
-      - name: Validate Tunisian multi-court tournament
+      - name: Validate one-off Tunisian ladder game
         run: python scripts/validate_tunisian_format.py
 
       - name: Verify screen readiness table is current

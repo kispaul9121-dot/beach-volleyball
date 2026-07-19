@@ -1,4 +1,4 @@
-version: 8
+version: 9
 scope: entity_sections
 source_of_truth_for:
 - public entity navigation
@@ -120,6 +120,9 @@ entity_types:
         default_match_count_per_court: 15
         cycle_count_entered_by_organizer: true
         movements_only_between_cycles_inside_same_event: true
+        user_facing_aliases:
+        - Король пляжа
+        - Тунисский формат
         season_mode_forbidden: true
       score_entry:
         entity_owner_actor: editable
@@ -171,18 +174,25 @@ entity_types:
     - overview
     - participants
     - chat
+    supported_formats:
+    - single_elimination
+    - round_robin
+    - swiss
+    - full_placement
     conditional_sections:
       matches: format_has_matches
-      bracket: elimination_or_groups_playoff_or_placement
+      bracket: elimination_or_placement
       rounds: swiss_or_placement
       schedule: round_robin_or_timed_matches
-      standings: round_robin_or_swiss_or_groups_or_king_of_the_beach
+      standings: round_robin_or_swiss
       placements: full_placement_or_completed
       statistics: statistics_available
     forbidden_formats_and_sections:
     - seasonal
     - tournament_days
     - tunisian_court_ladder
+    - king_of_the_beach
+    - groups_then_playoff
     visual_direction:
       rich_competition_map_allowed: true
       bracket_and_round_cards_allowed: true
@@ -203,9 +213,11 @@ implementation_rules:
 - Внутренние разделы зависят от типа, формата, статуса и роли пользователя.
 - На мобильном допускается горизонтальный tab bar или меню разделов, но глобальная нижняя навигация не заменяется.
 - Тунисская лестница является разовой игрой на одну дату с одной, двумя или тремя площадками по пять игроков.
+- Король пляжа является пользовательским синонимом Тунисской лестницы, а не отдельным турниром.
 - Количество матчей на площадку и количество циклов задаются отдельно.
 - Переходы между площадками происходят только между циклами внутри этой же игры.
 - Сезоны, повторяющиеся игровые дни и накопительная сезонная таблица запрещены.
+- Турнир Группы + плей-офф не поддерживается.
 - Поля счёта разовой игры показываются только actor-владельцу.
 - Делегированный менеджер, капитан и участник видят результаты только для чтения.
 - Кнопка оплаты показывается только владельцу собственного payment record.

@@ -1,4 +1,4 @@
-version: 9
+version: 10
 scope: entity_sections
 source_of_truth_for:
 - public entity navigation
@@ -176,18 +176,17 @@ entity_types:
     - chat
     supported_formats:
     - single_elimination
-    - round_robin
-    - swiss
     - full_placement
     conditional_sections:
-      matches: format_has_matches
-      bracket: elimination_or_placement
-      rounds: swiss_or_placement
-      schedule: round_robin_or_timed_matches
-      standings: round_robin_or_swiss
+      matches: always
+      bracket: single_elimination
+      rounds: full_placement
+      competition_map: always
       placements: full_placement_or_completed
       statistics: statistics_available
     forbidden_formats_and_sections:
+    - round_robin
+    - swiss
     - seasonal
     - tournament_days
     - tunisian_court_ladder
@@ -195,7 +194,7 @@ entity_types:
     - groups_then_playoff
     visual_direction:
       rich_competition_map_allowed: true
-      bracket_and_round_cards_allowed: true
+      bracket_and_placement_cards_allowed: true
   tour:
     base_sections:
     - overview
@@ -217,7 +216,8 @@ implementation_rules:
 - Количество матчей на площадку и количество циклов задаются отдельно.
 - Переходы между площадками происходят только между циклами внутри этой же игры.
 - Сезоны, повторяющиеся игровые дни и накопительная сезонная таблица запрещены.
-- Турнир Группы + плей-офф не поддерживается.
+- Турниры поддерживают только плей-офф на выбывание и полное распределение мест.
+- Круговая, швейцарская и система Группы + плей-офф не поддерживаются.
 - Поля счёта разовой игры показываются только actor-владельцу.
 - Делегированный менеджер, капитан и участник видят результаты только для чтения.
 - Кнопка оплаты показывается только владельцу собственного payment record.

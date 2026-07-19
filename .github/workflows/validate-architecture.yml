@@ -10,6 +10,7 @@ on:
       - "scripts/validate_navigation.py"
       - "scripts/validate_design_system.py"
       - "scripts/validate_profile_activity.py"
+      - "scripts/validate_tunisian_format.py"
       - "scripts/generate_screen_readiness.py"
       - "scripts/requirements.txt"
       - ".github/workflows/validate-architecture.yml"
@@ -25,6 +26,7 @@ on:
       - "scripts/validate_navigation.py"
       - "scripts/validate_design_system.py"
       - "scripts/validate_profile_activity.py"
+      - "scripts/validate_tunisian_format.py"
       - "scripts/generate_screen_readiness.py"
       - "scripts/requirements.txt"
       - ".github/workflows/validate-architecture.yml"
@@ -61,6 +63,9 @@ jobs:
 
       - name: Validate Profile activity and discovery boundaries
         run: python scripts/validate_profile_activity.py
+
+      - name: Validate Tunisian multi-court tournament
+        run: python scripts/validate_tunisian_format.py
 
       - name: Verify screen readiness table is current
         run: python scripts/generate_screen_readiness.py --check

@@ -1,16 +1,17 @@
-version: 2
+version: 3
 scope: tournament_visual_competition_map
 product_status: approved_direction
 source_of_truth_for:
 - rich visual presentation of tournament progress
 - separation from one-off game match table
-- bracket, group, round, placement and multi-court ladder behavior
+- bracket, group, round and placement behavior
 principles:
 - tournaments may use a rich sports visualization while one-off games remain a simple match list
 - the visual direction may be inspired by major search sports widgets but must not copy proprietary branding or exact layouts
 - every visual node has an equivalent accessible list representation
 - live status, score, court and next-stage path are visible without opening every match
 - the visualization adapts to tournament format
+- seasonal timelines and Tunisian court ladders are not tournament formats
 entry:
   public_screen: tournament.details
   manage_screen: tournament.manage
@@ -55,30 +56,12 @@ format_presentations:
     - court_cards
     - mixed_pairings
     - individual_points
-  tunisian_court_ladder:
-    contract: docs/TOURNAMENT_COURT_LADDER.yaml
-    primary: stacked_court_ladder
-    product_label: Тунисский формат
-    shows:
-    - two_or_three_court_cards
-    - five_players_per_court
-    - configured_match_cycle
-    - individual_table_per_court
-    - leader_moves_up
-    - last_place_moves_down
-    - next_cycle_preview
   full_placement:
     primary: placement_path_map
     shows:
     - winner_and_loser_paths
     - placement_matches
     - final_places
-  seasonal:
-    primary: tournament_day_timeline_and_cumulative_table
-    shows:
-    - game_days
-    - day_results
-    - cumulative_standings
 match_card:
   required_fields:
   - stage_or_round
@@ -108,40 +91,28 @@ interaction:
     label: Мой путь
     available_to_participant: true
   live_auto_scroll_for_current_round: optional
-  tunisian_format:
-    tap_court: opens_court_cycle_and_table
-    tap_movement_arrow: explains_source_destination_and_reason
-    focus_my_court:
-      label: Моя площадка
-      available_to_participant: true
 mobile_behavior:
   never_shrink_entire_bracket_to_unreadable_scale: true
   use_round_columns_or_stage_carousel: true
   sticky_round_header: true
   current_participant_matches_emphasized: true
   list_fallback_always_available: true
-  tunisian_format:
-    vertical_stack_for_courts: true
-    top_court_first: true
-    movement_arrows_between_cards: true
 manager_behavior:
   result_entry: tournament_specific_permissions
   unpublished_changes_have_preview_state: true
   publishing_round_updates_public_map: true
   correction_updates_paths_and_standings_with_audit: true
-  tunisian_format:
-    movement_preview_required: true
-    next_cycle_requires_confirmed_movements: true
 accessibility:
   equivalent_linear_match_list: required
   screen_reader_announces_stage_participants_score_and_status: true
   path_connections_have_text_equivalent: true
-  movement_connections_have_text_equivalent: true
   color_only_advancement_forbidden: true
 boundaries:
   one_off_game_contract: docs/GAME_MATCH_TABLE.yaml
+  tunisian_one_off_game_contract: docs/GAME_TUNISIAN_LADDER.yaml
   one_off_game_visual_bracket_forbidden: true
-  one_court_five_player_game_is_not_tunisian_tournament: true
+  tunisian_ladder_is_not_a_tournament: true
+  seasonal_tournament_forbidden: true
   tournament_map_not_reused_as_game_manage_table: true
 pending_decisions:
 - exact visual styling and animation language

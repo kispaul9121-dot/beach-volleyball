@@ -1,4 +1,4 @@
-version: 5
+version: 6
 scope: one_off_game_match_table
 product_status: approved
 source_of_truth_for:
@@ -93,16 +93,30 @@ lineup_modes:
       exact: 5
       minimum: 5
       maximum: 5
-    generated_match_count: 5
-    rounds: 5
-    active_players_per_match: 4
-    resting_players_per_match: 1
-    schedule_rules:
-    - each_round_has_two_pairs_and_one_resting_player
-    - each_player_rests_exactly_once
-    - each_player_partners_each_other_player_exactly_once
-    - no_player_appears_twice_in_one_round
-    presentation: five_rows_in_the_same_match_table
+    planned_match_count:
+      entered_by_organizer: true
+      input: positive_integer
+      default: 15
+      minimum: 1
+      hard_maximum: none
+    unique_cycle:
+      unique_match_count: 15
+      derivation: five_resting_player_choices_times_three_pair_splits
+      explanation: Для каждого из пяти отдыхающих игроков оставшиеся четверо разбиваются на две пары тремя уникальными способами.
+      full_cycle_properties:
+      - every_player_rests_three_times
+      - every_player_appears_twelve_times
+      - every_pair_of_players_are_partners_three_times
+      - all_fifteen_unique_match_compositions_are_used_once
+    generation:
+      requested_rows_formula: planned_match_count
+      when_less_than_fifteen: balanced_subset_of_unique_cycle
+      when_exactly_fifteen: complete_unique_cycle
+      when_more_than_fifteen: append_new_shuffled_cycles_with_repeats
+      repeated_combinations_warning_after: 15
+      no_player_appears_twice_in_one_match: true
+      waiting_time_and_partner_order_balanced: true
+    presentation: planned_match_count_rows_in_the_same_match_table
     larger_participant_counts:
       forbidden_in_one_off_game: true
       destination: docs/TOURNAMENT_COURT_LADDER.yaml
@@ -184,7 +198,9 @@ completion:
   - final_statistics_are_saved
 one_off_vs_tournament:
   one_off_game:
-    five_player_mixed_pairs_limit: exactly_5
+    five_player_mixed_pairs_limit: exactly_5_players
+    match_count: organizer_defined
+    default_match_count: 15
     presentation: simple_match_list_and_statistics_table
     bracket_or_visual_map: forbidden
   tournament:

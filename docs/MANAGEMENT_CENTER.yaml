@@ -1,18 +1,19 @@
-version: 3
+version: 4
 scope: contextual_section_management
 source_of_truth_for:
 - management mode in Games and Camps
 - contextual creation entry points
 - capability-aware event opening
 - return paths from entity management
-- archive boundary for completed managed entities
+- archive membership, reveal gesture and archive route states
 principles:
 - Profile has no creation or event-management controls
 - Games owns creation and management of games, trainings and tournaments
 - Camps owns creation and management of camps
 - management mode behaves as a reversible list filter, not a separate bottom tab
 - management mode shows current manageable entities in one list without Active or Completed tabs
-- completed managed entities belong to an archive whose placement is not yet approved
+- completed managed entities belong to an archive opened by a pull-down gesture from management mode
+- the archive has no permanently visible button, tab or bottom-navigation entry
 - server authorization is authoritative; client capability hints are never sufficient
 - public detail and entity management remain separate routes
 catalog_tap:
@@ -93,7 +94,7 @@ camps_section:
   - camps.create
   create_presentation: primary_contextual_button
 archive:
-  product_status: placement_pending
+  product_status: approved
   purpose: completed managed entities
   membership_rule: completion_status_derived
   includes:
@@ -101,17 +102,85 @@ archive:
   - completed_trainings
   - completed_tournaments
   - completed_camps
-  entry_point: null
-  route: null
-  exposed_in_games_management_mode: false
-  exposed_in_camps_management_mode: false
-  top_level_control_forbidden_until_placement_approved: true
+  idle_visibility: hidden
+  permanent_header_button: false
+  permanent_tab: false
+  bottom_navigation_entry: false
+  entry:
+    interaction: pull_down_overscroll
+    available_only_when:
+    - current_mode_is_manage
+    - list_scroll_offset_is_zero
+    - actor_is_authenticated
+    - actor_can_manage_at_least_one_entity_type_in_section
+    thresholds_dp:
+      reveal: 24
+      armed: 72
+      cancel_hysteresis: 12
+    labels:
+      revealed_title: Архив
+      revealed_hint: Потяните ещё, чтобы открыть
+      armed_title: Архив
+      armed_hint: Отпустите, чтобы открыть
+    release_before_armed: return_to_management_list
+    release_when_armed: open_archive_route_state
+    haptic_once_when_armed: true
+    repeated_trigger_while_armed: false
+    first_use_hint:
+      condition: first_completed_entity_enters_archive
+      repetitions: 1
+      copy: Потяните список вниз, чтобы открыть архив
+  gesture_conflicts:
+    pull_to_refresh_in_management_mode: disabled
+    refresh_strategy:
+    - refresh_on_screen_focus
+    - refresh_on_reconnect
+    - realtime_updates_when_available
+    - explicit_retry_in_error_state
+  accessibility:
+    custom_action_label: Открыть архив
+    custom_action_destination: archive_route_state_for_current_section
+    announce_revealed: Архив. Потяните ещё, чтобы открыть
+    announce_armed: Отпустите, чтобы открыть архив
+    color_is_not_the_only_signal: true
+    reduce_motion:
+      disable_elastic_stretch: true
+      use_static_indicator_and_text_change: true
+      preserve_gesture_thresholds: true
+  route_states:
+    games:
+      route: /play
+      query: mode=archive
+      title: Архив
+      entity_types:
+      - games
+      - trainings
+      - tournaments
+      category_filter_preserved: true
+      back_destination: /play?mode=manage
+    camps:
+      route: /camps
+      query: mode=archive
+      title: Архив кэмпов
+      entity_types:
+      - camps
+      back_destination: /camps?mode=manage
+  archive_list:
+    ordering: completed_at_descending
+    create_controls_forbidden: true
+    current_management_status_filters_hidden: true
+    card_opens_existing_manage_or_read_only_history_by_permission: true
+    empty_copy: В архиве пока нет завершённых событий
+  back_policy:
+    returns_to_management_mode: true
+    restore:
+    - category
+    - filters
+    - actor
+    - management_scroll_position
   data_retention_rule: completion moves the entity out of the current management list without deleting it
-  decision_pending:
-  - archive location
-  - archive navigation entry
-  - archive filters and grouping
-  - whether manual archiving is allowed
+  manual_archiving:
+    product_status: definition_pending
 managed_card_fields:
 - actor_profile
 - type

@@ -1,4 +1,4 @@
-version: 5
+version: 6
 scope: games_catalog
 source_of_truth_for:
 - Игры bottom tab
@@ -75,6 +75,11 @@ categories:
     rules:
     - public games are discoverable even when creator is not followed
     - followed and saved sources improve relevance but do not hide the open public catalog
+    format_examples:
+    - 2×2
+    - 4×4
+    - fixed_teams
+    - tunisian_ladder_one_to_three_courts
   trainings:
     title: Тренировки
     sources:
@@ -89,14 +94,13 @@ categories:
     - all
     - classic
     - king_of_the_beach
-    - seasonal
     mode_labels:
       all: Все
       classic: Классика
       king_of_the_beach: Король пляжа
-      seasonal: Сезонные
     rules:
-    - seasonal is a tournament mode and badge, not a separate entity
+    - seasonal mode is not supported
+    - Tunisian ladder belongs to one-off games, not tournaments
     - every list is ordered from nearest date to latest date
 following:
   organizer_follow:

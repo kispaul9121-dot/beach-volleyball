@@ -50,12 +50,44 @@ def main() -> int:
             errors.append(f"{section_name} must exclude completed entities")
 
     archive = management.get("archive", {}) or {}
-    if archive.get("product_status") != "placement_pending":
-        errors.append("Archive placement must remain pending")
-    if archive.get("entry_point") is not None or archive.get("route") is not None:
-        errors.append("Archive must not expose an entry point or route yet")
-    if archive.get("top_level_control_forbidden_until_placement_approved") is not True:
-        errors.append("Archive control must remain hidden until placement is approved")
+    if archive.get("product_status") != "approved":
+        errors.append("Archive pull-down placement must be approved")
+    if archive.get("idle_visibility") != "hidden":
+        errors.append("Archive entry must remain hidden while idle")
+    if archive.get("permanent_header_button") is not False or archive.get("permanent_tab") is not False:
+        errors.append("Archive must not add a permanent button or tab")
+
+    entry = archive.get("entry", {}) or {}
+    if entry.get("interaction") != "pull_down_overscroll":
+        errors.append("Archive must open through pull-down overscroll")
+    thresholds = entry.get("thresholds_dp", {}) or {}
+    if thresholds.get("reveal") != 24 or thresholds.get("armed") != 72:
+        errors.append("Archive gesture thresholds must remain 24/72 dp")
+    if entry.get("release_when_armed") != "open_archive_route_state":
+        errors.append("Armed archive gesture must open archive route state")
+
+    conflicts = archive.get("gesture_conflicts", {}) or {}
+    if conflicts.get("pull_to_refresh_in_management_mode") != "disabled":
+        errors.append("Management pull-to-refresh must be disabled to avoid archive gesture conflict")
+
+    accessibility = archive.get("accessibility", {}) or {}
+    if accessibility.get("custom_action_label") != "Открыть архив":
+        errors.append("Archive requires an accessibility custom action")
+    reduce_motion = accessibility.get("reduce_motion", {}) or {}
+    if reduce_motion.get("disable_elastic_stretch") is not True:
+        errors.append("Archive gesture must define a Reduce Motion fallback")
+
+    route_states = archive.get("route_states", {}) or {}
+    expected_archive_states = {
+        "games": ("/play", "mode=archive", "/play?mode=manage"),
+        "camps": ("/camps", "mode=archive", "/camps?mode=manage"),
+    }
+    for name, (route, query, back_destination) in expected_archive_states.items():
+        state = route_states.get(name, {}) or {}
+        if state.get("route") != route or state.get("query") != query:
+            errors.append(f"{name} archive route state differs")
+        if state.get("back_destination") != back_destination:
+            errors.append(f"{name} archive back destination differs")
 
     if find(routes, "path", "/manage"):
         errors.append("Standalone /manage route must be removed")
@@ -66,7 +98,7 @@ def main() -> int:
         route = find(routes, "path", path)
         accepted = set((route or {}).get("accepts_query", []) or [])
         if not {"mode", "actorId"}.issubset(accepted):
-            errors.append(f"{path} must accept contextual management queries")
+            errors.append(f"{path} must accept contextual management and archive mode")
         if "manageTab" in accepted:
             errors.append(f"{path} must not accept obsolete manageTab")
 
@@ -113,6 +145,11 @@ def main() -> int:
 
     if games.get("bottom_tab", {}).get("mode") != "discovery_and_contextual_management":
         errors.append("Games catalog must support contextual management")
+    games_archive = games.get("management_mode", {}).get("archive_entry", {}) or {}
+    if games_archive.get("interaction") != "pull_down_overscroll_at_scroll_top":
+        errors.append("Games catalog must expose the approved archive gesture")
+    if games_archive.get("visible_button_forbidden") is not True:
+        errors.append("Games archive must not add a visible button")
 
     home_text = (DOCS / "screens/home/main.md").read_text(encoding="utf-8")
     play_text = (DOCS / "screens/play/main.md").read_text(encoding="utf-8")
@@ -123,11 +160,20 @@ def main() -> int:
         errors.append("Games spec must expose management and creation")
     if "Режим управления" not in camps_text or "+ Создать кэмп" not in camps_text:
         errors.append("Camps spec must expose management and creation")
-    for name, text in (("Games", play_text), ("Camps", camps_text)):
+    for name, text, archive_route in (
+        ("Games", play_text, "/play?mode=archive"),
+        ("Camps", camps_text, "/camps?mode=archive"),
+    ):
         if "Активные · Завершённые" in text:
             errors.append(f"{name} spec restored Active/Completed controls")
-        if "placement_pending" not in text and "не утвержден" not in text.lower() and "не утверждены" not in text.lower():
-            errors.append(f"{name} spec must keep archive placement pending")
+        if "Потяните ещё, чтобы открыть" not in text or "Отпустите, чтобы открыть" not in text:
+            errors.append(f"{name} spec must describe both archive gesture stages")
+        if archive_route not in text:
+            errors.append(f"{name} spec must declare archive route state")
+        if "pull-to-refresh отключ" not in text:
+            errors.append(f"{name} spec must resolve pull-to-refresh conflict")
+        if "Открыть архив" not in text:
+            errors.append(f"{name} spec must include accessibility archive action")
 
     feedback = tokens.get("motion", {}).get("one_shot_feedback", {}).get("profile_activity_confirmation", {})
     if feedback.get("tab_id") != "home" or feedback.get("repetitions") != 1:

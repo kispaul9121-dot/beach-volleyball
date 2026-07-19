@@ -1,4 +1,4 @@
-version: 8
+version: 9
 scope: game_mvp_creation_and_management
 product_status: approved
 source_of_truth_for:
@@ -7,6 +7,7 @@ source_of_truth_for:
 - MVP game management sections
 - participant payment status and self-service pay action
 - universal owner-organizer-managed match table and statistics for one-off games
+- one-off Tunisian ladder on one to three courts
 - canonical game chat shared with Chats
 creation:
   screen: game.create
@@ -27,17 +28,23 @@ creation:
       - ends_at
       - timezone
       - visibility_public_or_private
+      rules:
+      - every_game_is_one_off
+      - start_and_end_belong_to_one_event_date_window
+      - recurring_dates_forbidden
+      - season_duration_forbidden
     2:
       title: Место и формат
       fields:
       - venue_or_manual_address
       - reserved_court_count
       - game_format
-      - participant_capacity
+      - participant_capacity_or_derived_capacity
       - lineup_mode
       - planned_match_count_when_required
+      - cycle_count_when_required
       participant_capacity:
-        input: positive_integer_text_or_stepper
+        input: positive_integer_text_or_stepper_except_derived_formats
         entered_by_organizer: true
         auto_only_forbidden: true
         validation:
@@ -64,18 +71,34 @@ creation:
           minimum_players_per_court: 8
           capacity_can_exceed_active_players_for_substitutions_or_reserve: true
         rotation_five:
-          product_label: Смешанные пары на 5 игроков
-          exact_players: 5
-          minimum_players: 5
-          maximum_players: 5
-          publish_blocked_when_not_exactly_five: true
-          planned_match_count:
+          product_label: Тунисская лестница
+          contract: docs/GAME_TUNISIAN_LADDER.yaml
+          entity_type: game
+          court_count:
+            allowed:
+            - 1
+            - 2
+            - 3
+            entered_by_organizer: true
+          participant_count:
+            derived_formula: court_count_times_5
+            supported:
+            - 5
+            - 10
+            - 15
+            editable_independently: false
+          planned_match_count_per_court:
             entered_by_organizer: true
             input: positive_integer
             default: 15
             minimum: 1
-            unique_compositions_before_repeats: 15
-          larger_counts_destination: docs/TOURNAMENT_COURT_LADDER.yaml
+          cycle_count:
+            entered_by_organizer: true
+            default: 1
+            minimum: 1
+            all_cycles_same_event: true
+          reserved_court_count_must_cover_selected_count: true
+          season_mode_forbidden: true
         fixed_team_match:
           minimum_teams: 2
           participant_capacity_derived_from_team_size_but_confirmed_by_organizer: true
@@ -96,7 +119,7 @@ creation:
       - compact_event_preview
       - capacity_and_venue_validation
       - enrollment_and_payment_summary
-      - format_lineup_and_match_count_summary
+      - format_lineup_match_and_cycle_summary
       - publish_errors
       primary_action: Опубликовать
       secondary_action: Сохранить черновик
@@ -128,6 +151,8 @@ management:
   - settings
   - payments
   - tournament_bracket
+  - season
+  - game_days
   overview:
     shows:
     - publication_and_game_status
@@ -138,6 +163,7 @@ management:
     - price_or_free
     - match_generation_status
     - planned_match_count_when_applicable
+    - court_and_cycle_count_when_tunisian
     - attention_summary
     edit_core_game_action:
       label: Редактировать игру
@@ -153,7 +179,7 @@ management:
     - last_name
     - participation_status
     - payment_cell
-    - pair_team_or_rotation_assignment
+    - pair_team_court_or_rotation_assignment
     payment_cell:
       public_status_for_confirmed_participants:
         paid: Оплачено
@@ -257,17 +283,28 @@ management:
       fixed_teams:
         default_schedule: round_robin_when_more_than_two_teams
       rotation_five:
-        product_label: Смешанные пары на 5 игроков
-        exact_participant_count: 5
-        planned_match_count_entered_by_organizer: true
-        default_planned_match_count: 15
-        generated_rows_formula: planned_match_count
-        unique_cycle_match_count: 15
+        product_label: Тунисская лестница
+        contract: docs/GAME_TUNISIAN_LADDER.yaml
+        court_count_allowed:
+        - 1
+        - 2
+        - 3
+        participant_count_formula: court_count_times_5
+        supported_participant_counts:
+        - 5
+        - 10
+        - 15
+        planned_match_count_per_court_entered_by_organizer: true
+        default_planned_match_count_per_court: 15
+        cycle_count_entered_by_organizer: true
+        default_cycle_count: 1
+        generated_rows_formula: court_count_times_cycle_count_times_planned_match_count_per_court
+        unique_cycle_match_count_per_court: 15
         when_less_than_fifteen: balanced_unique_subset
         when_exactly_fifteen: complete_unique_cycle
         when_more_than_fifteen: append_shuffled_repeat_cycles
-        more_than_five_players_forbidden: true
-        ten_or_fifteen_players_destination: docs/TOURNAMENT_COURT_LADDER.yaml
+        movement_between_courts_only_between_same_day_cycles: true
+        season_mode_forbidden: true
       manual:
         add_matches_one_by_one: true
     statistics:
@@ -279,7 +316,7 @@ management:
       - points_for
       - points_against
       - point_difference
-      rotation_five_individual:
+      tunisian_per_court:
       - played
       - wins
       - points_for
@@ -288,6 +325,7 @@ management:
       - personal_points_when_enabled
       - rank
     tournament_visual_map_forbidden: true
+    season_timeline_forbidden: true
   chat:
     mandatory_in_mvp: true
     conversation_identity: one_canonical_entity_chat
@@ -307,14 +345,21 @@ management:
     - venue_changed
     - payment_required
     - match_list_generated
+    - court_movement_confirmed
     - result_saved_by_organizer_owner
     - result_corrected_by_organizer_owner
     - game_cancelled
 completion:
   required_before_complete:
   - required_match_rows_have_saved_results
+  - unresolved_required_court_movement_preview_is_absent
   - unresolved_critical_participant_state_acknowledged
   result:
   - game_moves_to_archive
   - chat_follows_completed_policy
   - statistics_become_read_only_except_owner_actor_correction
+boundaries:
+  every_game_is_one_off: true
+  season_entity_or_mode_forbidden: true
+  recurring_game_days_forbidden: true
+  multi_month_duration_forbidden: true

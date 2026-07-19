@@ -1,8 +1,9 @@
-version: 1
+version: 2
 scope: one_off_tunisian_ladder_game
 product_status: approved
 source_of_truth_for:
 - Tunisian ladder as a one-off game
+- King of the Beach wording as a user-facing alias
 - one, two or three courts in one event
 - five players per court
 - organizer-defined matches per court
@@ -12,6 +13,7 @@ research_note:
   russian_community_terms:
   - Тунисский формат
   - Тунисская лестница
+  - Король пляжа
   official_fivb_or_vfv_standard: false
   international_generic_description: court ladder with mixed pairs
   rule_variation_warning: community implementations differ, so the application always shows the configured rules
@@ -20,6 +22,8 @@ format:
   product_label: Тунисская лестница
   aliases:
   - Тунисский формат
+  - Король пляжа
+  - Смешанные пары
   entity_type: game
   event_duration: one_off_single_date
   season_mode_forbidden: true
@@ -143,6 +147,7 @@ completion:
 boundaries:
   entity_type_must_be_game: true
   tournament_entity_for_this_format_forbidden: true
+  separate_king_of_the_beach_tournament_forbidden: true
   season_entity_or_mode_forbidden: true
   multi_month_duration_forbidden: true
   recurring_dates_forbidden: true

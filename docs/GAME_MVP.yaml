@@ -1,4 +1,4 @@
-version: 4
+version: 5
 scope: game_mvp_creation_and_management
 product_status: approved
 source_of_truth_for:
@@ -6,7 +6,7 @@ source_of_truth_for:
 - participant capacity input and venue limit
 - MVP game management sections
 - participant payment status and self-service pay action
-- universal organizer-managed match table and statistics for one-off games
+- universal owner-organizer-managed match table and statistics for one-off games
 - canonical game chat shared with Chats
 creation:
   screen: game.create
@@ -213,26 +213,29 @@ management:
     - side_b
     - result_status
     score_fields:
-      organizer_or_authorized_staff: editable_inline
+      entity_owner_actor: editable_inline
+      delegated_event_manager: read_only
       confirmed_participant: read_only
       guest: read_only_when_public_policy_allows
     separate_match_screen_required: false
-    manager_actions:
+    organizer_actions:
     - Сформировать игры
     - Добавить игру
     - Ввести счёт
     - Сохранить результат
     - Изменить игру
     - Удалить игру
-    participant_permissions:
+    organizer_action_permission: entity_owner_actor
+    non_owner_permissions:
+      delegated_manager_can_enter_score: false
       participant_can_enter_score: false
       participant_can_confirm_result: false
       participant_can_view_all_published_scores: true
     result_entry:
-      permission: entity_manager
-      organizer_only_ui: true
-      initial_status: empty
+      permission: entity_owner_actor
+      organizer_owner_only_ui: true
       save_directly_without_opponent_confirmation: true
+      delegated_manager_entry_forbidden: true
       correction_requires_reason: true
       participant_conflict_flow_forbidden: true
     generation:
@@ -248,7 +251,7 @@ management:
       manual:
         add_matches_one_by_one: true
     statistics:
-      recalculation_trigger: organizer_saved_result
+      recalculation_trigger: organizer_owner_saved_result
       fixed_pairs_or_teams:
       - played
       - wins
@@ -284,8 +287,8 @@ management:
     - venue_changed
     - payment_required
     - match_list_generated
-    - result_saved_by_organizer
-    - result_corrected_by_organizer
+    - result_saved_by_organizer_owner
+    - result_corrected_by_organizer_owner
     - game_cancelled
 completion:
   required_before_complete:
@@ -294,4 +297,4 @@ completion:
   result:
   - game_moves_to_archive
   - chat_follows_completed_policy
-  - statistics_become_read_only_except_authorized_correction
+  - statistics_become_read_only_except_owner_actor_correction

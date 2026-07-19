@@ -1,4 +1,4 @@
-version: 3
+version: 4
 scope: entity_sections
 source_of_truth_for:
 - public entity navigation
@@ -6,6 +6,7 @@ source_of_truth_for:
 - mandatory event chat
 - type-specific sections
 - single chat identity across entity screen and global Chats
+- participant-list payment visibility and self-service action
 common_rules:
 - У каждого опубликованного события есть канонический экран и один связанный чат события.
 - Черновик не создаёт доступный участникам чат.
@@ -91,12 +92,32 @@ entity_types:
         rotation_five: round_court_cards_and_individual_standings
       statistics_live_with_scoring: true
     participants:
-      payment_status_embedded: true
-      edit_mode_actions:
+      identity_fields:
+      - first_name
+      - last_name
+      payment_status_visible_to:
+      - confirmed_participants
+      - entity_managers
+      payment_cell:
+        other_rows_show:
+        - Оплачено
+        - Не оплачено
+        - Бесплатно
+        other_rows_actions_forbidden: true
+        own_unpaid_online_row:
+          button: Оплатить
+          action_id: entity.open_payment
+        own_paid_row:
+          status: Оплачено
+        successful_payment_replaces_button_with_status: true
+        paying_for_another_participant_forbidden: true
+      manager_edit_mode_actions:
       - add
       - remove
-      - change_participation_status
-      - mark_payment_status
+      payment_editing_forbidden: true
+      pending_request_actions:
+      - approve
+      - decline
   training:
     base_sections:
     - overview
@@ -139,3 +160,4 @@ implementation_rules:
 - На мобильном допускается горизонтальный tab bar или меню разделов, но глобальная нижняя навигация не заменяется.
 - Вкладка `Игроки`, `Пары` или `Команды` показывает состав и статусы участия, а не социальный список пользователя.
 - Для игры таблица счёта или карточки раундов выбираются по `GAME_FORMATS.yaml` и доступной ширине.
+- Кнопка оплаты показывается только владельцу собственного payment record в его строке списка участников.

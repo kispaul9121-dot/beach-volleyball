@@ -1,10 +1,11 @@
-version: 6
+version: 7
 scope: one_off_game_match_table
 product_status: approved
 source_of_truth_for:
 - the always-present match list for a one-off game
 - pre-generation of pairs, teams and matches
 - strict organizer-only score and result entry
+- one-off Tunisian ladder on one to three courts
 - statistics derived from organizer-saved match results
 - separation between a simple game table and tournament visual brackets
 principles:
@@ -15,6 +16,7 @@ principles:
 - only the owner actor that created the game can enter, change or publish a result
 - delegated event managers, captains and ordinary participants never receive editable score fields
 - statistics are calculated only from organizer-saved results
+- the Tunisian ladder is always one event on one date, never a season
 section:
   id: matches
   label: Матчи
@@ -85,21 +87,39 @@ lineup_modes:
     default_schedule: round_robin_when_more_than_two_teams
     two_teams_result: one_initial_match
   rotation_five:
-    label: Смешанные пары на 5 игроков
+    label: Тунисская лестница
     aliases:
-    - Ротация пяти
-    - Король площадки на 5
+    - Тунисский формат
+    contract: docs/GAME_TUNISIAN_LADDER.yaml
+    entity_type: game
+    event_duration: one_off_single_date
+    court_count:
+      allowed:
+      - 1
+      - 2
+      - 3
+      entered_by_organizer: true
     participant_count:
-      exact: 5
-      minimum: 5
-      maximum: 5
-    planned_match_count:
+      formula: court_count_times_5
+      supported:
+      - 5
+      - 10
+      - 15
+      exactly_five_players_per_court: true
+      editable_independently: false
+    planned_match_count_per_court:
       entered_by_organizer: true
       input: positive_integer
       default: 15
       minimum: 1
       hard_maximum: none
-    unique_cycle:
+    cycle_count:
+      entered_by_organizer: true
+      input: positive_integer
+      default: 1
+      minimum: 1
+      all_cycles_inside_same_event: true
+    unique_five_player_cycle:
       unique_match_count: 15
       derivation: five_resting_player_choices_times_three_pair_splits
       explanation: Для каждого из пяти отдыхающих игроков оставшиеся четверо разбиваются на две пары тремя уникальными способами.
@@ -108,18 +128,33 @@ lineup_modes:
       - every_player_appears_twelve_times
       - every_pair_of_players_are_partners_three_times
       - all_fifteen_unique_match_compositions_are_used_once
-    generation:
-      requested_rows_formula: planned_match_count
+    generation_per_court:
+      requested_rows_formula: planned_match_count_per_court
       when_less_than_fifteen: balanced_subset_of_unique_cycle
       when_exactly_fifteen: complete_unique_cycle
       when_more_than_fifteen: append_new_shuffled_cycles_with_repeats
       repeated_combinations_warning_after: 15
       no_player_appears_twice_in_one_match: true
       waiting_time_and_partner_order_balanced: true
-    presentation: planned_match_count_rows_in_the_same_match_table
-    larger_participant_counts:
-      forbidden_in_one_off_game: true
-      destination: docs/TOURNAMENT_COURT_LADDER.yaml
+    movement_between_cycles:
+      applies_when_more_than_one_court_and_another_cycle_remains: true
+      leader_of_lower_court_moves_up: true
+      last_of_higher_court_moves_down: true
+      simultaneous_across_boundaries: true
+      organizer_preview_and_confirmation_required: true
+      next_cycle_pairings_regenerated_after_movement: true
+      one_court_behavior: no_movement
+      final_cycle_behavior: final_positions_only
+    presentation:
+      group_rows_by:
+      - cycle
+      - court
+      court_selector_visible_when_more_than_one: true
+      cycle_selector_visible_when_more_than_one: true
+      root_remains_simple_match_table: true
+    season_mode_forbidden: true
+    recurring_dates_forbidden: true
+    tournament_entity_forbidden: true
   manual:
     label: Вручную
     use_case: organizer_builds_pairs_or_teams_and_adds_matches_one_by_one
@@ -173,7 +208,8 @@ statistics:
     - points_for
     - points_against
     - point_difference
-  rotation_five_individual_table:
+  tunisian_individual_table:
+    scope: per_court_and_cycle
     columns:
     - rank
     - player
@@ -183,6 +219,9 @@ statistics:
     - points_against
     - point_difference
     - personal_points_when_enabled
+  tunisian_final_order:
+  - court_priority_top_to_bottom
+  - rank_inside_final_court
   ordering_and_tiebreaks:
   - wins_descending
   - point_difference_descending
@@ -191,20 +230,27 @@ statistics:
   provisional_label_until_all_required_results_saved: true
 completion:
   required_match_rows_must_have_saved_result: true
+  unresolved_required_movement_preview_forbidden: true
   optional_manually_added_matches_may_be_excluded_by_organizer: true
   after_completion:
   - match_table_is_read_only_for_participants_and_delegated_managers
   - owner_actor_correction_remains_available_with_audit
   - final_statistics_are_saved
+  - game_moves_to_archive
 one_off_vs_tournament:
   one_off_game:
-    five_player_mixed_pairs_limit: exactly_5_players
-    match_count: organizer_defined
-    default_match_count: 15
+    tunisian_ladder_supported_courts:
+    - 1
+    - 2
+    - 3
+    tunisian_ladder_supported_participants:
+    - 5
+    - 10
+    - 15
     presentation: simple_match_list_and_statistics_table
     bracket_or_visual_map: forbidden
+    season_mode: forbidden
   tournament:
-    ten_or_fifteen_player_grid_ladder: docs/TOURNAMENT_COURT_LADDER.yaml
     presentation: format_specific_schedule_bracket_groups_or_visual_competition_map
     separate_contract: tournament_specs
 accessibility:
@@ -213,3 +259,4 @@ accessibility:
   result_status_is_textual: true
   table_reading_order_matches_visual_order: true
   horizontal_scroll_does_not_hide_current_score_context: true
+  court_movement_has_text_equivalent: true

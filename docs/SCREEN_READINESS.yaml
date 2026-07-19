@@ -779,14 +779,14 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 12 пунктов.
+      evidence: Есть структурный раздел и 17 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: camps.open_search, camps.open_camp, camps.change_mode, camps.open_management_filters…; действия
         описаны в spec.'
     states:
       status: partial
-      evidence: 'Описана только часть состояний: empty.'
+      evidence: 'Описана только часть состояний: empty, error.'
     role_variants:
       status: ready
       evidence: variants=player, trainer, organization.
@@ -798,7 +798,7 @@ screens:
       evidence: 'Указана одна связь: payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 43 непустых строк, 9 заголовков.'
+      evidence: 'Spec существует: 70 непустых строк, 10 заголовков.'
 - id: club.details
   title: Клуб
   section: discovery

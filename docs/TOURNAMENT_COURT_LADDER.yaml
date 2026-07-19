@@ -1,0 +1,106 @@
+version: 1
+scope: tournament_court_ladder
+product_status: approved
+source_of_truth_for:
+- 10-player and 15-player mixed-pair tournaments
+- two-grid and three-grid movement between cycles
+- separation from the one-off five-player game
+format:
+  id: king_of_the_beach_court_ladder
+  product_label: Король площадки по сеткам
+  entity_type: tournament
+  participant_unit: individual
+  supported_configurations:
+    ten_players:
+      participant_count: 10
+      grid_count: 2
+      players_per_grid: 5
+    fifteen_players:
+      participant_count: 15
+      grid_count: 3
+      players_per_grid: 5
+  other_participant_counts_forbidden: true
+  one_off_game_reuse_forbidden: true
+terminology:
+  grid: Сетка
+  grid_one: Верхняя сетка
+  higher_grid_has_better_rank: true
+initial_distribution:
+  methods:
+  - manual
+  - rating
+  - random
+  requirement: exactly_five_players_per_grid
+cycle:
+  matches_per_grid: 5
+  pairing_engine: five_player_mixed_pairs
+  rules:
+  - each_player_plays_four_matches_in_their_current_grid
+  - each_player_rests_exactly_once
+  - each_player_partners_every_other_player_in_their_grid_exactly_once
+  - results_create_an_individual_grid_table
+movement_after_cycle:
+  enabled: true
+  movement_count_per_boundary: 1
+  upward:
+    source: rank_1_of_lower_grid
+    destination: next_higher_grid
+  downward:
+    source: rank_5_of_higher_grid
+    destination: next_lower_grid
+  simultaneous_across_boundaries: true
+  two_grid_example:
+  - leader_of_grid_2_moves_to_grid_1
+  - last_place_of_grid_1_moves_to_grid_2
+  three_grid_example:
+  - leader_of_grid_3_moves_to_grid_2
+  - last_place_of_grid_2_moves_to_grid_3
+  - leader_of_grid_2_moves_to_grid_1
+  - last_place_of_grid_1_moves_to_grid_2
+  edge_rules:
+  - leader_of_top_grid_stays_in_top_grid
+  - last_place_of_bottom_grid_stays_in_bottom_grid
+  - next_cycle_pairings_are_regenerated_after_movement
+rounds:
+  organizer_enters_cycle_count: true
+  minimum_cycles: 1
+  next_cycle_requires_all_required_results: true
+  movement_preview_before_publish: true
+standings:
+  per_grid:
+  - rank
+  - player
+  - played
+  - wins
+  - points_for
+  - points_against
+  - point_difference
+  tiebreaks:
+  - wins_descending
+  - point_difference_descending
+  - points_for_descending
+  final_order:
+  - grid_priority_top_to_bottom
+  - rank_inside_final_grid
+visualization:
+  public_and_participant_view: stacked_grid_cards
+  each_grid_card_shows:
+  - five_players
+  - five_cycle_matches
+  - current_table
+  - movement_arrows_after_completed_cycle
+  rich_map_contract: docs/TOURNAMENT_VISUAL_MAP.yaml
+  one_off_match_table_contract_not_used: docs/GAME_MATCH_TABLE.yaml
+management:
+  organizer_actions:
+  - distribute_players
+  - generate_cycle
+  - enter_results
+  - preview_movements
+  - publish_next_cycle
+  participant_result_entry_forbidden: true
+  delegated_roles_follow_tournament_permissions: true
+accessibility:
+  movement_arrows_have_text_equivalent: true
+  screen_reader_announces_source_grid_destination_grid_and_reason: true
+  color_only_grid_rank_forbidden: true

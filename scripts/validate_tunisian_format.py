@@ -27,6 +27,7 @@ def main() -> int:
     catalog = load_yaml("GAMES_CATALOG.yaml")
     competitions = load_yaml("COMPETITION_FORMATS.yaml")
     visual = load_yaml("TOURNAMENT_VISUAL_MAP.yaml")
+    entity_sections = load_yaml("ENTITY_SECTIONS.yaml")
 
     fmt = ladder.get("format", {}) or {}
     if fmt.get("technical_id") != "rotation_five":
@@ -110,25 +111,43 @@ def main() -> int:
     if mvp_rotation.get("season_mode_forbidden") is not True:
         errors.append("Game creation must forbid season mode")
 
-    tournament_modes = (((catalog.get("categories", {}) or {}).get("tournaments", {}) or {}).get("mode_chips", []) or [])
-    if tournament_modes != ["all", "classic"]:
+    tournament_catalog = ((catalog.get("categories", {}) or {}).get("tournaments", {}) or {})
+    if tournament_catalog.get("mode_chips") != ["all", "classic"]:
         errors.append("Tournament catalog modes must be only All and Classic")
-    forbidden_catalog_formats = set((((catalog.get("categories", {}) or {}).get("tournaments", {}) or {}).get("forbidden_formats", []) or []))
-    if not {"groups_then_playoff", "king_of_the_beach"}.issubset(forbidden_catalog_formats):
-        errors.append("Tournament catalog must forbid groups playoff and separate King format")
+    if tournament_catalog.get("supported_formats") != ["single_elimination", "full_placement"]:
+        errors.append("Tournament catalog must expose only playoff and full placement")
+    forbidden_catalog_formats = set(tournament_catalog.get("forbidden_formats", []) or [])
+    required_forbidden = {"round_robin", "swiss", "groups_then_playoff", "king_of_the_beach"}
+    if not required_forbidden.issubset(forbidden_catalog_formats):
+        errors.append("Tournament catalog must forbid round robin, Swiss, groups playoff and King")
 
     competition_formats = competitions.get("formats", {}) or {}
-    for forbidden_format in ("groups_then_playoff", "king_of_the_beach", "seasonal_tournament"):
-        if forbidden_format in competition_formats:
-            errors.append(f"Forbidden tournament format remains: {forbidden_format}")
+    if set(competition_formats) != {"single_elimination", "full_placement"}:
+        errors.append("Competition formats must contain only single elimination and full placement")
+    full_placement = competition_formats.get("full_placement", {}) or {}
+    example_32 = ((full_placement.get("examples", {}) or {}).get("teams_32", {}) or {})
+    if example_32.get("total_matches") != 80:
+        errors.append("Full placement for 32 teams must contain 80 matches")
+    if example_32.get("matches_per_team") != 5 or example_32.get("rounds") != 5:
+        errors.append("Full placement for 32 teams must give five rounds and five matches per team")
     catalog_modes = competitions.get("catalog_modes", {}) or {}
     if set(catalog_modes) != {"classic"}:
         errors.append("Competition catalog must expose only Classic")
+    classic_formats = ((catalog_modes.get("classic", {}) or {}).get("formats", []) or [])
+    if classic_formats != ["single_elimination", "full_placement"]:
+        errors.append("Classic tournament mode must contain only playoff and full placement")
 
     visual_formats = visual.get("format_presentations", {}) or {}
-    for forbidden_visual in ("groups_playoff", "king_of_the_beach", "seasonal", "tunisian_court_ladder"):
-        if forbidden_visual in visual_formats:
-            errors.append(f"Forbidden tournament visual remains: {forbidden_visual}")
+    if set(visual_formats) != {"elimination", "full_placement"}:
+        errors.append("Tournament visual map must contain only elimination and full placement")
+    visual_boundaries = visual.get("boundaries", {}) or {}
+    approved_visual = visual_boundaries.get("approved_tournament_formats", []) or []
+    if approved_visual != ["single_elimination", "full_placement"]:
+        errors.append("Tournament visual map approved format list differs")
+
+    tournament_sections = ((entity_sections.get("entity_types", {}) or {}).get("tournament", {}) or {})
+    if tournament_sections.get("supported_formats") != ["single_elimination", "full_placement"]:
+        errors.append("Entity sections must expose only playoff and full placement tournaments")
 
     forbidden_path = DOCS / "TOURNAMENT_COURT_LADDER.yaml"
     if forbidden_path.exists():
@@ -140,6 +159,7 @@ def main() -> int:
     game_manage_text = (DOCS / "screens/shared/game-manage.md").read_text(encoding="utf-8")
     play_text = (DOCS / "screens/play/main.md").read_text(encoding="utf-8")
     tournament_create_text = (DOCS / "screens/shared/tournament-create.md").read_text(encoding="utf-8")
+    tournament_details_text = (DOCS / "screens/shared/tournament-details.md").read_text(encoding="utf-8")
     if "1 площадка → 5 игроков" not in game_create_text or "3 площадки → 15 игроков" not in game_create_text:
         errors.append("Game creation spec must show all Tunisian court configurations")
     if "Циклов за игру" not in game_create_text:
@@ -148,16 +168,20 @@ def main() -> int:
         errors.append("Game management must confirm court movements")
     if "Отдельных фильтров `Король пляжа`, `Группы + плей-офф` и `Сезонные` нет" not in play_text:
         errors.append("Games catalog spec must remove King, groups playoff and seasonal tournament filters")
-    if "Группы + плей-офф\nКороль пляжа" not in tournament_create_text:
-        errors.append("Tournament creation spec must list removed groups playoff and King formats")
+    if "Плей-офф на выбывание\nПолное распределение мест" not in tournament_create_text:
+        errors.append("Tournament creation spec must show exactly the two approved formats")
+    if "80 матчей всего" not in tournament_create_text:
+        errors.append("Tournament creation must show the 32-team 80-match calculation")
+    if "Круговая и швейцарская системы" not in tournament_details_text:
+        errors.append("Tournament details must explicitly remove round robin and Swiss")
 
     if errors:
-        print("Tunisian one-off game validation failed:")
+        print("Tunisian and tournament format validation failed:")
         for error in errors:
             print(f"  - {error}")
         return 1
 
-    print("Tunisian one-off game validation passed.")
+    print("Tunisian and tournament format validation passed.")
     return 0
 
 

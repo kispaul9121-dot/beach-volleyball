@@ -1738,7 +1738,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 31 пунктов.
+      evidence: Есть структурный раздел и 29 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: tournament.open_match; действия описаны в spec.'
@@ -1756,7 +1756,7 @@ screens:
       evidence: 'Связи: chat, deep_link, maps, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 59 непустых строк, 13 заголовков.'
+      evidence: 'Spec существует: 65 непустых строк, 15 заголовков.'
 - id: tournament.create
   title: Создание турнира
   section: shared
@@ -1815,7 +1815,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 17 пунктов.
+      evidence: Есть структурный раздел и 26 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: tournament.generate_draw, tournament.review_pairings, tournament.publish_round, tournament.generate_next_round;
@@ -1834,7 +1834,7 @@ screens:
       evidence: 'Связи: audit, chat, maps, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 69 непустых строк, 20 заголовков.'
+      evidence: 'Spec существует: 83 непустых строк, 20 заголовков.'
 - id: competition.match
   title: Матч
   section: shared

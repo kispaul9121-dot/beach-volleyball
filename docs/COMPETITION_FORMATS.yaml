@@ -1,8 +1,7 @@
-version: 4
+version: 5
 shared_configuration:
   participant_unit:
     values:
-    - individual
     - pair
     - team
     default_for_beach_volleyball: pair
@@ -90,29 +89,6 @@ formats:
     tabs:
     - overview
     - schedule
-    - standings
-    - participants
-    - chat
-  groups_then_playoff:
-    title: Группы + плей-офф
-    entity_types:
-    - tournament
-    mvp: true
-    configuration:
-      group_size_min: 3
-      group_size_max: 6
-      qualifiers_per_group: configurable
-      playoff_format: single_elimination
-      placement_matches: optional
-    algorithm:
-      group_stage: round_robin
-      qualification_order: group_standings
-      cross_group_seeding: configurable
-    tabs:
-    - overview
-    - groups
-    - matches
-    - bracket
     - standings
     - participants
     - chat
@@ -205,28 +181,6 @@ formats:
     - all_results_in_round_complete_before_next_round
     - every_participant_has_exactly_one_match_per_round
     - no_duplicate_participant_in_round
-  king_of_the_beach:
-    title: Король пляжа
-    entity_types:
-    - tournament
-    mvp: true
-    participant_unit: individual
-    purpose: Игроки меняют партнёров и соперников, а итоговая таблица считается персонально.
-    configuration:
-      rounds: configurable
-      partner_rotation: required
-      repeat_partner_policy: minimize
-      standings:
-      - personal_wins
-      - point_difference
-      - points_scored
-      - head_to_head_when_applicable
-    tabs:
-    - overview
-    - rounds
-    - standings
-    - participants
-    - chat
 validation_rules:
 - competition_format must be compatible with entity_type
 - every participant must have a stable participant_id
@@ -236,6 +190,9 @@ validation_rules:
 - standings are calculated from immutable result events, not manually typed totals
 - organizer overrides require reason and actor_id
 - seasonal tournaments, season entities and recurring tournament-day containers are not supported
+- groups_then_playoff is not supported
+- King or Queen of the Beach is not a separate tournament format in this product
+- user-facing King of the Beach wording resolves to the one-off Tunisian ladder game in docs/GAME_TUNISIAN_LADDER.yaml
 - Tunisian ladder belongs to one-off games through docs/GAME_TUNISIAN_LADDER.yaml
 catalog_modes:
   classic:
@@ -243,10 +200,9 @@ catalog_modes:
     formats:
     - single_elimination
     - round_robin
-    - groups_then_playoff
     - swiss
     - full_placement
-  king_of_the_beach:
-    title: Король пляжа
-    formats:
-    - king_of_the_beach
+research_backlog:
+  double_elimination:
+    product_status: proposed_not_approved
+    reason: widely used in professional beach volleyball and worth evaluating separately

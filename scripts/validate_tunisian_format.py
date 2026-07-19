@@ -33,6 +33,9 @@ def main() -> int:
         errors.append("Tunisian ladder technical id must remain rotation_five")
     if fmt.get("product_label") != "Тунисская лестница":
         errors.append("Product label must be Тунисская лестница")
+    aliases = set(fmt.get("aliases", []) or [])
+    if not {"Тунисский формат", "Король пляжа"}.issubset(aliases):
+        errors.append("Tunisian ladder must include Tunisian and King user-facing aliases")
     if fmt.get("entity_type") != "game":
         errors.append("Tunisian ladder must be a game, not a tournament")
     if fmt.get("event_duration") != "one_off_single_date":
@@ -108,22 +111,24 @@ def main() -> int:
         errors.append("Game creation must forbid season mode")
 
     tournament_modes = (((catalog.get("categories", {}) or {}).get("tournaments", {}) or {}).get("mode_chips", []) or [])
-    if "seasonal" in tournament_modes:
-        errors.append("Games catalog must not expose Seasonal")
-    if set(tournament_modes) != {"all", "classic", "king_of_the_beach"}:
-        errors.append("Tournament catalog modes must be All, Classic and King of the Beach")
+    if tournament_modes != ["all", "classic"]:
+        errors.append("Tournament catalog modes must be only All and Classic")
+    forbidden_catalog_formats = set((((catalog.get("categories", {}) or {}).get("tournaments", {}) or {}).get("forbidden_formats", []) or []))
+    if not {"groups_then_playoff", "king_of_the_beach"}.issubset(forbidden_catalog_formats):
+        errors.append("Tournament catalog must forbid groups playoff and separate King format")
 
     competition_formats = competitions.get("formats", {}) or {}
-    if "seasonal_tournament" in competition_formats:
-        errors.append("Seasonal tournament format must be removed")
-    if "seasonal" in (competitions.get("catalog_modes", {}) or {}):
-        errors.append("Seasonal tournament catalog mode must be removed")
+    for forbidden_format in ("groups_then_playoff", "king_of_the_beach", "seasonal_tournament"):
+        if forbidden_format in competition_formats:
+            errors.append(f"Forbidden tournament format remains: {forbidden_format}")
+    catalog_modes = competitions.get("catalog_modes", {}) or {}
+    if set(catalog_modes) != {"classic"}:
+        errors.append("Competition catalog must expose only Classic")
 
     visual_formats = visual.get("format_presentations", {}) or {}
-    if "seasonal" in visual_formats:
-        errors.append("Tournament visual map must not contain seasonal presentation")
-    if "tunisian_court_ladder" in visual_formats:
-        errors.append("Tournament visual map must not contain Tunisian ladder")
+    for forbidden_visual in ("groups_playoff", "king_of_the_beach", "seasonal", "tunisian_court_ladder"):
+        if forbidden_visual in visual_formats:
+            errors.append(f"Forbidden tournament visual remains: {forbidden_visual}")
 
     forbidden_path = DOCS / "TOURNAMENT_COURT_LADDER.yaml"
     if forbidden_path.exists():
@@ -134,14 +139,17 @@ def main() -> int:
     game_create_text = (DOCS / "screens/shared/game-create.md").read_text(encoding="utf-8")
     game_manage_text = (DOCS / "screens/shared/game-manage.md").read_text(encoding="utf-8")
     play_text = (DOCS / "screens/play/main.md").read_text(encoding="utf-8")
+    tournament_create_text = (DOCS / "screens/shared/tournament-create.md").read_text(encoding="utf-8")
     if "1 площадка → 5 игроков" not in game_create_text or "3 площадки → 15 игроков" not in game_create_text:
         errors.append("Game creation spec must show all Tunisian court configurations")
     if "Циклов за игру" not in game_create_text:
         errors.append("Game creation spec must expose same-day cycle count")
     if "Подтвердить переходы" not in game_manage_text:
         errors.append("Game management must confirm court movements")
-    if "Сезонной категории и сезонного режима нет" not in play_text:
-        errors.append("Games catalog spec must explicitly remove seasons")
+    if "Отдельных фильтров `Король пляжа`, `Группы + плей-офф` и `Сезонные` нет" not in play_text:
+        errors.append("Games catalog spec must remove King, groups playoff and seasonal tournament filters")
+    if "Группы + плей-офф\nКороль пляжа" not in tournament_create_text:
+        errors.append("Tournament creation spec must list removed groups playoff and King formats")
 
     if errors:
         print("Tunisian one-off game validation failed:")

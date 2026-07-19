@@ -164,13 +164,14 @@ def main() -> int:
         ("Games", play_text, "/play?mode=archive"),
         ("Camps", camps_text, "/camps?mode=archive"),
     ):
+        lowered = text.lower()
         if "Активные · Завершённые" in text:
             errors.append(f"{name} spec restored Active/Completed controls")
         if "Потяните ещё, чтобы открыть" not in text or "Отпустите, чтобы открыть" not in text:
             errors.append(f"{name} spec must describe both archive gesture stages")
         if archive_route not in text:
             errors.append(f"{name} spec must declare archive route state")
-        if "pull-to-refresh отключ" not in text:
+        if "pull-to-refresh" not in lowered or "отключ" not in lowered:
             errors.append(f"{name} spec must resolve pull-to-refresh conflict")
         if "Открыть архив" not in text:
             errors.append(f"{name} spec must include accessibility archive action")

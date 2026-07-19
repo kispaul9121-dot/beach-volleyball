@@ -1,0 +1,118 @@
+version: 1
+scope: entity_join_flow
+product_status: approved
+source_of_truth_for:
+- the meaning of the Вступить action
+- organizer enrollment policy
+- independent payment policy
+- capacity and waitlist resolution
+- participation status created after join
+principles:
+- enrollment confirmation and payment are independent dimensions
+- a free event may require organizer approval
+- a paid event may confirm immediately or require approval
+- unresolved invitations use invitation.details and are not participation
+- server state is authoritative for capacity, permission, price and policy
+- the user sees one entry action and the resolver chooses the required flow
+entry:
+  action_id: entity.start_join_flow
+  default_label: Вступить
+  resolver: system.resolve_join_flow
+  availability:
+    public_or_permitted_entity: true
+    invitation_only_without_active_invitation: false
+organizer_configuration:
+  enrollment_policy:
+    field: enrollmentPolicy
+    label: Как игроки вступают
+    required: true
+    values:
+      immediate:
+        label: Сразу записываются
+        result_before_payment: confirmed_or_payment_required
+      approval:
+        label: Отправляют заявку
+        result_before_payment: requested
+      invitation_only:
+        label: Только по приглашению
+        public_join_action_hidden: true
+  payment_policy:
+    field: paymentPolicy
+    label: Стоимость
+    required: true
+    values:
+      free:
+        label: Бесплатно
+      online:
+        label: Оплата онлайн
+        requires_payout_configuration_for_publish: true
+      external:
+        label: Оплата организатору вне приложения
+        platform_payment_not_created: true
+  waitlist:
+    field: waitlistEnabled
+    label: Лист ожидания при заполнении
+    default: true
+resolution:
+  capacity_available:
+    immediate:
+      free: confirmed
+      online: payment_required
+      external: confirmed_external_payment_unverified
+    approval:
+      free: requested
+      online: requested_then_payment_required_after_approval
+      external: requested
+    invitation_only:
+      without_invitation: unavailable_invitation_only
+      with_active_invitation: invitation_accept_flow
+  capacity_full:
+    waitlist_enabled: waitlisted
+    waitlist_disabled: unavailable_no_places
+  active_invitation:
+    entry_screen: invitation.details
+    accept_label: Принять приглашение
+    decline_label: Отказаться
+    acceptance_does_not_imply_payment: true
+    accepted_free: confirmed
+    accepted_online: payment_required
+    accepted_external: confirmed_external_payment_unverified
+status_model:
+- requested
+- payment_required
+- waitlisted
+- confirmed
+- confirmed_external_payment_unverified
+- declined
+- cancelled
+- removed_by_organizer
+profile_activity:
+  created_for:
+  - requested
+  - payment_required
+  - waitlisted
+  - confirmed
+  - confirmed_external_payment_unverified
+  not_created_for:
+  - unresolved_invitation
+  - unavailable_invitation_only
+  - unavailable_no_places
+  feedback_contract: docs/PROFILE_ACTIVITY.yaml
+copy:
+  requested: Заявка отправлена
+  payment_required: Место будет подтверждено после оплаты
+  waitlisted: Вы добавлены в лист ожидания
+  confirmed: Вы участвуете
+  confirmed_external_payment_unverified: Вы участвуете · оплата организатору
+  unavailable_invitation_only: Участие только по приглашению
+  unavailable_no_places: Свободных мест нет
+edge_cases:
+- price_or_policy_changed_requires_reconfirmation_before_mutation
+- capacity_revalidated_immediately_before_record_creation
+- idempotent_repeated_submission
+- offline_submission_not_optimistically_confirmed
+- permission_revoked_returns_to_public_details_with_notice
+accessibility:
+  result_announced_with_text: true
+  color_only_status_forbidden: true
+  loading_preserves_action_layout: true

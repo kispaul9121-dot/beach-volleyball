@@ -1,10 +1,11 @@
-version: 4
+version: 5
 scope: profile_activity
 source_of_truth_for:
 - personal participation preview on home.main
 - unified personal activity list
 - contextual creation and management in Games and Camps
 - post-join Profile tab feedback
+- boundary between invitation and participation
 catalog_boundaries:
   games:
     screen: play.main
@@ -55,11 +56,11 @@ profile_root:
     ordering: starts_at_ascending
     maximum_preview_items: 4
     statuses:
-    - invited
     - requested
     - payment_required
     - waitlisted
     - confirmed
+    - confirmed_external_payment_unverified
     shows:
     - date
     - time
@@ -69,6 +70,7 @@ profile_root:
     - participation_status
     - required_action
     excludes:
+    - unresolved_invitation
     - draft
     - manager_only_task
     - staff_operation
@@ -100,6 +102,7 @@ activity_screen:
     tournaments: Турниры
     camps: Кэмпы
   management_items_forbidden: true
+  unresolved_invitations_forbidden: true
   empty_upcoming_action: Открыть Игры
   empty_past_copy: Завершённые участия появятся здесь
 legacy_filtered_activity_screens:
@@ -135,11 +138,12 @@ management:
   temporal_tabs_forbidden: true
   current_lists_exclude_completed: true
   completed_entities_destination: archive
-  archive_placement_status: placement_pending
+  archive_placement_status: approved_pull_down_overscroll
   games:
     screen: play.main
     route: /play
     mode_query: manage
+    archive_query: archive
     entity_types:
     - game
     - training
@@ -148,20 +152,30 @@ management:
     screen: camps.main
     route: /camps
     mode_query: manage
+    archive_query: archive
     entity_types:
     - camp
 join_flow:
-  product_status: definition_pending
+  product_status: approved
+  source_of_truth: docs/JOIN_FLOW.yaml
   entry_action_id: entity.start_join_flow
   entry_label: Вступить
   resolver: system.resolve_join_flow
-  possible_future_outcomes:
-  - free_immediate_confirmation
-  - paid_checkout
-  - organizer_approval
-  - waitlist
+  independent_dimensions:
+  - enrollment_policy
+  - payment_policy
+  enrollment_policies:
+  - immediate
+  - approval
   - invitation_only
-  rule: do_not_expose_a_final_join_mechanism_until_the_product_decision_is_approved
+  payment_policies:
+  - free
+  - online
+  - external
+  capacity_fallback:
+  - waitlist
+  - unavailable_no_places
+  unresolved_invitation_is_not_participation: true
 profile_tab_feedback:
   trigger: profile_activity_item_created_or_updated_after_join_flow
   bottom_tab_id: home

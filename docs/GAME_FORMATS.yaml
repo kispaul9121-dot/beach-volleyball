@@ -1,4 +1,4 @@
-version: 7
+version: 8
 
 formats:
   standard_2x2:
@@ -89,62 +89,38 @@ formats:
       - point_difference
 
   rotation_five:
-    technical_id_status: legacy_name_kept_for_compatibility
-    title: Смешанные пары
+    title: Смешанные пары на 5 игроков
     aliases:
-    - Ротация
-    - Король площадки
-    - Смешанные пары на 5
+    - Ротация пяти
+    - Король площадки на 5
     participant_unit: individual
-    players_on_court_per_match: 4
+    players_on_court: 4
     team_size: 2
+    resting_players_per_round: 1
+    canonical_round_count: 5
     capacity:
       organizer_enters_participant_capacity: true
-      minimum_players: 4
-      fixed_to_five: false
-      exact_multiple_rule: none
-      maximum_players: venue_capacity
+      exact_players: 5
+      minimum_players: 5
+      maximum_players: 5
       must_not_exceed_venue_limit: true
+      publish_blocked_when_not_exactly_five: true
     generation:
-      generated_match_count_formula: participant_count
-      active_player_slots_formula: participant_count_times_4
-      target_appearances_per_player: 4
-      partner_repetitions: minimize
-      opponent_repetitions: minimize
-      waiting_time_distribution: balance
-      simultaneous_matches_limited_by_reserved_courts: true
-      no_player_on_two_courts_in_same_time_slot: true
-    special_case_five_players:
-      matches: 5
+      generated_match_count: 5
       appearances_per_player: 4
       each_player_rests_once: true
       every_pair_of_players_are_partners_once: true
-    example_fifteen_players:
-      players: 15
-      matches: 15
-      target_appearances_per_player: 4
-    purpose: Система создаёт столько матчей, сколько введено участников, и равномерно перемешивает пары.
-    per_game_configuration:
-    - court_count
-    - participant_capacity
-    - points_per_match
-    - scoring_model
-    - initial_order
-    - rating_effect
-    results:
-      supported_models:
-        individual_points: Очки каждого игрока суммируются по матчам.
-        wins_and_point_difference: Победы, затем разница очков.
-        custom_season_points: Правило сезона.
+      no_player_appears_twice_in_one_match: true
+    purpose: Одна разовая игра ровно на пять участников с пятью смешанными матчами.
     one_off_game_view:
       primary: match_table
-      generated_rows_formula: participant_count
+      generated_rows: 5
       each_row:
-      - match_number
+      - round_number
       - pair_a
       - score
       - pair_b
-      - court_or_time_optional
+      - resting_player
       - result_status
       score_entry_permission: entity_owner_actor
       delegated_manager_score_view: read_only
@@ -158,19 +134,15 @@ formats:
       - point_difference
       - total_personal_points
       - rank
-    generated_views:
-      participant:
-      - assigned_matches
-      - partners
-      - opponents
-      - court_or_time
-      - personal_points
-      organizer:
-      - all_match_rows
-      - court_schedule
-      - fairness_warnings
-      - missing_results
-      - regenerate_before_first_saved_result
+    larger_groups:
+      ten_players:
+        entity_type: tournament
+        destination_contract: docs/TOURNAMENT_COURT_LADDER.yaml
+        grid_count: 2
+      fifteen_players:
+        entity_type: tournament
+        destination_contract: docs/TOURNAMENT_COURT_LADDER.yaml
+        grid_count: 3
 
   fixed_team_match:
     title: Матч фиксированных команд
@@ -218,9 +190,8 @@ format_engine_rules:
 - tournament and seasonal modes may use brackets, groups, schedules and rich visual maps through tournament-specific contracts.
 - participant_capacity is entered by the organizer and validated against format and venue constraints.
 - fixed pairs or teams generate a round-robin list by default when more than two sides exist.
-- the technical id rotation_five now means generic mixed-pair rotation and is not limited to five players.
-- mixed-pair rotation creates exactly participant_count match rows, including 15 rows for 15 players.
-- the generator targets four appearances per player and balances partners, opponents and waiting time.
+- rotation_five is a one-off game with exactly five participants and exactly five match rows.
+- ten or fifteen players with five-player grids belong to the separate tournament contract docs/TOURNAMENT_COURT_LADDER.yaml.
 - only the owner actor that created the game can enter, change or publish scores in a one-off game.
 - delegated managers, captains and participants can view published match rows and statistics but never receive score inputs.
 - published lineups cannot be silently regenerated.

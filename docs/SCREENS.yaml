@@ -113,7 +113,8 @@ screens:
   route: /
   section: home
   spec: docs/screens/home/main.md
-  purpose: 'Личный профиль active actor: связи, ближайшие участия и переход ко всей личной активности без создания и управления событиями.'
+  purpose: 'Личный профиль active actor: связи, ближайшие участия и переход ко всей личной активности без создания
+    и управления событиями.'
   variants:
   - player
   - trainer
@@ -325,7 +326,7 @@ screens:
   route: /games/:gameId
   section: shared
   spec: docs/screens/shared/game-details.md
-  purpose: Канонический экран разовой игры для гостя, участника и организатора.
+  purpose: Канонический экран одноразовой игры для гостя, участника и организатора.
   variants:
   - guest
   - participant
@@ -336,16 +337,16 @@ screens:
   route: /games/create
   section: shared
   spec: docs/screens/shared/game-create.md
-  purpose: Четырёхшаговый мастер создания разовой игры, включая Тунисскую лестницу на одной, двух или трёх площадках.
-  back_fallback: /play?mode=manage&category=games
+  purpose: Единый мастер с выбором «Создать как».
+  back_fallback: /profile/games?mode=managing&tab=active
 - id: game.manage
   title: Управление игрой
   route: /games/:gameId/manage
   section: shared
   spec: docs/screens/shared/game-manage.md
-  purpose: Обзор, участники, матчи, статистика и чат разовой игры.
+  purpose: Участники, раунды, корты, результаты, оплаты, чат и настройки.
   permission: entity_manager
-  back_fallback: /play?mode=manage&category=games
+  back_fallback: /profile/games?mode=managing&tab=active
 - id: training.details
   title: Тренировка
   route: /trainings/:trainingId
@@ -365,7 +366,7 @@ screens:
   spec: docs/screens/shared/training-create.md
   purpose: Создание тренировки, приглашение игроков и настройка публичности.
   permission: trainer_or_organization
-  back_fallback: /play?mode=manage&category=trainings
+  back_fallback: /profile/trainings?mode=managing&tab=active
 - id: training.manage
   title: Управление тренировкой
   route: /trainings/:trainingId/manage
@@ -373,7 +374,7 @@ screens:
   spec: docs/screens/shared/training-manage.md
   purpose: Записи, программа, посещаемость, оплаты и сообщения.
   permission: entity_manager
-  back_fallback: /play?mode=manage&category=trainings
+  back_fallback: /profile/trainings?mode=managing&tab=active
 - id: training.attendance
   title: Посещаемость
   route: /trainings/:trainingId/attendance
@@ -387,7 +388,7 @@ screens:
   route: /tournaments/:tournamentId
   section: shared
   spec: docs/screens/shared/tournament-details.md
-  purpose: Канонический экран классического турнира или Короля пляжа.
+  purpose: Канонический экран классического, Короля пляжа или сезонного турнира.
   variants:
   - guest
   - participant
@@ -398,22 +399,22 @@ screens:
   route: /tournaments/create
   section: shared
   spec: docs/screens/shared/tournament-create.md
-  purpose: Создание классического турнира или Короля пляжа без сезонного режима.
-  back_fallback: /play?mode=manage&category=tournaments
+  purpose: Создание классического, Короля пляжа или сезонного турнира.
+  back_fallback: /profile/competitions?mode=managing&tab=active
 - id: tournament.manage
   title: Управление турниром
   route: /tournaments/:tournamentId/manage
   section: shared
   spec: docs/screens/shared/tournament-manage.md
-  purpose: Регистрация, жеребьёвка, раунды, таблица, площадки, результаты и выплаты.
+  purpose: Регистрация, игровые дни, жеребьёвка, раунды, таблица, корты, результаты и выплаты.
   permission: entity_manager
-  back_fallback: /play?mode=manage&category=tournaments
+  back_fallback: /profile/competitions?mode=managing&tab=active
 - id: competition.match
   title: Матч
   route: /matches/:matchId
   section: shared
   spec: docs/screens/shared/competition-match.md
-  purpose: Состав, площадка, счёт, статус и история результата.
+  purpose: Состав, корт, счёт, статус и подтверждение результата.
   back_fallback: /play
 - id: tour.details
   title: Кэмп
@@ -432,7 +433,7 @@ screens:
   section: shared
   spec: docs/screens/shared/tour-create.md
   purpose: Создание совместного игрового кэмпа игроком, лагеря тренером или коммерческого кэмпа организацией.
-  back_fallback: /camps?mode=manage
+  back_fallback: /profile/trips?mode=managing&tab=active
 - id: tour.manage
   title: Управление кэмпом
   route: /tours/:tourId/manage
@@ -440,7 +441,7 @@ screens:
   spec: docs/screens/shared/tour-manage.md
   purpose: Заявки, бронирования, программа, участники, оплаты и сообщения.
   permission: entity_manager
-  back_fallback: /camps?mode=manage
+  back_fallback: /profile/trips?mode=managing&tab=active
 - id: tour.booking
   title: Бронирование кэмпа
   route: /tours/:tourId/booking

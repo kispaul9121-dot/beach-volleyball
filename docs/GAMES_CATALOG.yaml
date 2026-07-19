@@ -1,4 +1,4 @@
-version: 3
+version: 4
 scope: games_catalog
 source_of_truth_for:
 - Игры bottom tab
@@ -6,6 +6,7 @@ source_of_truth_for:
 - followed organizers and saved players
 - empty-state recovery
 - contextual management mode
+- pull-down archive entry for managed games, trainings and tournaments
 bottom_tab:
   screen_id: play.main
   route: /play
@@ -25,6 +26,7 @@ bottom_tab:
   - start_join_flow
   - switch_to_management_mode
   - create_in_section
+  - reveal_archive_from_management_overscroll
 categories:
   games:
     title: Игры
@@ -145,10 +147,8 @@ management_mode:
   - trainings
   - tournaments
   temporal_tabs: none
-  completed_entities_visible: false
-  completed_entities_destination: archive
-  archive_placement_status: placement_pending
-  state_filters:
+  excludes_completed: true
+  status_filters:
   - all
   - draft
   - requires_action
@@ -158,3 +158,19 @@ management_mode:
   - game
   - training
   - tournament
+  archive_entry:
+    idle_visibility: hidden
+    interaction: pull_down_overscroll_at_scroll_top
+    reveal_threshold_dp: 24
+    armed_threshold_dp: 72
+    release_when_armed: /play?mode=archive
+    visible_button_forbidden: true
+    pull_to_refresh_in_management_mode: disabled
+  archive_mode:
+    query: mode=archive
+    title: Архив
+    includes_only: completed_managed_entities
+    ordering: completed_at_descending
+    preserves_category: true
+    create_controls_forbidden: true
+    back_destination: /play?mode=manage

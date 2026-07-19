@@ -1815,7 +1815,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 36 пунктов.
+      evidence: Есть структурный раздел и 42 пунктов.
     actions:
       status: ready
       evidence: 'ACTIONS.yaml: tournament.generate_draw, tournament.review_pairings, tournament.publish_round, tournament.generate_next_round;
@@ -1825,7 +1825,7 @@ screens:
       evidence: Нет loading, empty, error, offline и permission states.
     role_variants:
       status: ready
-      evidence: роли в spec=manager, organizer, participant.
+      evidence: роли в spec=manager, organizer, participant, player.
     navigation:
       status: ready
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
@@ -1834,7 +1834,7 @@ screens:
       evidence: 'Связи: audit, chat, maps, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 80 непустых строк, 20 заголовков.'
+      evidence: 'Spec существует: 117 непустых строк, 25 заголовков.'
 - id: competition.match
   title: Матч
   section: shared

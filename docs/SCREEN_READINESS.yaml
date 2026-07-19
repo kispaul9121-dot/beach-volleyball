@@ -62,8 +62,8 @@ summary:
       ready: 32
       partial: 9
     navigation:
-      ready: 45
-      partial: 9
+      ready: 44
+      partial: 10
     integrations:
       na: 4
       ready: 46
@@ -1457,7 +1457,7 @@ screens:
   section: shared
   route: /games/:gameId
   spec: docs/screens/shared/game-details.md
-  score: 95
+  score: 90
   status: готово
   criteria:
     identity_route:
@@ -1471,7 +1471,7 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 69 пунктов.
+      evidence: Есть структурный раздел и 45 пунктов.
     actions:
       status: partial
       evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
@@ -1482,14 +1482,14 @@ screens:
       status: ready
       evidence: variants=guest, participant, organizer.
     navigation:
-      status: ready
-      evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
+      status: partial
+      evidence: Навигация определена только в реестре или только в spec.
     integrations:
       status: ready
-      evidence: 'Связи: calendar, chat, deep_link, notifications, payments.'
+      evidence: 'Связи: calendar, chat, notifications, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 126 непустых строк, 12 заголовков.'
+      evidence: 'Spec существует: 92 непустых строк, 13 заголовков.'
 - id: game.create
   title: Создание игры
   section: shared
@@ -1548,13 +1548,13 @@ screens:
       evidence: Purpose задан; в spec есть источник или модель данных.
     blocks:
       status: ready
-      evidence: Есть структурный раздел и 72 пунктов.
+      evidence: Есть структурный раздел и 55 пунктов.
     actions:
       status: partial
       evidence: Действия описаны в spec, но не привязаны к ACTIONS.yaml.
     states:
       status: partial
-      evidence: 'Описана только часть состояний: empty, offline.'
+      evidence: 'Описана только часть состояний: offline.'
     role_variants:
       status: ready
       evidence: роли в spec=manager, organizer, participant, player.
@@ -1563,10 +1563,10 @@ screens:
       evidence: Route определяет вход/возврат; deep-link поведение описано или экран корневой.
     integrations:
       status: ready
-      evidence: 'Связи: audit, chat, notifications, payments.'
+      evidence: 'Связи: audit, chat, maps, payments.'
     spec:
       status: ready
-      evidence: 'Spec существует: 189 непустых строк, 18 заголовков.'
+      evidence: 'Spec существует: 162 непустых строк, 19 заголовков.'
 - id: training.details
   title: Тренировка
   section: shared

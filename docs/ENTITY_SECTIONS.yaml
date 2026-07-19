@@ -1,4 +1,4 @@
-version: 5
+version: 6
 scope: entity_sections
 source_of_truth_for:
 - public entity navigation
@@ -7,7 +7,7 @@ source_of_truth_for:
 - type-specific sections
 - single chat identity across entity screen and global Chats
 - participant-list payment visibility and self-service action
-- organizer-only result entry for one-off games
+- strict owner-organizer-only result entry for one-off games
 common_rules:
 - У каждого опубликованного события есть канонический экран и один связанный чат события.
 - Черновик не создаёт доступный участникам чат.
@@ -100,11 +100,13 @@ entity_types:
         fixed_team_match: fixed_teams_round_robin_or_manual
         rotation_five: five_generated_mixed_pair_rows
       score_entry:
-        organizer_or_authorized_staff: editable
+        entity_owner_actor: editable
+        delegated_event_manager: read_only
         confirmed_participant: read_only
         guest: read_only_when_public
         participant_confirmation_required: false
-      statistics_derived_from_organizer_saved_results: true
+        delegated_manager_entry_forbidden: true
+      statistics_derived_from_owner_saved_results: true
     participants:
       identity_fields:
       - first_name
@@ -178,5 +180,6 @@ implementation_rules:
 - На мобильном допускается горизонтальный tab bar или меню разделов, но глобальная нижняя навигация не заменяется.
 - Вкладка `Игроки`, `Пары` или `Команды` показывает состав и статусы участия, а не социальный список пользователя.
 - Разовая игра всегда использует простой список матчей и таблицу статистики, а не турнирную сетку.
-- Поля счёта разовой игры показываются только организатору или уполномоченному сотруднику.
+- Поля счёта разовой игры показываются только actor-владельцу, который создал игру.
+- Делегированный менеджер, капитан и участник видят результаты только для чтения.
 - Кнопка оплаты показывается только владельцу собственного payment record в его строке списка участников.

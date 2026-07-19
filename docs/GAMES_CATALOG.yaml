@@ -1,4 +1,4 @@
-version: 2
+version: 3
 scope: games_catalog
 source_of_truth_for:
 - Игры bottom tab
@@ -139,14 +139,21 @@ management_mode:
   contract: docs/MANAGEMENT_CENTER.yaml
   query: mode=manage
   button_label: Режим управления
-  shows_only: entities_manageable_by_active_actor
+  shows_only: current_entities_manageable_by_active_actor
   categories:
   - games
   - trainings
   - tournaments
-  tabs:
-  - active
-  - completed
+  temporal_tabs: none
+  completed_entities_visible: false
+  completed_entities_destination: archive
+  archive_placement_status: placement_pending
+  state_filters:
+  - all
+  - draft
+  - requires_action
+  - published
+  - in_progress
   create:
   - game
   - training

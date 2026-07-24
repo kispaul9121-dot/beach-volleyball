@@ -1,0 +1,158 @@
+version: 1
+
+scope: player_directory
+source_of_truth_for:
+  - actor-owned player lists
+  - player picker
+  - event invitations
+  - event visibility and enrollment
+
+principles:
+  - Игрок — единственное пользовательское понятие для людей, участвующих в спортивных событиях.
+  - В MVP нет друзей, подписчиков, социальных групп, учеников или партнёров как отдельных сущностей.
+  - `Мои игроки` — односторонний рабочий список активного actor-профиля.
+  - Добавление игрока в список не требует подтверждения и не создаёт участие в событии.
+  - Список не даёт доступа к закрытым данным, статистике, сообщениям или событиям игрока.
+  - Удаление из списка не меняет прошлые участия, платежи, результаты и чаты.
+
+owner_model:
+  owner: actor_profile
+  supported_actor_types: [player, trainer, organization]
+  item: player_profile
+  relationship_type: saved_player
+  mutual_relationship: false
+
+screen:
+  proposed_screen_id: profile.players
+  proposed_route: /profile/players
+  title: Мои игроки
+  variants: [player, trainer, organization]
+  sections:
+    - saved
+    - recent
+    - search
+  row_fields:
+    - avatar
+    - display_name
+    - level_when_public
+    - city_when_public
+    - last_shared_event_when_allowed
+    - selected_state
+  actions:
+    - add_player
+    - remove_player
+    - open_public_profile
+    - select_for_invitation
+
+sources:
+  saved:
+    description: Игроки, вручную сохранённые активным actor-профилем.
+  recent:
+    description: Игроки из общих завершённых или текущих событий, доступные по контексту участия.
+  search:
+    description: Поиск по публичным player-профилям с учётом блокировок и приватности.
+
+player_picker:
+  screen_id: player.picker
+  route: system://player-picker
+  presentation: full_screen_modal
+  hide_global_bottom_tabs: true
+  return_to_required: true
+  title: Добавить игроков
+  multi_select: true
+  sources: [saved, recent, search]
+  selection_summary: true
+  primary_action: Отправить приглашения
+  optional_actions:
+    - add_as_confirmed
+    - copy_invitation_link
+  rules:
+    - Один picker используется для игры, тренировки, турнира, сезона и тура.
+    - Глобальная нижняя навигация скрыта только внутри picker.
+    - Picker нельзя открыть без entity или draft context и returnTo.
+    - Выбор игрока не меняет участие до выполнения явного действия.
+    - `add_as_confirmed` доступно только менеджеру события и требует аудита причины или подтверждённой офлайн-договорённости.
+    - Заблокированные пользователи не показываются и не могут быть приглашены.
+
+invitation_model:
+  statuses:
+    - invited
+    - accepted
+    - declined
+    - expired
+    - revoked
+    - payment_required
+    - confirmed
+  fields:
+    - invitation_id
+    - entity_type
+    - entity_id
+    - inviter_user_id
+    - inviter_actor_id
+    - player_profile_id
+    - status
+    - expires_at
+    - message
+    - created_at
+    - responded_at
+  rules:
+    - Приглашение относится к конкретному событию, а не к списку `Мои игроки`.
+    - Принятое бесплатное приглашение создаёт подтверждённое участие, если место доступно.
+    - Для платного события принятие переводит участие в `payment_required` до подтверждения платежа.
+    - При заполненной вместимости применяется лист ожидания или понятный отказ согласно политике события.
+    - Отозванное приглашение не удаляет игрока из `Мои игроки`.
+
+visibility_and_enrollment:
+  visibility_modes:
+    private:
+      catalog_visibility: hidden
+      discovery: invitation_or_private_link
+    public:
+      catalog_visibility: visible_in_events_all
+      discovery: events_catalog
+  rules:
+    - Видимость выбирается для всей сущности, а не для отдельных свободных мест.
+    - Приглашения можно отправлять и для публичной, и для непубличной сущности.
+    - Публичная сущность целиком появляется в `События → Все` после публикации.
+    - Непубличная сущность не появляется в `События → Все`, но доступна по приглашению или приватной ссылке.
+    - Смена видимости не удаляет приглашения, заявки, подтверждённые участия и платежи.
+    - Способ набора настраивается отдельно от видимости.
+  enrollment_modes:
+    - open
+    - request
+    - invitation_only
+  full_capacity_behavior:
+    - close_registration
+    - enable_waitlist
+
+chat_access:
+  invited: no_access
+  requested: no_access
+  confirmed: member
+  organizer_or_authorized_staff: moderator_or_member
+  removed_or_cancelled: access_recalculated_by_policy
+
+privacy:
+  - В списке отображаются только публичные поля player-профиля и данные общего события, доступные текущему actor.
+  - Организация не получает личные заметки, историю вне своих событий или полную статистику игрока.
+  - Сохранение игрока не отправляет ему уведомление.
+  - Массовые приглашения ограничиваются rate limit, антиспамом и правами actor.
+
+out_of_scope_mvp:
+  - friends
+  - followers
+  - social_feed
+  - social_groups
+  - mutual_partner_requests
+  - automatic_activity_broadcasts
+  - contact_import
+
+trainer_relationship_integration:
+  source_of_truth: docs/TRAINER_RELATIONSHIPS.yaml
+  rules:
+    - pending trainer request is separate from actor_player_links
+    - pending request appears in trainer My Players > Новые
+    - only trainer action Добавить creates or ensures actor_player_link with source trainer_accepted_request
+    - accepted player moves to trainer saved My Players list
+    - declining or cancelling a request does not create event participation
+    - ending active trainer relationship does not silently delete event history

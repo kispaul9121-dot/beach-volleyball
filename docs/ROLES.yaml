@@ -1,50 +1,127 @@
-version: 1
+version: 2
 
-roles:
-  player:
-    can:
-      - browse_public_activities
-      - join_game
-      - create_one_off_game
-      - create_private_trip
-      - participate_in_tournament
-      - participate_in_season
+note: Пользовательские профили описаны в ACTORS.yaml. Этот файл описывает разрешения внутри сущностей и организаций.
 
-  coach:
-    inherits: player
-    can:
-      - create_training
-      - manage_training_groups
-      - organize_public_tour_if_verified
+capability_aliases:
+  trainer_or_organization:
+    replacement: can_create_training
+    behavior:
+      player: only_peer_practice
+      trainer: professional_training_and_groups
+      organization: professional_training_with_assigned_trainer
+    note: Имя сохранено в маршрутах временно; реализация должна проверять режим через CAPABILITIES.yaml.
 
-  private_organizer:
-    inherits: player
+system_roles:
+  authenticated_user:
     can:
-      - create_game
-      - create_tournament
-      - create_season
+      - manage_own_account
+      - manage_own_actor_profiles
+      - browse_public_entities
+      - report_content
+
+entity_relationship_roles:
+  participant:
+    can:
+      - view_participant_content
+      - view_own_payment
+      - access_chat_when_policy_allows
+      - cancel_own_participation_when_policy_allows
+
+  creator_owner:
+    can:
+      - edit_entity
+      - publish_entity
       - manage_participants
+      - manage_schedule
       - manage_results
+      - manage_chat
+      - cancel_entity
+      - transfer_ownership
+      - view_audit_log
 
-  club_manager:
+  entity_admin:
     can:
-      - manage_club
-      - manage_venues_and_courts
-      - create_game
-      - create_training
-      - create_tournament
-      - create_season
-      - create_public_tour
-      - accept_payments
+      - edit_entity
+      - manage_participants
+      - manage_schedule
+      - manage_results
+      - manage_chat
+    cannot:
+      - transfer_ownership
+      - delete_financial_history
 
-  company_manager:
+  scorekeeper:
     can:
-      - create_public_tour
-      - manage_tour_bookings
-      - accept_payments
+      - view_internal_schedule
+      - enter_results
+      - correct_unconfirmed_results
+
+  finance_manager:
+    can:
+      - view_entity_payments
+      - issue_refunds
+      - export_financial_report
+
+  chat_moderator:
+    can:
+      - moderate_entity_chat
+      - pin_messages
+      - restrict_member
+
+organization_membership_roles:
+  owner:
+    can: [all_organization_permissions]
+
+  admin:
+    can:
+      - manage_organization_profile
+      - manage_staff
+      - manage_venues
+      - create_and_manage_entities
+      - view_finance
+
+  event_manager:
+    can:
+      - create_entities_as_organization
+      - manage_assigned_entities
+      - communicate_with_participants
+
+  trainer:
+    can:
+      - manage_assigned_trainings
+      - manage_attendance
+      - communicate_with_training_groups
+
+  finance:
+    can:
+      - view_payments
+      - manage_refunds
+      - view_payouts
+      - export_reports
+
+  viewer:
+    can:
+      - view_internal_dashboards
+
+platform_roles:
+  support:
+    can:
+      - inspect_support_context
+      - view_audit_metadata
 
   moderator:
     can:
       - review_reports
       - restrict_content
-      - inspect_audit_log
+      - suspend_publication
+
+  super_admin:
+    can:
+      - platform_administration
+
+permission_rules:
+  - actor_type alone never grants management of an entity; relationship or organization membership is also required.
+  - switching active actor immediately recalculates permissions.
+  - a player profile can own and manage entities it created.
+  - trainer verification changes badges and financial capabilities, not ownership of already created drafts.
+  - every organizer override must store acting_user_id and acting_actor_id.

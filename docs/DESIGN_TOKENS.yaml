@@ -1,0 +1,381 @@
+version: 1
+status: architecture_contract
+units: react_native_density_independent
+platforms:
+- ios
+- android
+technology:
+  framework: react_native
+  language: typescript
+  runtime: expo
+  routing: expo-router
+  architecture: new_architecture
+  package_version_policy: use_current_expo_compatible_versions_and_lockfile
+  ui_kit_policy: custom_volleyplay_components_over_react_native_primitives
+libraries:
+  required:
+    navigation:
+    - expo-router
+    - react-native-screens
+    - react-native-safe-area-context
+    icons:
+    - lucide-react-native
+    - react-native-svg
+    motion:
+    - react-native-reanimated
+    - react-native-worklets
+    - react-native-gesture-handler
+  optional_scoped:
+    illustrated_animation:
+      package: lottie-react-native
+      allowed_for:
+      - onboarding
+      - empty_state
+      - success_state
+      forbidden_for:
+      - ordinary_buttons
+      - bottom_navigation
+      - continuous_decoration
+    large_list_optimization:
+      package: '@shopify/flash-list'
+      policy: add_only_after_profiling
+appearance:
+  strategy: dark_first_system_aware
+  required_primary_mode: dark
+  architecture_modes:
+  - dark
+  - light
+  - system
+  hardcoded_color_values_allowed: false
+  palette_approved: false
+  semantic_roles:
+    surfaces:
+    - surface.base
+    - surface.raised
+    - surface.overlay
+    text:
+    - text.primary
+    - text.secondary
+    - text.disabled
+    - text.inverse
+    borders:
+    - border.subtle
+    - border.strong
+    actions:
+    - action.primary
+    - action.secondary
+    - action.destructive
+    - action.disabled
+    statuses:
+    - status.success
+    - status.warning
+    - status.danger
+    - status.info
+  pending_decisions:
+  - dark_palette_values
+  - accent_color
+  - semantic_status_colors
+  - light_theme_scope
+  - blur_transparency_shadow_policy
+spacing:
+  base_grid: 4
+  allowed:
+  - 4
+  - 8
+  - 12
+  - 16
+  - 20
+  - 24
+  - 32
+  - 40
+  phone_screen_gutter: 16
+  wide_screen_gutter: 24
+  section_gap: 24
+  card_gap: 12
+  card_padding: 16
+  icon_label_gap: 8
+  max_content_width: 640
+  arbitrary_values_require_component_justification: true
+radii:
+  button: 12
+  chip: 999
+  card: 16
+  input: 12
+  sheet_top: 24
+interaction:
+  minimum_touch_target:
+    width: 48
+    height: 48
+  hit_slop_is_not_layout_replacement: true
+  overlapping_touch_targets_forbidden: true
+  immediate_press_feedback_required: true
+navigation:
+  bottom_tabs:
+    immutable: true
+    component: AppTabBar
+    items:
+    - id: home
+      title: Профиль
+      route: /
+    - id: play
+      title: Игры
+      route: /play
+    - id: chats
+      title: Чаты
+      route: /chats
+    - id: camps
+      title: Кэмпы
+      route: /camps
+    - id: profile
+      title: Настройки
+      route: /profile
+    equal_width_slots: true
+    content_height: 64
+    safe_area_added: bottom
+    icon_size: 24
+    label_size_range:
+    - 11
+    - 12
+    label_lines: 1
+    minimum_slot_touch_height: 48
+    second_bottom_navigation_forbidden: true
+  screen_header:
+    component: ScreenHeader
+    content_height: 56
+    safe_area_added: top
+    icon_action_size: 48
+    max_trailing_actions: 2
+    overflow_action: MoreVertical
+    root_tabs_show_back: false
+    nested_screens_show_back: true
+buttons:
+  variants:
+  - primary
+  - secondary
+  - tertiary
+  - destructive
+  - icon
+  text_button:
+    height: 52
+    horizontal_padding: 16
+    icon_size: 20
+    icon_text_gap: 8
+    radius: 12
+    label_lines: 1
+  icon_button:
+    width: 48
+    height: 48
+    icon_size: 24
+  hierarchy:
+    max_primary_per_visible_action_group: 1
+    max_primary_per_entity_card: 1
+    two_equal_filled_actions_side_by_side_forbidden: true
+    transactional_actions_require_text_label: true
+  states:
+  - default
+  - pressed
+  - focused
+  - disabled
+  - loading
+  loading_preserves_layout: true
+  platform_feedback:
+    ios: opacity_or_small_scale
+    android: bounded_ripple_and_surface_change
+chips:
+  interactive_component: FilterChip
+  noninteractive_component: StatusBadge
+  filter_chip:
+    visual_height: 36
+    minimum_touch_height: 48
+    horizontal_padding: 12
+    gap: 8
+    label_lines: 1
+    full_width_forbidden: true
+    overflow_behavior: single_row_horizontal_scroll
+    wrap_allowed_by_default: false
+    list_implementation: horizontal_flatlist_or_equivalent
+    scroll_indicator_visible: false
+    preserve_order_after_selection: true
+    accessibility_focus_scrolls_item_into_view: true
+    detailed_filters_use_bottom_sheet: true
+    states:
+    - default
+    - pressed
+    - focused
+    - selected
+    - disabled
+  status_badge:
+    interactive: false
+    label_lines: 1
+    color_only_meaning_forbidden: true
+  pending_decisions:
+  - filled_or_outlined
+  - selected_visual_treatment
+  - chip_color_roles
+icons:
+  component: AppIcon
+  primary_library: lucide-react-native
+  renderer: react-native-svg
+  visual_style: rounded_outline
+  sizes:
+    small: 20
+    default: 24
+    decorative_max_without_special_component: 32
+  default_stroke_width: 2
+  rounded_linecaps_and_joins: true
+  one_function_one_icon_name: true
+  mix_large_icon_libraries_forbidden: true
+  custom_sport_icon_grid:
+  - 24
+  - 24
+  icon_only_action_requires_accessibility_label: true
+  native_symbol_policy: only_os_owned_native_controls
+cards:
+  components:
+  - Section
+  - SurfaceCard
+  - EntityCard
+  - ProfileHeaderCard
+  - ReviewCard
+  - InfoRow
+  standard_radius: 16
+  standard_padding: 16
+  internal_gap: 12
+  content_driven_height: true
+  arbitrary_fixed_height_forbidden: true
+  nested_cards_require_justification: true
+  whole_card_clickable_when_actionable: true
+  max_primary_actions: 1
+  dark_separation_requires_surface_or_border: true
+lists:
+  standard_row_min_height: 56
+  avatar_row_min_height: 64
+  participant_row_min_height: 72
+  long_lists_use_flatlist: true
+  swipe_actions:
+    allowed_for: frequent_reversible_actions
+    destructive_requires_confirmation: true
+typography:
+  font_policy: platform_system_fonts_until_brand_font_decision
+  allow_font_scaling: true
+  minimum_test_scale_percent: 200
+  tokens:
+    display:
+      size: 32
+      line_height: 38
+    title_large:
+      size: 24
+      line_height: 30
+    title_section:
+      size: 20
+      line_height: 26
+    body:
+      size: 16
+      line_height: 24
+    body_compact:
+      size: 14
+      line_height: 20
+    caption:
+      size: 12
+      line_height: 16
+  minimum_interactive_label_size: 14
+  button_auto_shrink_forbidden: true
+  pending_decisions:
+  - brand_font_or_system_fonts
+motion:
+  library: react-native-reanimated
+  gesture_library: react-native-gesture-handler
+  durations_ms:
+    instant: 0
+    fast: 120
+    standard: 180
+    emphasized: 240
+    maximum: 320
+  spring_use: physical_drag_and_sheet_only
+  decorative_button_bounce_forbidden: true
+  aggressive_skeleton_shimmer_forbidden: true
+  reduce_motion:
+    required: true
+    transform_fallback: crossfade_or_none
+    infinite_decorative_loops_forbidden: true
+  one_shot_feedback:
+    profile_activity_confirmation:
+      component: AppTabBar
+      tab_id: home
+      duration_ms: 900
+      repetitions: 1
+      confirmed_semantic_color: status.success
+      pending_semantic_color: status.info
+      non_color_signal: check_or_dot_badge_and_accessibility_announcement
+      reduce_motion_fallback: static_badge_then_fade
+      layout_change_forbidden: true
+responsive:
+  required_test_widths:
+  - 320
+  - 360
+  - 390
+  - 430
+  safe_area_required:
+  - top
+  - bottom
+  android_edge_to_edge_supported: true
+  landscape_supported: true
+  tablet_max_width: 640
+  keyboard_must_not_cover_active_field_or_primary_action: true
+  horizontal_rails_must_not_block_vertical_scroll: true
+accessibility:
+  ordinary_text_minimum_contrast_ratio: 4.5
+  color_only_state_forbidden: true
+  screen_readers:
+  - VoiceOver
+  - TalkBack
+  required_settings_tests:
+  - increase_contrast
+  - reduce_transparency
+  - reduce_motion
+  - font_scale_200_percent
+  component_states_required:
+  - default
+  - pressed
+  - focused
+  - selected_when_applicable
+  - disabled
+  - loading_when_applicable
+  - error_when_applicable
+component_catalog:
+  required_components:
+  - AppScreen
+  - ScreenHeader
+  - AppTabBar
+  - Section
+  - SurfaceCard
+  - EntityCard
+  - ProfileHeaderCard
+  - Button
+  - IconButton
+  - FilterChip
+  - StatusBadge
+  - TextField
+  - SearchField
+  - InfoRow
+  - Avatar
+  - AppIcon
+  - EmptyState
+  - ErrorState
+  - Skeleton
+  - BottomSheet
+  local_component_duplicates_forbidden: true
+  new_variant_must_be_added_to_design_system_first: true
+screen_acceptance_tests:
+- ios
+- android
+- widths_320_to_430
+- dark_theme
+- text_scale_200_percent
+- voiceover
+- talkback
+- reduce_motion
+- loading_empty_error_offline_permission_denied
+- long_russian_content
+- safe_area_and_keyboard
+- registered_components_and_icons_only

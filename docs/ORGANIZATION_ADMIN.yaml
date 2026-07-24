@@ -1,0 +1,309 @@
+version: 3
+
+scope: organization_admin
+source_of_truth_for:
+  - club.manage screen
+  - organization dashboard composition
+  - organization permissions
+  - organization actions
+  - organization operational tasks
+
+screen:
+  screen_id: club.manage
+  route: /clubs/:clubId/manage
+  active_actor_required: organization
+  membership_required: true
+  navigation:
+    preserve_global_bottom_tabs: true
+    visible_labels: [Главная, События, Чаты, Клубы, Профиль]
+    internal_ids: [home, play, chats, clubs, profile]
+    active_global_tab: clubs
+    create_secondary_bottom_navigation: false
+    create_separate_admin_shell: false
+    preserve_filters_per_organization: true
+  header:
+    - organization_logo
+    - organization_name
+    - actor_type
+    - actor_switcher
+    - notifications
+
+approved_mobile_dashboard:
+  order:
+    - today_summary
+    - attention_tasks
+    - upcoming_activities
+    - primary_create_action
+  today_summary:
+    title: Сегодня
+    metrics:
+      - events_count
+      - occupied_courts_count
+      - pending_requests_count
+      - unpaid_orders_count
+    max_metrics: 4
+    behavior: tap_metric_opens_filtered_destination
+  attention_tasks:
+    title: Требуют внимания
+    max_items: 3
+    show_all_action: true
+    item_fields:
+      - severity_icon
+      - short_title
+      - entity_or_context
+      - time_or_deadline
+      - chevron
+    rule: one_primary_destination_per_item
+  upcoming_activities:
+    title: Ближайшие активности
+    max_items: 2
+    show_all_action: true
+    item_fields:
+      - entity_type
+      - title
+      - starts_at
+      - venue_or_court
+      - capacity
+      - status
+  primary_action:
+    label: Создать
+    destination: system.create_menu
+    rule: exactly_one_large_primary_button
+
+shared_events_destination:
+  route: /play
+  visible_name: События
+  screen_id: play.main
+  organization_context:
+    actorId: active_organization_actor
+    default_scope: managed
+    default_tab: managed
+  user_tabs:
+    - all
+    - participating
+    - managed
+  visible_labels:
+    all: Все
+    participating: Участвую
+    managed: Управляю
+  rules:
+    - Организация по умолчанию открывает вкладку Управляю.
+    - Ссылка «Все активности» ведёт в События → Управляю с actorId организации.
+    - Публичный каталог остаётся доступен через События → Все.
+    - Не создавать отдельный список активностей только для административного режима.
+
+content_destinations:
+  calendar:
+    title: Календарь организации
+    route: /profile/calendar?scope=active_profile
+    spec: docs/screens/clubs/manage-calendar.md
+    required_permission: organization_calendar_view
+  activities:
+    title: События организации
+    route: /play?tab=managed&actorId=:organizationActorId
+    spec: docs/screens/play/main.md
+    required_permission: organization_entities_view
+  people:
+    title: Люди
+    route: /clubs/:clubId/manage?section=people
+    spec: docs/screens/clubs/manage-people.md
+    required_permission: organization_people_view
+  venues:
+    title: Площадки и корты
+    route: /clubs/:clubId/manage?section=venues
+    spec: docs/screens/clubs/manage-venues.md
+    required_permission: venues_view
+  staff:
+    title: Сотрудники и права
+    route: /clubs/:clubId/manage?section=staff
+    spec: docs/screens/clubs/manage-staff.md
+    required_permission: staff_view
+  finance:
+    title: Финансы
+    route: /clubs/:clubId/manage?section=finance
+    spec: docs/screens/clubs/manage-finance.md
+    required_permission: finance_view
+  settings:
+    title: Настройки организации
+    route: /clubs/:clubId/manage?section=settings
+    spec: docs/screens/clubs/manage-settings.md
+    required_permission: organization_settings_view
+  audit:
+    title: Аудит
+    route: /clubs/:clubId/manage?section=audit
+    spec: docs/screens/clubs/manage-audit.md
+    required_permission: audit_view
+  public_profile:
+    title: Публичная страница
+    route: /clubs/:clubId
+    spec: docs/screens/clubs/details.md
+    required_permission: organization_profile_edit
+
+operational_task_model:
+  source_events:
+    - participation_request_created
+    - payment_overdue
+    - payment_failed
+    - result_missing
+    - result_disputed
+    - court_conflict_detected
+    - staff_assignment_missing
+    - payout_failed
+    - document_expiring
+    - entity_requires_publication
+  fields:
+    - task_id
+    - organization_id
+    - source_type
+    - source_id
+    - severity
+    - due_at
+    - assigned_membership_id
+    - status
+    - primary_action_id
+    - deep_link
+  severity_order: [critical, high, normal, low]
+  statuses: [open, snoozed, resolved, obsolete]
+  rules:
+    - Задача исчезает после выполнения или потери актуальности, а не после просмотра.
+    - На первом экране показывается максимум три задачи.
+    - Ссылка «Все» открывает полный отфильтрованный список.
+    - Каждая задача ведёт прямо к месту исправления.
+
+role_permissions:
+  owner:
+    grants: [all_permissions]
+  admin:
+    grants:
+      - organization_dashboard_view
+      - organization_calendar_view
+      - organization_entities_view
+      - organization_people_view
+      - venues_view
+      - venues_manage
+      - staff_view
+      - staff_manage_except_owner
+      - finance_view
+      - finance_manage
+      - announcements_manage
+      - organization_profile_edit
+      - organization_settings_view
+      - organization_settings_manage
+      - organization_analytics_view
+      - audit_view
+  event_manager:
+    grants:
+      - organization_dashboard_view
+      - organization_calendar_view
+      - organization_entities_view
+      - organization_people_view
+      - venues_view
+      - staff_view
+      - announcements_manage
+    constraints:
+      - manage_only_assigned_or_created_entities
+      - no_financial_reports
+      - no_staff_role_changes
+  trainer:
+    grants:
+      - organization_dashboard_view
+      - organization_calendar_view
+      - organization_people_view
+      - venues_view
+    constraints:
+      - assigned_trainings_and_groups_only
+  finance:
+    grants:
+      - organization_dashboard_view
+      - finance_view
+      - finance_manage
+      - organization_analytics_view
+      - audit_view_financial_only
+    constraints:
+      - no_entity_content_edit
+      - no_staff_role_changes
+  viewer:
+    grants:
+      - organization_dashboard_view
+      - organization_calendar_view
+      - organization_entities_view
+      - organization_people_view
+      - venues_view
+    constraints:
+      - read_only
+
+scoped_actions:
+  - id: organization_admin.switch_actor
+    destination: actor.switcher
+    permission: actor_owner_or_member
+  - id: organization_admin.open_notifications
+    destination: global.notifications
+    permission: organization_member
+  - id: organization_admin.open_task
+    destination: dynamic.task_deep_link
+    permission: organization_member
+  - id: organization_admin.open_all_tasks
+    destination: system.organization_task_list
+    permission: organization_member
+  - id: organization_admin.open_all_activities
+    destination: play.main
+    context: {tab: managed, actorId: active_actor}
+    permission: organization_entities_view
+  - id: organization_admin.open_calendar
+    destination: profile.calendar
+    context: {scope: active_profile, actorId: active_actor}
+    permission: organization_calendar_view
+  - id: organization_admin.create_entity
+    destination: system.create_menu
+    permission: organization_entity_creator
+  - id: organization_admin.open_entity_manage
+    destination: dynamic.entity_manage
+    permission: assigned_entity_manager
+  - id: organization_admin.open_venues
+    destination: system.organization_admin_section
+    context: {section: venues}
+    permission: venues_view
+  - id: organization_admin.open_staff
+    destination: system.organization_admin_section
+    context: {section: staff}
+    permission: staff_view
+  - id: organization_admin.open_finance
+    destination: system.organization_admin_section
+    context: {section: finance}
+    permission: finance_view
+  - id: organization_admin.open_settings
+    destination: system.organization_admin_section
+    context: {section: settings}
+    permission: organization_settings_view
+
+shared_states:
+  - loading
+  - empty
+  - partial_error
+  - offline_read_only
+  - permission_denied
+  - membership_suspended
+  - organization_deactivated
+  - actor_mismatch
+
+actor_switch_behavior:
+  same_organization_access:
+    result: keep_screen_and_recalculate_permissions
+  switched_to_other_profile:
+    result: leave_organization_dashboard_and_open_equivalent_global_tab
+  unsaved_form:
+    result: ask_save_discard_or_cancel
+  lost_permission_while_open:
+    result: close_sensitive_editor_and_show_permission_changed
+
+implementation_rules:
+  - Глобальная нижняя навигация всегда остаётся Главная, События, Чаты, Клубы, Профиль.
+  - Внутренний id второй вкладки и маршрут остаются play и /play.
+  - Не создавать второе нижнее меню или отдельную административную оболочку.
+  - Первый экран организации содержит только сводку, максимум три проблемы, максимум две ближайшие активности и одну кнопку «Создать».
+  - Все события организации открываются в общем разделе События через вкладку Управляю.
+  - Календарь переиспользует глобальный календарь с фильтром активной организации.
+  - Площадки, сотрудники, финансы и настройки открываются как отдельные stack-экраны.
+  - Любая карточка проблемы показывает одно следующее действие.
+  - Права проверяются на сервере для каждой операции.
+  - Критические изменения создают audit event.

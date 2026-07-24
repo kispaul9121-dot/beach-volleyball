@@ -1,0 +1,133 @@
+version: 2
+
+principles:
+  - Любой активный профиль может быть участником публичной сущности, если правила допускают участие.
+  - Любой активный профиль может создать социальную версию основной сущности.
+  - Коммерческие, профессиональные и организационные функции требуют соответствующего профиля и настроек.
+  - Ограничивать нужно конкретную возможность, а не полностью запрещать тип сущности.
+
+capabilities:
+  player:
+    create:
+      game:
+        allowed: true
+        modes: [social, private, public]
+      training:
+        allowed: true
+        modes: [peer_practice]
+        restrictions:
+          - cannot_claim_verified_trainer
+          - cannot_create_recurring_professional_group
+          - cannot_sell_coaching_service_without_trainer_actor
+      tournament:
+        allowed: true
+        modes: [social, amateur]
+      season:
+        allowed: true
+        modes: [social, amateur]
+      tour:
+        allowed: true
+        modes: [informal_trip]
+    finance:
+      collect_platform_payments: requires_payout_onboarding
+      issue_invoices: false
+      manage_refunds: own_entities_only
+    professional_features:
+      trainer_badge: false
+      staff_management: false
+      venue_inventory: false
+      recurring_training_groups: false
+
+  trainer:
+    inherits: player
+    create:
+      game:
+        allowed: true
+        modes: [social, coached]
+      training:
+        allowed: true
+        modes: [peer_practice, single_session, recurring_group, camp_session]
+      tournament:
+        allowed: true
+        modes: [social, amateur, coached]
+      season:
+        allowed: true
+        modes: [social, coached]
+      tour:
+        allowed: true
+        modes: [informal_trip, training_camp]
+    finance:
+      collect_platform_payments: requires_verified_payout_profile
+      issue_invoices: optional_later
+      manage_refunds: own_entities_only
+    professional_features:
+      trainer_badge: requires_verification
+      groups_and_attendance: true
+      training_programs: true
+
+  organization:
+    create:
+      game:
+        allowed: true
+        modes: [social, public, branded, commercial]
+      training:
+        allowed: true
+        modes: [peer_practice, single_session, recurring_group, camp_session]
+      tournament:
+        allowed: true
+        modes: [social, amateur, branded, commercial]
+      season:
+        allowed: true
+        modes: [social, league, branded]
+      tour:
+        allowed: true
+        modes: [informal_trip, training_camp, commercial_package]
+    finance:
+      collect_platform_payments: requires_verified_organization_and_payout_profile
+      issue_invoices: true
+      manage_refunds: true
+      staff_finance_roles: true
+    professional_features:
+      staff_management: true
+      venues_and_courts: true
+      branded_pages: true
+      trainer_assignment: true
+      organization_analytics: true
+
+creation_policy:
+  create_as:
+    required_when_multiple_profiles: true
+    default: active_actor
+    can_change_before_publish: true
+  paid_entity:
+    allowed_without_payout_profile: true
+    behavior: Сохранить черновик, но не разрешать публикацию с онлайн-оплатой.
+  public_visibility:
+    player: allowed
+    trainer: allowed
+    organization: allowed
+  verification_badges:
+    player: none
+    trainer: verified_trainer
+    organization: verified_organization
+
+participant_view:
+  always_show_creator:
+    - actor_name
+    - actor_type
+    - actor_avatar_or_logo
+    - verification_status
+  show_contextual_label:
+    player: Организатор — частное лицо
+    trainer: Организатор — тренер
+    organization: Организатор — клуб или компания
+
+training_label_rules:
+  player_peer_practice:
+    public_label: Совместная практика
+    creator_label: Организатор — игрок
+    prohibited_labels: [Тренировка с тренером, Профессиональный тренер]
+  trainer_session:
+    public_label: Тренировка
+  organization_session:
+    public_label: Тренировка клуба

@@ -1,0 +1,132 @@
+version: 1
+scope: invitation_discovery_and_response
+source_of_truth_for:
+- where unresolved invitations appear
+- priority invitation block in Games and Camps
+- invitation card visual hierarchy
+- tab badges and notifications
+- transition from invitation to participation
+principles:
+- an unresolved invitation is not participation
+- invitations are shown in the section that owns the invited entity type
+- event invitations are visible before the ordinary catalog but never mixed into ordinary result ranking
+- accepting or declining requires opening the canonical invitation details screen
+- color is never the only invitation signal
+- a pending invitation must not use the same semantic meaning as confirmed participation
+placement:
+  games_section:
+    screen: play.main
+    entity_types:
+    - game
+    - training
+    - tournament
+    position: above_category_chips_and_catalog
+    visible_only_in_mode: discovery
+  camps_section:
+    screen: camps.main
+    entity_types:
+    - camp
+    position: above_catalog
+    visible_only_in_mode: discovery
+  organization_membership_and_role_invitations:
+    destination: global.notifications_or_actor_management
+    forbidden_in_games_and_camps_priority_blocks: true
+priority_block:
+  title: Вас пригласили
+  count_format: Вас пригласили · {count}
+  idle_visibility: hidden
+  preview_limit: 2
+  overflow_action:
+    label: Все приглашения · {count}
+    destination: invitation_list_for_current_section
+  ordering:
+  - expires_at_ascending
+  - starts_at_ascending
+  card:
+    component: EntityCard
+    variant: invitation
+    whole_card_clickable: true
+    primary_action_count: 1
+    primary_action_label: Открыть
+    destination: invitation.details
+    visual:
+      border_width_dp: 2
+      border_semantic_role: invitation.emphasis
+      accent_family_direction: green
+      surface_semantic_role: invitation.surface_subtle
+      full_green_fill_forbidden: true
+      accepted_success_style_forbidden_while_pending: true
+      top_badge:
+        label: ПРИГЛАШЕНИЕ
+        icon: MailPlus
+        semantic_role: invitation.emphasis
+      color_only_meaning_forbidden: true
+    required_fields:
+    - inviter_actor
+    - entity_type
+    - entity_title
+    - starts_at
+    - venue_or_destination
+    - price_or_free
+    - invitation_expiry_or_reservation_deadline
+    optional_fields:
+    - invited_role
+    - short_message_from_inviter
+    - reserved_place_until
+    forbidden_inline_actions:
+    - accept
+    - decline
+    reason: prevent accidental response and keep one primary action per catalog card
+notification_surface:
+  push_or_in_app_notification: true
+  unresolved_tab_badge:
+    games_tab_for:
+    - game
+    - training
+    - tournament
+    camps_tab_for:
+    - camp
+    badge_meaning: unresolved_invitation_count
+    count_cap: 9+
+    clears_when:
+    - accepted
+    - declined
+    - expired
+    - revoked
+    opening_without_resolution_does_not_clear: true
+response_flow:
+  screen: invitation.details
+  active_actions:
+  - Принять приглашение
+  - Отказаться
+  accepting:
+    removes_from_priority_block: true
+    creates_or_updates_participation_relation: true
+    profile_activity_visibility: after_participation_or_pending_relation_created
+    profile_tab_feedback: docs/PROFILE_ACTIVITY.yaml
+    payment_rule: acceptance_does_not_imply_payment_when_payment_is_required
+  declining:
+    removes_from_priority_block: true
+    keeps_history_in_notifications: true
+  expired_or_revoked:
+    removes_from_priority_block: true
+    details_screen_shows_reason: true
+states:
+- loading
+- active
+- accepted
+- declined
+- expired
+- revoked
+- permission_conflict
+- actor_selection_required
+- offline_read_only
+- error
+accessibility:
+  screen_reader_prefix: Приглашение
+  announce_inviter_and_event: true
+  border_not_required_to_understand_state: true
+  text_scale_200_percent_supported: true
+pending_decisions:
+- exact green palette values
+- dedicated all-invitations list route versus filtered notification list

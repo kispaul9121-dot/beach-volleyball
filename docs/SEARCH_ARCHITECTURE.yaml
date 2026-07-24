@@ -1,0 +1,37 @@
+version: 2
+scope: contextual_search
+universal_search_screen_in_mvp: false
+
+contexts:
+  games:
+    screen: play.main
+    entities: [game, training, tournament, organization, venue, player]
+    categories: [games, trainings, tournaments]
+    default_sort: starts_at_ascending
+    tournament_modes: [classic, king_of_the_beach, seasonal]
+  camps:
+    screen: camps.main
+    entities: [tour]
+    creator_actor_types: [player, trainer, organization]
+    default_sort: starts_at_ascending
+  trainers:
+    screen: trainer.search
+    entry_points: [home.player_no_trainer, home.player_my_trainers, trainer.public_profile]
+    entities: [trainer_profile]
+  players:
+    screens: [profile.players, player.picker, play.main]
+    entities: [player_profile]
+  chats:
+    screen: chats.main
+    entities: [conversation, conversation_member]
+  personal_archive:
+    parent: profile.main
+    entities: [owned_or_related_entities]
+
+rules:
+  - search context determines initial entity type and filters
+  - organizations and venues are found inside Games search, not a bottom tab
+  - camps have a dedicated bottom tab and are not mixed into the Games category chips
+  - seasonal competition is a tournament mode and never a separate search entity
+  - all public lists default to nearest upcoming date first
+  - blocked, hidden or nonpublic entities are excluded according to permissions

@@ -1,0 +1,151 @@
+version: 6
+shared_configuration:
+  participant_unit:
+    values:
+    - pair
+    - team
+    default_for_beach_volleyball: pair
+  scoring:
+    walkover_policy: configurable
+    withdrawal_policy: configurable
+  required_before_start:
+  - registration_closed_or_manual_override
+  - participants_confirmed
+  - format_validated
+  - courts_assigned_or_schedule_without_courts_allowed
+  - organizer_confirmed_start
+  shared_screens:
+    participant:
+    - overview
+    - registration
+    - participants
+    - matches
+    - competition_map
+    - places
+    - chat
+    organizer:
+    - dashboard
+    - registration
+    - format_and_rules
+    - seeding_and_draw
+    - schedule_and_courts
+    - live_round_control
+    - results
+    - payments
+    - notifications
+    - settings
+    - audit_log
+formats:
+  single_elimination:
+    title: Плей-офф на выбывание
+    entity_types:
+    - tournament
+    mvp: true
+    purpose: Проигравшая пара или команда выбывает из борьбы за первое место.
+    participant_count:
+      minimum: 2
+      recommended: powers_of_two
+      non_power_of_two: byes
+    algorithm:
+      rounds: ceil_log2_participant_count
+      loss: eliminated_from_championship
+      seeding:
+      - manual
+      - rating
+      - random
+      byes: highest_seeds_or_random
+      total_matches_without_third_place: participant_count_minus_1
+    outputs:
+    - champion
+    - finalist
+    - semifinalists
+    - optional_third_place
+    tabs:
+    - overview
+    - matches
+    - bracket
+    - participants
+    - chat
+  full_placement:
+    title: Полное распределение мест
+    entity_types:
+    - tournament
+    mvp: true
+    participant_count:
+      supported_mvp:
+      - 4
+      - 8
+      - 16
+      - 32
+      other_counts: unsupported_in_mvp
+    purpose: Каждый участник продолжает играть после победы и поражения, пока не получит точное итоговое место.
+    algorithm:
+      rounds: log2_participant_count
+      matches_per_participant: log2_participant_count
+      matches_per_round: participant_count_divided_by_2
+      total_matches: participant_count_divided_by_2_times_log2_participant_count
+      next_path:
+        winner: upper_placement_half
+        loser: lower_placement_half
+    examples:
+      teams_4:
+        rounds: 2
+        total_matches: 4
+        final_places: 1_to_4
+      teams_8:
+        rounds: 3
+        total_matches: 12
+        final_places: 1_to_8
+      teams_16:
+        rounds: 4
+        total_matches: 32
+        final_places: 1_to_16
+      teams_32:
+        rounds: 5
+        matches_per_team: 5
+        matches_per_round: 16
+        total_matches: 80
+        final_places: 1_to_32
+    tabs:
+    - overview
+    - rounds
+    - placement_bracket
+    - places
+    - participants
+    - chat
+    organizer_requirements:
+    - all_results_in_round_complete_before_next_round
+    - every_participant_has_exactly_one_match_per_round
+    - no_duplicate_participant_in_round
+    - winner_and_loser_paths_are_validated_before_publish
+validation_rules:
+- competition_format must be compatible with entity_type
+- every participant must have a stable participant_id
+- a published round cannot be regenerated without an explicit rollback
+- result corrections must create an audit record
+- next round generation is blocked while required results are missing
+- final places are derived from immutable match results and cannot be typed manually
+- organizer overrides require reason and actor_id
+- seasonal tournaments, season entities and recurring tournament-day containers are not supported
+- round_robin is not supported
+- swiss is not supported
+- groups_then_playoff is not supported
+- King or Queen of the Beach is not a separate tournament format in this product
+- user-facing King of the Beach wording resolves to the one-off Tunisian ladder game in docs/GAME_TUNISIAN_LADDER.yaml
+- Tunisian ladder belongs to one-off games through docs/GAME_TUNISIAN_LADDER.yaml
+catalog_modes:
+  classic:
+    title: Классика
+    formats:
+    - single_elimination
+    - full_placement
+removed_formats:
+- round_robin
+- swiss
+- groups_then_playoff
+- king_of_the_beach
+- seasonal_tournament
+research_backlog:
+  double_elimination:
+    product_status: proposed_not_approved
+    reason: Возможный будущий формат, но не входит в текущий набор из двух турниров.

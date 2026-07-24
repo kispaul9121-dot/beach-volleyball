@@ -1,0 +1,228 @@
+version: 8
+scope: games_catalog
+source_of_truth_for:
+- Игры bottom tab
+- catalog categories and ordering
+- followed organizers and saved players
+- empty-state recovery
+- contextual management mode
+- pull-down archive entry for managed games, trainings and tournaments
+- priority invitation block above the catalog
+bottom_tab:
+  screen_id: play.main
+  route: /play
+  title: Игры
+  category_chips:
+  - games
+  - trainings
+  - tournaments
+  default_sort: starts_at_ascending
+  sorting_rule: nearest_upcoming_first_then_later_dates
+  mode: discovery_and_contextual_management
+  capabilities:
+  - browse
+  - search
+  - filter
+  - open_by_capability
+  - start_join_flow
+  - switch_to_management_mode
+  - create_in_section
+  - reveal_archive_from_management_overscroll
+  - show_unresolved_invitations
+invitation_priority_block:
+  contract: docs/INVITATION_DISCOVERY.yaml
+  visible_only_when:
+  - mode_is_discovery
+  - active_unresolved_invitation_count_is_positive
+  position: above_category_chips_and_catalog
+  title: Вас пригласили
+  count_format: Вас пригласили · {count}
+  preview_limit: 2
+  ordering:
+  - expires_at_ascending
+  - starts_at_ascending
+  entity_types:
+  - game
+  - training
+  - tournament
+  card_variant: invitation
+  card_visual:
+    border_width_dp: 2
+    border_semantic_role: invitation.emphasis
+    accent_family_direction: green
+    top_badge: ПРИГЛАШЕНИЕ
+    icon: MailPlus
+    color_only_meaning_forbidden: true
+    pending_invitation_is_not_success: true
+  primary_action:
+    label: Открыть
+    destination: invitation.details
+  inline_accept_decline_forbidden: true
+  overflow:
+    label: Все приглашения · {count}
+    destination_status: definition_pending
+  bottom_tab_badge:
+    meaning: unresolved_invitation_count
+    count_cap: 9+
+    opening_without_resolution_does_not_clear: true
+categories:
+  games:
+    title: Игры
+    sources:
+    - public_open_games_from_any_player
+    - followed_organizers
+    - saved_players
+    rules:
+    - public games are discoverable even when creator is not followed
+    - followed and saved sources improve relevance but do not hide the open public catalog
+    - user-facing Король пляжа wording resolves to the Tunisian ladder game and never creates a tournament
+    format_examples:
+    - 2×2
+    - 4×4
+    - fixed_teams
+    - tunisian_ladder_one_to_three_courts
+  trainings:
+    title: Тренировки
+    sources:
+    - public_trainings_from_private_trainers
+    - public_trainings_from_organizations
+    rules:
+    - only whole public trainings appear in the catalog
+    - private trainings remain accessible only through participation or invitation
+  tournaments:
+    title: Турниры
+    mode_chips:
+    - all
+    - classic
+    mode_labels:
+      all: Все
+      classic: Классика
+    supported_formats:
+    - single_elimination
+    - full_placement
+    forbidden_formats:
+    - round_robin
+    - swiss
+    - groups_then_playoff
+    - king_of_the_beach
+    rules:
+    - seasonal mode is not supported
+    - Tunisian ladder and King of the Beach wording belong to one-off games, not tournaments
+    - the tournament creator offers only playoff and full placement
+    - every list is ordered from nearest date to latest date
+following:
+  organizer_follow:
+    owner: player_profile
+    target: organization_actor
+    selectable_categories:
+    - games
+    - trainings
+    - tournaments
+    - camps
+    effects:
+    - prioritize matching public publications in catalogs
+    - allow notification preferences per category
+    forbidden_effects:
+    - automatic participation
+    - access_to_private_events
+  saved_players:
+    source: docs/PLAYER_DIRECTORY.yaml
+    effects:
+    - prioritize public games created by saved players
+    mutual_friendship_required: false
+search:
+  entities:
+  - game
+  - training
+  - tournament
+  - organization
+  - venue
+  - player
+  result_groups:
+  - games
+  - trainings
+  - tournaments
+  - organizers
+  - venues
+  - players
+  organizer_search_entry: empty_state_or_search_scope
+  player_search_entry: empty_state_or_saved_players
+empty_states:
+  all:
+    title: Пока нет подходящих игр
+    actions:
+    - id: games.find_organizers
+      label: Добавить организацию
+    - id: games.find_players
+      label: Добавить игроков
+    rules:
+    - actions open search immediately rather than an explanatory dead-end screen
+    - show nearby public suggestions when available
+card:
+  required_fields:
+  - type
+  - title
+  - starts_at
+  - venue
+  - creator
+  - price_or_free
+  - capacity
+  - free_places
+  - relationship_status
+  date_is_prominent: true
+  capacity_examples:
+  - 8 из 12
+  - Осталось 4 места
+  primary_action_count: 1
+personal_activity:
+  home_preview: home.main
+  full_list: profile.activity
+  participation_tabs_forbidden_in_catalog: true
+  unresolved_invitations_are_not_participation: true
+catalog_open_policy:
+  action_id: games.open_entity
+  resolver: dynamic.catalog_entity_entry
+  manager_result: dynamic.entity_manage
+  public_result: dynamic.entity_details
+  rules:
+  - canManageHint is only an optimization and must be revalidated by the server
+  - revoked permission falls back to public details with a clear notice
+  - returning from manage restores catalog category, filters and scroll position
+management_mode:
+  contract: docs/MANAGEMENT_CENTER.yaml
+  query: mode=manage
+  button_label: Режим управления
+  shows_only: current_entities_manageable_by_active_actor
+  categories:
+  - games
+  - trainings
+  - tournaments
+  temporal_tabs: none
+  excludes_completed: true
+  invitation_priority_block_visible: false
+  status_filters:
+  - all
+  - draft
+  - requires_action
+  - published
+  - in_progress
+  create:
+  - game
+  - training
+  - tournament
+  archive_entry:
+    idle_visibility: hidden
+    interaction: pull_down_overscroll_at_scroll_top
+    reveal_threshold_dp: 24
+    armed_threshold_dp: 72
+    release_when_armed: /play?mode=archive
+    visible_button_forbidden: true
+    pull_to_refresh_in_management_mode: disabled
+  archive_mode:
+    query: mode=archive
+    title: Архив
+    includes_only: completed_managed_entities
+    ordering: completed_at_descending
+    preserves_category: true
+    create_controls_forbidden: true
+    back_destination: /play?mode=manage

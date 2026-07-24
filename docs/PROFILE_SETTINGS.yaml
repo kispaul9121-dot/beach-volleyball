@@ -1,0 +1,261 @@
+version: 1
+
+scope: profile_settings
+screen_id: profile.settings
+route: /profile/settings
+source_of_truth_for:
+  - account settings
+  - active profile settings variants
+  - settings actor switch behavior
+  - notification and privacy settings hierarchy
+
+layout:
+  type: single_scroll_hub
+  preserve_global_bottom_tabs: true
+  active_global_tab: profile
+  header:
+    - back
+    - title
+    - help
+  active_profile_card:
+    fields:
+      - avatar_or_logo
+      - display_name
+      - actor_type
+      - active_badge
+      - switch_action
+    profile_selector:
+      visible_when_multiple_profiles: true
+      options: [player, trainer, organization]
+      behavior: switch_active_actor_and_refresh_profile_sections
+  section_rules:
+    - Общие настройки аккаунта одинаковы для всех профилей.
+    - Профильные разделы меняются после переключения actor.
+    - Не дублировать полную административную конфигурацию организации на экране Профиля.
+    - Каждый пункт открывает отдельный экран, sheet или системный flow.
+    - На главном экране настроек не размещать редактируемые формы.
+
+common_sections:
+  account:
+    title: Аккаунт
+    items:
+      - id: settings.account.login
+        label: Email и вход
+        destination: system.account_login_settings
+      - id: settings.account.security
+        label: Пароль и безопасность
+        destination: system.account_security_settings
+      - id: settings.account.sessions
+        label: Активные устройства
+        destination: system.account_sessions
+      - id: settings.account.appearance
+        label: Язык и тема
+        destination: system.application_appearance_settings
+  application:
+    title: Приложение
+    items:
+      - id: settings.application.permissions
+        label: Разрешения приложения
+        destination: system.device_permissions
+      - id: settings.application.support
+        label: Поддержка
+        destination: system.support
+      - id: settings.application.about
+        label: О приложении
+        destination: system.about_app
+  dangerous_actions:
+    title: Опасные действия
+    items:
+      - id: settings.account.sign_out
+        label: Выйти из аккаунта
+        destination: system.sign_out_confirmation
+      - id: settings.account.delete
+        label: Удалить аккаунт
+        destination: system.delete_account_confirmation
+    style: danger
+
+variants:
+  player:
+    accent_semantic: player
+    profile_section:
+      title: Активный профиль — Игрок
+      items:
+        - id: settings.player.personal
+          label: Личные данные
+          destination: system.player_profile_editor
+        - id: settings.player.level
+          label: Уровень и рейтинг
+          destination: system.player_level_settings
+        - id: settings.player.side
+          label: Игровая сторона
+          destination: system.player_side_settings
+        - id: settings.player.formats
+          label: Предпочитаемые форматы
+          destination: system.player_format_preferences
+        - id: settings.player.invites
+          label: Кто может приглашать
+          destination: system.player_invitation_privacy
+          summary: current_value
+        - id: settings.player.messages
+          label: Кто может писать
+          destination: system.player_message_privacy
+          summary: current_value
+        - id: settings.player.statistics_visibility
+          label: Видимость статистики
+          destination: system.player_statistics_privacy
+          summary: current_value
+    notifications:
+      title: Уведомления
+      items:
+        - id: settings.notifications.general
+          label: Общие уведомления
+          destination: system.account_notification_settings
+        - id: settings.notifications.player
+          label: Уведомления игрока
+          destination: system.actor_notification_settings
+        - id: settings.notifications.messages
+          label: Чаты и сообщения
+          destination: system.messaging_notification_settings
+    privacy:
+      title: Приватность
+      items:
+        - id: settings.player.profile_visibility
+          label: Видимость профиля
+          destination: system.player_profile_privacy
+          summary: current_value
+        - id: settings.privacy.blocked
+          label: Заблокированные пользователи
+          destination: system.blocked_users
+
+  trainer:
+    accent_semantic: trainer
+    profile_section:
+      title: Активный профиль — Тренер
+      items:
+        - id: settings.trainer.public_profile
+          label: Публичный профиль
+          destination: trainer.public_profile
+        - id: settings.trainer.experience
+          label: Специализации и опыт
+          destination: system.trainer_profile_editor
+        - id: settings.trainer.schedule
+          label: Расписание и занятость
+          destination: profile.calendar
+        - id: settings.trainer.booking
+          label: Правила записи
+          destination: system.trainer_booking_policy
+        - id: settings.trainer.cancellation
+          label: Правила отмены
+          destination: system.trainer_cancellation_policy
+        - id: settings.trainer.payouts
+          label: Выплаты тренера
+          destination: system.payout_settings
+    notifications:
+      title: Уведомления
+      items:
+        - id: settings.notifications.general
+          label: Общие уведомления
+          destination: system.account_notification_settings
+        - id: settings.notifications.trainer
+          label: Уведомления тренера
+          destination: system.actor_notification_settings
+        - id: settings.notifications.messages
+          label: Чаты и сообщения
+          destination: system.messaging_notification_settings
+    privacy:
+      title: Приватность
+      items:
+        - id: settings.trainer.messages
+          label: Кто может писать
+          destination: system.trainer_message_privacy
+        - id: settings.trainer.invites
+          label: Кто может приглашать
+          destination: system.trainer_invitation_privacy
+        - id: settings.trainer.profile_visibility
+          label: Видимость профиля
+          destination: system.trainer_profile_privacy
+        - id: settings.trainer.statistics_visibility
+          label: Видимость статистики
+          destination: system.trainer_statistics_privacy
+
+  organization:
+    accent_semantic: organization
+    profile_section:
+      title: Активный профиль — Организация
+      items:
+        - id: settings.organization.public_data
+          label: Публичные данные клуба
+          destination: club.details
+        - id: settings.organization.notifications
+          label: Уведомления организации
+          destination: system.actor_notification_settings
+        - id: settings.organization.role
+          label: Моя роль и права
+          destination: system.organization_membership_details
+          summary: current_membership_role
+        - id: settings.organization.open_admin_settings
+          label: Открыть настройки организации
+          description: Полный доступ к управлению клубом согласно роли
+          destination: system.organization_admin_section
+          context: {section: settings}
+          permission: organization_settings_view
+    notifications:
+      title: Уведомления
+      items:
+        - id: settings.notifications.general
+          label: Общие уведомления
+          destination: system.account_notification_settings
+        - id: settings.notifications.organization
+          label: Уведомления организации
+          destination: system.actor_notification_settings
+        - id: settings.notifications.messages
+          label: Чаты и сообщения
+          destination: system.messaging_notification_settings
+    privacy:
+      title: Приватность
+      items:
+        - id: settings.organization.messages
+          label: Кто может писать
+          destination: system.organization_message_privacy
+        - id: settings.organization.invites
+          label: Кто может приглашать
+          destination: system.organization_invitation_privacy
+        - id: settings.organization.visibility
+          label: Видимость клуба
+          destination: system.organization_visibility
+        - id: settings.privacy.blocked
+          label: Заблокированные пользователи
+          destination: system.blocked_users
+
+notification_precedence:
+  - entity_override
+  - actor_preference
+  - account_preference
+  - application_default
+
+actor_switch_behavior:
+  clean_state:
+    result: switch_actor_and_refresh_variant_in_place
+  unsaved_child_form:
+    result: ask_save_discard_or_cancel
+  actor_unavailable:
+    result: keep_current_actor_and_show_error
+  organization_permission_missing:
+    result: show_role_and_permission_explanation
+
+states:
+  - loading
+  - only_player_profile
+  - multiple_profiles
+  - actor_profile_incomplete
+  - verification_pending
+  - permission_denied
+  - offline_read_only
+  - save_error_on_child_screen
+
+implementation_rules:
+  - Аккаунт, Приложение и Опасные действия сохраняют одинаковое положение для всех вариантов.
+  - Переключение actor не создаёт новый экран и не сбрасывает прокрутку без необходимости.
+  - Полные настройки организации открываются в club.manage settings.
+  - Строки настроек не содержат inline-форм, кроме короткого summary текущего значения.
+  - Чувствительные действия всегда требуют повторного подтверждения.

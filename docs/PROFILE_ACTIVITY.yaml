@@ -1,0 +1,198 @@
+version: 5
+scope: profile_activity
+source_of_truth_for:
+- personal participation preview on home.main
+- unified personal activity list
+- contextual creation and management in Games and Camps
+- post-join Profile tab feedback
+- boundary between invitation and participation
+catalog_boundaries:
+  games:
+    screen: play.main
+    route: /play
+    mode: discovery_and_contextual_management
+    allows:
+    - browse
+    - search
+    - filter
+    - open_by_capability
+    - start_join_flow
+    - switch_to_management_mode
+    - create_in_section
+    forbids:
+    - participating_tab
+    - personal_archive
+    - profile_management_entry
+  camps:
+    screen: camps.main
+    route: /camps
+    mode: discovery_and_contextual_management
+    allows:
+    - browse
+    - search
+    - filter
+    - open_by_capability
+    - start_join_flow
+    - switch_to_management_mode
+    - create_in_section
+    forbids:
+    - participating_tab
+    - personal_archive
+    - profile_management_entry
+profile_root:
+  screen: home.main
+  route: /
+  mode: personal_profile_and_participation
+  management_controls_forbidden: true
+  creation_controls_forbidden: true
+  connections_contract: docs/PROFILE_CONNECTIONS.yaml
+  upcoming_timeline:
+    title: Ближайшее
+    entity_types:
+    - game
+    - training
+    - tournament
+    - camp
+    ordering: starts_at_ascending
+    maximum_preview_items: 4
+    statuses:
+    - requested
+    - payment_required
+    - waitlisted
+    - confirmed
+    - confirmed_external_payment_unverified
+    shows:
+    - date
+    - time
+    - type
+    - title
+    - place
+    - participation_status
+    - required_action
+    excludes:
+    - unresolved_invitation
+    - draft
+    - manager_only_task
+    - staff_operation
+  activity_entry:
+    label: Вся моя активность
+    action_id: home.open_activity
+    screen: profile.activity
+    route: /activity
+activity_screen:
+  screen: profile.activity
+  route: /activity
+  purpose: all personal participation across entity types
+  tabs:
+  - upcoming
+  - past
+  tab_labels:
+    upcoming: Предстоящие
+    past: Прошедшие
+  type_filters:
+  - all
+  - games
+  - trainings
+  - tournaments
+  - camps
+  type_labels:
+    all: Все
+    games: Игры
+    trainings: Тренировки
+    tournaments: Турниры
+    camps: Кэмпы
+  management_items_forbidden: true
+  unresolved_invitations_forbidden: true
+  empty_upcoming_action: Открыть Игры
+  empty_past_copy: Завершённые участия появятся здесь
+legacy_filtered_activity_screens:
+  profile.my_games:
+    route: /profile/games
+    fixed_type: games
+    tabs:
+    - upcoming
+    - past
+  profile.trainings:
+    route: /profile/trainings
+    fixed_type: trainings
+    tabs:
+    - booked
+    - past
+  profile.competitions:
+    route: /profile/competitions
+    fixed_type: tournaments
+    tabs:
+    - registered
+    - past
+  profile.trips:
+    route: /profile/trips
+    fixed_type: camps
+    tabs:
+    - booked
+    - past
+management:
+  source_of_truth: docs/MANAGEMENT_CENTER.yaml
+  profile_embedding_forbidden: true
+  profile_entry_forbidden: true
+  standalone_center_removed: true
+  temporal_tabs_forbidden: true
+  current_lists_exclude_completed: true
+  completed_entities_destination: archive
+  archive_placement_status: approved_pull_down_overscroll
+  games:
+    screen: play.main
+    route: /play
+    mode_query: manage
+    archive_query: archive
+    entity_types:
+    - game
+    - training
+    - tournament
+  camps:
+    screen: camps.main
+    route: /camps
+    mode_query: manage
+    archive_query: archive
+    entity_types:
+    - camp
+join_flow:
+  product_status: approved
+  source_of_truth: docs/JOIN_FLOW.yaml
+  entry_action_id: entity.start_join_flow
+  entry_label: Вступить
+  resolver: system.resolve_join_flow
+  independent_dimensions:
+  - enrollment_policy
+  - payment_policy
+  enrollment_policies:
+  - immediate
+  - approval
+  - invitation_only
+  payment_policies:
+  - free
+  - online
+  - external
+  capacity_fallback:
+  - waitlist
+  - unavailable_no_places
+  unresolved_invitation_is_not_participation: true
+profile_tab_feedback:
+  trigger: profile_activity_item_created_or_updated_after_join_flow
+  bottom_tab_id: home
+  duration_ms: 900
+  repetitions: 1
+  confirmed:
+    semantic_color: status.success
+    badge: check
+    message: Игра добавлена в Профиль
+  pending_or_payment_required:
+    semantic_color: status.info
+    badge: dot
+    message: Статус вступления сохранён в Профиле
+  rules:
+  - never_loop
+  - never_move_or_resize_the_tab_bar
+  - do_not_use_color_as_the_only_signal
+  - respect_reduce_motion
+  - feedback_does_not_mean_confirmed_when_status_is_pending
+  reduce_motion_fallback: static_badge_and_accessibility_announcement

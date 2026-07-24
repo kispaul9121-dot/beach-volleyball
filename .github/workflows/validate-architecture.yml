@@ -11,6 +11,7 @@ on:
       - "scripts/validate_design_system.py"
       - "scripts/validate_profile_activity.py"
       - "scripts/validate_tunisian_format.py"
+      - "scripts/validate_implementation_prompts.py"
       - "scripts/generate_screen_readiness.py"
       - "scripts/requirements.txt"
       - ".github/workflows/validate-architecture.yml"
@@ -27,6 +28,7 @@ on:
       - "scripts/validate_design_system.py"
       - "scripts/validate_profile_activity.py"
       - "scripts/validate_tunisian_format.py"
+      - "scripts/validate_implementation_prompts.py"
       - "scripts/generate_screen_readiness.py"
       - "scripts/requirements.txt"
       - ".github/workflows/validate-architecture.yml"
@@ -66,6 +68,9 @@ jobs:
 
       - name: Validate one-off Tunisian ladder game
         run: python scripts/validate_tunisian_format.py
+
+      - name: Validate ordered implementation prompt pack
+        run: python scripts/validate_implementation_prompts.py
 
       - name: Verify screen readiness table is current
         run: python scripts/generate_screen_readiness.py --check

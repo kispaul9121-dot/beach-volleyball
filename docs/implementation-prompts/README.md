@@ -131,9 +131,9 @@ Supabase выбран потому, что имеет официальный Exp
 - `04-games-public-create.md` — `030–039`: база игр, каталог и создание;
 - `05-games-management-formats.md` — `040–049`: страница игры, управление и форматы;
 - `06-games-audit-trainings.md` — `050–059`: тренировки и турниры;
-- `07-tournaments.md` — `060–069`: чаты, уведомления и платежи;
-- `08-chats-payments.md` — `070–079`: кэмпы и организации;
-- `09-camps-organizations.md` — `080–089`: база, cache, security и интеграция;
+- `07-chats-payments.md` — `060–069`: чаты, уведомления и платежи;
+- `08-camps-organizations.md` — `070–079`: кэмпы и организации;
+- `09-backend-integration.md` — `080–089`: база, cache, security и интеграция;
 - `10-quality-release.md` — `090–099`: качество, builds и release candidate.
 
 ## Граница MVP

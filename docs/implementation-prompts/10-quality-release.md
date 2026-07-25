@@ -1,164 +1,132 @@
-# Блок 10 — качество, безопасность и выпуск
+# Блок 10 — качество, builds и release candidate
 
-## 073 — Аудит полноты состояний экранов
+## 090 — Полная unit и component test suite
 
 ```text
-Audit-only. Сопоставь SCREENS.yaml, SCREEN_READINESS.yaml, specs и фактический код.
+Закрой критический автоматический test baseline без изменения UX.
 
-Для каждого реализованного/partial экрана проверь применимые состояния: loading, empty, error, offline, permission denied, cancelled/closed и stale data. Не создавай универсальный экран, если состояние требует контекста; переиспользуй общие primitives.
+Сопоставь domain engines, capability/join resolvers, repositories, format generators и screen state components. Добавь unit/component tests там, где отсутствует защита: auth/session, actor switch, catalog scopes, creation drafts, game formats, tournament strategies, chat reducer, payments, booking и cache. Удали или перепиши flaky tests с доказанной причиной; не маскируй их retry-only настройкой.
 
-Definition_pending экраны не повышай до implemented из-за placeholder. Исправь IMPLEMENTATION_STATUS evidence и добавь тесты для отсутствующих состояний только в уже реализованных областях.
-
-Сгенерируй отчёт по screen_id: missing state, риск, файл и тест. Не расширяй бизнес-функции.
-
-Commit: test: audit screen state completeness
+Определи минимальные coverage thresholds по критическим модулям, а не искусственные 100% для generated/boilerplate. Test data берётся из semantic fixtures.
+Проверки: deterministic repeated runs, no network in unit tests, CI time report.
+Commit: test: complete critical unit and component coverage
 ```
 
-## 074 — Навигация, actions и canonical screens
+## 091 — Производительность списков и Supabase-запросов
 
 ```text
-Audit-only. Запусти/расширь validators для SCREENS.yaml, ROUTES.yaml, ACTIONS.yaml и реального Expo Router tree.
+Профилируй реальные bottlenecks, не делай преждевременный массовый refactor.
 
-Найди:
-- route без screen_id или наоборот;
-- pressable без action_id/явного local UI action;
-- action с несуществующим destination;
-- stack screen без back_fallback;
-- duplicated canonical details;
-- create/manage route без actor/permission handling;
-- returnTo/open redirect risk;
-- второй tab bar;
-- stale route из удалённых seasons/formats.
+Проверь play/camps catalogs, profile activity, participants, chat messages и tournament maps. На backend изучи query plans/indexes/pagination; на mobile — renders, list virtualization, image sizes и cache. Добавляй FlashList или другие оптимизации только после измерения и совместимости с Expo.
 
-Добавь automated route registry test и deep-link smoke suite. Исправь только навигационные дефекты.
+Установи budgets для initial screen data, repeated query count и scroll responsiveness. Избегай N+1 queries и full-table realtime subscriptions. Сохрани accessibility и stable item keys.
 
-Commit: test: validate implementation navigation graph
+Через iOS-плагин выполни scroll/interaction smoke на large seed.
+Проверки: before/after measurements, query plans и regression tests.
+Commit: perf: optimize measured mobile and Supabase bottlenecks
 ```
 
-## 075 — Accessibility аудит
+## 092 — Полная доступность
 
 ```text
-Проведи accessibility audit без изменения продуктового scope.
+Проведи accessibility pass по всем implemented screens, не завершая definition_pending features.
 
-Проверь iOS VoiceOver и Android TalkBack semantics:
-- доступные имена/роли/состояния;
-- 48×48 targets;
-- порядок focus;
-- modal focus trap/return;
-- status не только цветом;
-- формы имеют labels/errors;
-- charts/brackets/ladders имеют текстовый эквивалент;
-- 200% text scaling;
-- Reduce Motion;
-- announcement после submit/payment/result.
+Проверь VoiceOver labels/roles/hints, focus order, announcements loading/error/success, Dynamic Type 200%, contrast, Reduce Motion, touch targets 48×48, keyboard navigation where applicable и text alternatives для bracket/placement paths. Статусы не обозначаются одним цветом.
 
-Добавь automated accessibility/component checks, но не полагайся только на snapshots. Составь ручной checklist по ключевым flows и исправь подтверждённые проблемы.
+Используй iOS-плагин для фактического VoiceOver/render review и зафиксируй manual findings. Исправь clipping, inaccessible icon-only actions, hidden focus и keyboard-obscured inputs. Не отключай font scaling для сохранения макета.
 
-Commit: fix: complete mobile accessibility audit
+Проверки: component accessibility queries, screenshot matrix и manual checklist.
+Commit: a11y: complete mobile accessibility pass
 ```
 
-## 076 — Responsive, safe areas и клавиатура
+## 093 — iOS regression через плагин
 
 ```text
-Audit-only для widths 320, 360, 390, 430, tablet max width, iOS safe areas и Android edge-to-edge.
+Audit-only для iOS. Используй точный @mention из IMPLEMENTATION_RUNTIME.yaml и фактический simulator/device host.
 
-Проверь:
-- bottom tab и sticky CTA не перекрываются;
-- keyboard не закрывает active input/action;
-- chips используют horizontal scroll без wrap;
-- tournament map scroll не конфликтует с vertical screen;
-- long Russian names, locations и prices;
-- landscape/split screen не ломают critical actions;
-- cards не имеют бессмысленных fixed heights.
+Пройди cold launch, registration/login, пять tabs, actor switch, game create/join/manage, fixed pairs, Tunisian 3 courts, training attendance, single elimination, full placement, chat keyboard/realtime, camp booking draft и settings appearance. Проверь background/foreground, deep links, safe area, system back gestures, memory warnings where observable и offline transitions.
 
-Добавь visual/component tests там, где tooling позволяет, и исправь layout без изменения navigation/content hierarchy.
-
-Commit: fix: harden responsive mobile layouts
+Не исправляй Android-only или продуктовые пробелы. iOS defects исправляй минимально и добавляй regression test/report.
+Проверки: build/launch result, screenshots, routes and failed step evidence.
+Commit: test: run Codex iOS plugin regression suite
 ```
 
-## 077 — Offline, retry и stale data
+## 094 — Android parity smoke
 
 ```text
-Проведи сквозной resilience audit.
+Проведи Android smoke для критической parity, сохраняя iOS-first процесс и общий React Native codebase.
 
-Классифицируй operations:
-- read cached;
-- reversible local draft;
-- authoritative mutation;
-- external provider flow.
+Пройди пять tabs, auth, game join/create/manage, tournament map, chat keyboard, camp details и settings. Проверь edge-to-edge, hardware back, permissions, keyboard resize и touch feedback. Не вводи отдельный Android visual language и не ломай iOS fixes.
 
-Правила:
-- join, publish, payment success, result save и movement confirmation не подтверждаются оптимистично offline;
-- local unsynced drafts имеют явный status;
-- retries используют idempotency keys;
-- stale server version вызывает conflict UI;
-- cache не раскрывает данные после permission revoke/logout;
-- reconnect invalidates только нужные queries.
+Если Android environment отсутствует, сформируй blocked report и CI/device instructions, не заявляя success. Platform-specific adapter допустим только при доказанной системной разнице.
 
-Добавь network fault integration tests и исправь ложные success states. Не внедряй сложный offline-first sync для всего приложения.
-
-Commit: fix: harden offline and retry behavior
+Проверки: Android build/typecheck, route smoke и parity issue list.
+Commit: test: verify Android parity for critical flows
 ```
 
-## 078 — Security и permission penetration review
+## 095 — EAS build profiles и environments
 
 ```text
-Audit-only с отрицательными тестами на клиентском и service/API contract уровне.
+Настрой EAS development, preview и production profiles для существующего Expo app.
 
-Проверь:
-- подмена actorId/entityId/participantId/paymentId;
-- доступ к чужим manage routes;
-- delegated manager вводит game result;
-- participant платит за другого;
-- invited/requested читает chat;
-- organization member видит finance без grant;
-- private entity через guessed deep link;
-- stale cached sensitive data после logout/actor revoke;
-- client-only permission checks;
-- logging secrets/PII.
+Раздели bundle/package identifiers, app variants, environment variables и Supabase project refs. Secrets не хранятся в eas.json или Git; public variables явно перечислены. Добавь development build для iOS plugin/simulator workflow, preview build для QA и production build без автоматической публикации.
 
-UI hiding не считается защитой. Зафиксируй server enforcement requirements, если backend отсутствует. Исправь только реальные уязвимости/контракты.
+Проверь app.config validation, icons/splash references, deep-link schemes и native permission descriptions. Не запускай платный/production build без явного разрешения, если среда требует внешнего действия.
 
-Commit: security: audit permissions and data isolation
+Проверки: config inspect, local/prebuild validation и documented commands.
+Commit: build: configure EAS development preview and production profiles
 ```
 
-## 079 — Производительность и устойчивость списков
+## 096 — TestFlight beta readiness
 
 ```text
-Проведи performance audit на типичных и крайних fixtures.
+Подготовь iOS beta checklist без отправки в App Store Connect.
 
-Проверь catalogs, participants, chats, notifications, 80-match tournament и activity feed.
+Проверь bundle id, version/build strategy, signing responsibility, privacy usage descriptions, icons, splash, supported orientations, deep links, data collection disclosure inputs и test accounts/seed plan. Создай release notes template и список ручных сценариев TestFlight.
 
-Сделай:
-- profile renders и query waterfalls;
-- stable keys/memoization только по измерениям;
-- FlatList virtualization и pagination;
-- image sizing/cache policy;
-- no full 80-match render одновременно;
-- no repeated derived statistics on every row;
-- cleanup subscriptions/timers;
-- startup bundle dependency review.
+Через iOS-плагин или EAS development/preview result проверь production-like launch. Не публикуй build, не принимай agreements и не меняй certificates без отдельной команды пользователя.
 
-FlashList добавляй только после доказанного bottleneck. Добавь performance budgets/benchmarks, которые стабильны в CI, и исправь критические проблемы без premature rewrite.
-
-Commit: perf: optimize measured mobile bottlenecks
+Definition_pending функции должны быть скрыты feature flags или честно исключены из beta scope.
+Проверки: metadata/config audit и no missing permission strings.
+Commit: docs: prepare TestFlight beta readiness checklist
 ```
 
-## 080 — Финальный MVP audit и честный backlog
+## 097 — Backup, recovery и migration plan
 
 ```text
-Финальный audit-only промт. Не добавляй новую функцию.
+Подготовь operational plan для Supabase data без разрушительных действий.
 
-1. Запусти полный verify и все e2e/property tests.
-2. Сопоставь IMPLEMENTATION_STATUS со всеми 54 screen_id и инфраструктурными блоками.
-3. Проверь основные flows: auth/onboarding; actor switch; discovery/invitation; game create/details/manage; 2x2/4x4/Tunisian; training; two tournament formats; chat; own payment; camps; organization shell.
-4. Убедись, что deleted product features нигде не доступны.
-5. Составь docs/MVP_RELEASE_REPORT.md: completed, partial, blocked, known risks, manual test matrix и release prerequisites.
-6. Создай приоритизированный backlog только из реально незавершённого; не называй placeholder готовым.
-7. Обнови README с командами запуска/проверки и фактическим scope.
-8. Не публикуй в stores, не включай auto-merge и не меняй production credentials.
+Опиши backup availability текущего plan, migration forward/rollback strategy, restore verification, point-in-time expectations where available, Storage backup considerations и incident ownership. Добавь safe pre-deploy migration checklist и recovery drill для local/preview. Production restore не запускай.
 
-Release candidate считается готовым только если critical security/data-loss issues отсутствуют; остальные ограничения явно перечислены.
+Для irreversible migration требуй explicit backup/approval и staged rollout. Seed scripts блокируются в production. Audit/result/payment event tables сохраняют историю по retention policy, а не удаляются случайным cleanup.
 
-Commit: docs: finalize mvp implementation audit
+Проверки: dry-run migration, local restore simulation и documentation consistency.
+Commit: docs: add database backup and recovery plan
+```
+
+## 098 — Финальный архитектурный и продуктовый аудит
+
+```text
+Audit-only. Сопоставь фактический код с AGENTS.md, YAML-контрактами, screen specs, DECISIONS.md, IMPLEMENTATION_STATUS.yaml и 000–097.
+
+Найди duplicate canonical screens/chats/tab bars, routes без action, action без destination, permission gaps, schema drift, forbidden formats/seasons, placeholders mislabeled as implemented, hard-coded colors, service secrets и missing tests. Проверь, что approved formats ровно соответствуют текущему MVP.
+
+Исправляй только доказанные несоответствия; product decisions не принимай самостоятельно. Dead code удаляй только при подтверждённых references/tests. Обнови screen readiness из фактических свидетельств.
+
+Проверки: все validators, Supabase reset/RLS, typecheck/lint/tests и architecture report.
+Commit: test: complete final architecture and product audit
+```
+
+## 099 — Release candidate и итоговый отчёт
+
+```text
+Собери release candidate состояния проекта без merge, store publication или production migration.
+
+Запусти clean install, Supabase local reset/seed, generated types check, validators, unit/component/integration suites, iOS regression through plugin, Android smoke where available и EAS config validation. Сформируй один итоговый отчёт: implemented, partial, placeholder, definition_pending, blocked; known risks; manual setup; beta scope; exact commands and commit SHAs.
+
+Release candidate считается готовым только при отсутствии critical security/data-loss/permission defects. Низкоприоритетные unfinished screens остаются честно deferred с compatible foundations.
+
+Не merge PR и не публикуй build без явной команды пользователя.
+Проверки: reproducible RC checklist and artifact references.
+Commit: chore: assemble VolleyPlay release candidate report
 ```

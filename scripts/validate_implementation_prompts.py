@@ -140,8 +140,9 @@ def main() -> int:
     index_text = (DOCS / "PROMPTS.md").read_text(encoding="utf-8")
     if "implementation-prompts/README.md" not in index_text or "100" not in index_text:
         errors.append("docs/PROMPTS.md must point to the 100-prompt runbook")
-    if "001–008" in index_text or "80" in index_text:
-        errors.append("docs/PROMPTS.md still references the legacy 80-prompt numbering")
+    legacy_markers = ("80 последовательных непересекающихся промтов", "001–080", "001–008")
+    if any(marker in index_text for marker in legacy_markers):
+        errors.append("docs/PROMPTS.md still references the legacy prompt pack")
 
     print(f"Implementation prompts found: {len(prompts)}")
     if errors:

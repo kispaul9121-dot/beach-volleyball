@@ -1,171 +1,139 @@
-# Блок 4 — создание и публичная страница игры
+# Блок 4 — база игр, каталог и создание
 
-## 025 — Game domain shell и repository boundary
+## 030 — Game schema, registration и RLS
 
 ```text
-Цель: подготовить game feature без визуальной реализации всех экранов.
+Создай Supabase migrations для games, game_participants, game_invitations, join_requests, waitlist и draft metadata по GAME_MVP.yaml, JOIN_FLOW.yaml и DATA_MODEL.md.
 
-Прочитай GAME_MVP.yaml, GAME_FORMATS.yaml, GAME_MATCH_TABLE.yaml, GAME_TUNISIAN_LADDER.yaml, JOIN_FLOW.yaml и ENTITY_SECTIONS.yaml.
+Разделяй visibility, enrollment policy и payment policy. Храни created_by_user_id, created_by_actor_id/type, одно временное окно, venue/court references и status lifecycle. Добавь constraints, indexes и RLS: public catalog видит только public published games; private relation — только разрешённым пользователям; manage mutations — только capabilities.
 
-Сделай:
-1. Типы Game, GameFormatConfig, GameParticipant, GameMatch, GameResult и GamePermissions.
-2. Repository/use-case interfaces для details, create draft, manage, join и matches.
-3. Route loaders для game.details/create/manage с cancellation и stale-response protection.
-4. Чётко раздели public read model и manage commands.
-5. Результаты представлены immutable events/read model; участник не получает write command.
-6. Не реализуй UI или генераторы матчей в этом промте.
-7. Не создавай сезонные поля и tournament bracket внутри Game.
-
-Тесты: schema validation, lifecycle transitions, owner vs delegated manager command surface.
-
-Commit: feat: add game domain feature boundary
+Не добавляй сезоны, recurring days или tournament tables. Сгенерируй TypeScript types и repository interfaces.
+Проверки: migration reset, RLS guest/participant/owner/delegate negatives, schema invariant tests.
+Commit: feat: add game registration schema and RLS
 ```
 
-## 026 — Создание игры: шаг 1 «Что и когда»
+## 031 — Каталог play.main из Supabase
 
 ```text
-Реализуй только первый шаг game.create.
+Подключи основу play.main из промта 002 к Supabase read models.
 
-Поля: Создать как, название/описание по контракту, дата, start/end в одном временном окне. Используй active actor и capability resolver.
+Сделай paginated queries для категорий Игры/Тренировки/Турниры и scopes Все/Участвую/Управляю согласно GAMES_CATALOG.yaml. В «Все» попадают только public published entities. Участвую строится по relation, Управляю — по capabilities. Не смешивай unresolved invitation с confirmed participation.
 
-Требования:
-- ровно четыре шага мастера в общем progress;
-- draft создаётся/восстанавливается;
-- end после start, timezone явно учитывается;
-- нет recurrence, сезона или нескольких игровых дней;
-- смена actor с заполненными данными требует подтверждения и пересчёта прав;
-- route returnTo сохраняется;
-- offline не подтверждает server draft как сохранённый.
+Карточки используют общий EntityCard, stable sorting и query cache. Добавь pull-to-refresh только там, где он не конфликтует с management/archive gesture.
 
-Не реализуй место, формат, участие или цену. Создай stable draft contract для следующих шагов.
-
-Тесты: date validation, daylight-saving boundary, actor change, resume draft, duplicate submit.
-
-Commit: feat: implement game creation basics step
+Через iOS-плагин проверь scroll, category chips, loading skeleton, empty/error/offline и actor switch refresh.
+Проверки: query/RLS integration, pagination и duplicate suppression.
+Commit: feat: connect play catalog to Supabase
 ```
 
-## 027 — Создание игры: шаг 2 «Место и формат»
+## 032 — Приоритетный блок приглашений
 
 ```text
-Реализуй только второй шаг game.create.
+Реализуй invitation discovery block над каталогом по INVITATION_DISCOVERY.yaml.
 
-Форматы: fixed pairs 2x2, 4x4/fixed teams и Тунисская лестница. Используй GAME_FORMATS и GAME_TUNISIAN_LADDER.
+Показывай заголовок «Вас пригласили · N», максимум две карточки, semantic success/green border/tint, MailPlus и label ПРИГЛАШЕНИЕ. В каталоге единственное действие карточки — «Открыть», ведущее в invitation.details. Accept/decline здесь запрещены.
 
-Сделай:
-1. Venue/court selection через существующий route/selector; при незавершённом бронировании сохрани только venue reference, не симулируй booking.
-2. Для Тунисской лестницы court count 1/2/3 автоматически задаёт 5/10/15 игроков.
-3. Отдельные поля: матчей на площадку default 15 и циклов default 1.
-4. Все циклы обязаны помещаться в одно временное окно; показывай estimate, но не выдумывай duration матча без настройки.
-5. Для fixed formats capacity следует контракту; не превращай разовую игру в турнир.
-6. Переход назад сохраняет draft.
+Supabase query возвращает active unresolved invitations для account, а не active actor только. Нерешённое приглашение не создаёт profile activity participation и не открывает event chat.
 
-Тесты: format switching resets only incompatible fields, 1→5/2→10/3→15, invalid court count.
-
-Commit: feat: implement game format and venue step
+Через iOS-плагин проверь zero/one/two/many states, accessibility text и переход.
+Проверки: query status mapping, no accidental accept mutation, RLS.
+Commit: feat: add priority invitation discovery block
 ```
 
-## 028 — Создание игры: шаг 3 «Участие и цена»
+## 033 — Режим управления и pull-down архив
 
 ```text
-Реализуй третий шаг game.create по JOIN_FLOW.yaml.
+Подключи management mode play.main к реальным managed entities и drafts.
 
-Две независимые настройки:
-- enrollment: Сразу записываются / Отправляют заявку / Только по приглашению;
-- payment: Бесплатно / Оплата онлайн / Оплата организатору вне приложения.
+Фильтры: Все, Черновики, Требуют действий, Опубликованы, Идут. Completed entities автоматически доступны через архивный mode, а не постоянную вкладку. Реализуй pull-down reveal/armed thresholds из MANAGEMENT_CENTER.yaml, отключи pull-to-refresh в management mode и добавь accessibility action «Открыть архив» и Reduce Motion fallback.
 
-Сделай waitlist toggle, capacity summary и server capability validation для online payments. Visibility всей сущности задаётся отдельно по существующему контракту и не смешивается со способом набора.
+Manage card ведёт на канонический /manage route с permission revalidation. Profile activity не получает эти controls.
 
-Правила:
-- invitation_only скрывает public join action, но не обязательно делает сущность непубличной;
-- online payment требует payout readiness; при отсутствии показать block и путь настройки, не fake success;
-- external payment не создаёт platform payment;
-- не добавляй ручное изменение online payment status организатором.
-
-Тесты: все 9 комбинаций policies, full capacity/waitlist, payout unavailable и draft persistence.
-
-Commit: feat: implement game enrollment and price step
+Через iOS-плагин проверь gesture conflict, haptics only if approved, scroll и back from archive.
+Проверки: state/gesture tests и unauthorized manage route.
+Commit: feat: implement contextual management mode and archive gesture
 ```
 
-## 029 — Создание игры: шаг 4 «Проверка и публикация»
+## 034 — Мастер создания игры — shell и draft
 
 ```text
-Реализуй финальный шаг game.create.
+Реализуй game.create как мастер ровно из четырёх шагов: Что и когда; Место и формат; Участие и цена; Проверка и публикация.
 
-Сделай review sections по трём предыдущим шагам, edit links с возвратом, validation summary и Publish action.
+Сохраняй draft в local repository и Supabase drafts только после auth/backend availability. Обязательны actorId, returnTo, «Создать как», resume после закрытия и безопасное удаление draft. UI stepper не создаёт отдельные routes, если контракт их не требует.
 
-Перед публикацией authoritative server check проверяет actor capability, время, venue reference, format capacity, enrollment/payment config и payout readiness. Двойное нажатие идемпотентно.
+Не реализуй поля следующих промтов; добавь typed form model, placeholders и validation boundary. Permission resolver проверяет возможность создания active actor.
 
-После успеха:
-- published game получает canonical gameId;
-- создаётся/привязывается один event conversation согласно контракту;
-- draft помечается completed;
-- route ведёт на game.manage или game.details согласно product action, сохраняя корректный back context.
-
-При частичной server ошибке не показывай published. Не формируй матчи автоматически, если контракт требует отдельного действия владельца.
-
-Тесты: stale review, price changed, idempotency, server rejection, successful redirect.
-
-Commit: feat: complete game publishing wizard
+Через iOS-плагин проверь keyboard, swipe-back protection при dirty draft, resume и safe area CTA.
+Проверки: draft state-machine и navigation tests.
+Commit: feat: build four-step game creation shell
 ```
 
-## 030 — Страница игры: guest variant
+## 035 — Создание игры: «Что и когда»
 
 ```text
-Реализуй game.details для guest/stranger, сохраняя единый canonical экран.
+Реализуй первый шаг game.create.
 
-Используй гибридную light-first композицию: компактная hero/visual зона, ключевая информация, вкладки Обзор · Участники · Матчи · Чат и sticky primary action, когда применимо.
+Поля: название, короткое описание при наличии контракта, дата, start/end одного временного окна. Используй native date/time controls через совместимые Expo modules и timezone-safe serialization. Запрети end <= start, прошедшую публикацию и пустое название; draft может хранить неполное значение.
 
-Guest видит разрешённые публичные данные: формат, организатор, дата/время, место, заполненность, цена, правила и ограниченный preview участников. Guest не видит payment statuses, сообщения чата, закрытые результаты или manage controls.
+Не добавляй recurring rule, сезонный диапазон или несколько игровых дней. Ошибки показываются рядом с полями и в summary для accessibility.
 
-Главное действие одно: `Вступить`; resolver определяет дальнейший flow. Для invitation-only без активного приглашения action скрыт и показывается текстовый статус.
-
-Не додумывай полный визуал definition_pending блоков; создай совместимые slots.
-
-Тесты: public/private, no places, registration closed, invitation only, deep link и no sensitive fields.
-
-Commit: feat: implement public game details
+Через iOS-плагин проверь date/time picker, locale ru-RU, keyboard и 200% text.
+Проверки: validation/timezone unit tests и resume draft.
+Commit: feat: implement game creation timing step
 ```
 
-## 031 — Invitation details и переход к игре
+## 036 — Создание игры: «Место и формат»
 
 ```text
-Реализуй invitation.details для game/training/tournament/tour через общий invitation feature, но в этом промте полноценно протестируй game invitation.
+Реализуй второй шаг game.create по GAME_FORMATS.yaml и GAME_TUNISIAN_LADDER.yaml.
 
-Сделай:
-1. Контекст события, пригласивший actor, срок и условия.
-2. Действия Принять приглашение и Отказаться только здесь.
-3. Acceptance не означает оплату: free→confirmed, online→payment_required, external→confirmed_external_payment_unverified.
-4. Нерешённое приглашение не появляется в Profile activity и не даёт chat access.
-5. Повторное открытие resolved invitation показывает итог и link к canonical entity.
-6. Expired/revoked/stale capacity обрабатываются authoritative response.
-7. Decline требует подтверждения только если контракт это допускает; не добавляй лишний friction.
+Поля: venue/place, court/count where applicable, формат разовой игры и форматные параметры. Показывай только утверждённые режимы: фиксированные пары 2×2, фиксированные команды 4×4 и Тунисская лестница. Для лестницы доступны 1/2/3 площадки и автоматически ожидаются 5/10/15 игроков, но матчи на площадку и циклы вводятся отдельно.
 
-Тесты: accept idempotency, expired, revoked, online payment state и activity/chat boundary.
+Не показывай удалённые tournament formats и сезоны. Venue picker может быть repository-backed placeholder, если каталог площадок не готов.
 
-Commit: feat: implement invitation resolution flow
+Через iOS-плагин проверь conditional fields и keyboard.
+Проверки: format validation matrix и no forbidden options.
+Commit: feat: implement game venue and format step
 ```
 
-## 032 — Страница игры: participant и organizer viewing variants
+## 037 — Создание игры: «Участие и цена»
 
 ```text
-Расширь game.details, не создавая отдельные экраны.
+Реализуй третий шаг по JOIN_FLOW.yaml.
 
-Participant:
-- статус `Вы участвуете`;
-- полный разрешённый список участников;
-- собственная payment cell с Оплатить/Повторить/статусом;
-- матчи и статистика read-only;
-- canonical event chat;
-- для Тунисской лестницы: моя площадка, текущий цикл, подтверждённые переходы.
+Visibility: публичная/непубличная. Enrollment policy: сразу записываются, отправляют заявку, только по приглашению. Payment policy: бесплатно, онлайн, организатору вне приложения. Эти измерения независимы. Добавь capacity, waitlist toggle и price/currency only when applicable.
 
-Organizer на публичном details:
-- badge `Вы организатор`;
-- действие `Управлять` на /games/:gameId/manage;
-- данные остаются в view mode, editable поля не появляются.
+Online payment publish остаётся blocked/definition_pending, если payout/provider не настроен; не симулируй оплату. External payment не создаёт platform payment record. Сервер повторно проверит policies при публикации.
 
-Delegated manager также не получает поля счёта на public page. Оплата за другого запрещена.
+Через iOS-плагин проверь radios/switches, conditional price field и accessibility.
+Проверки: combination matrix и validation tests.
+Commit: feat: implement game enrollment and pricing step
+```
 
-Тесты: role switching, owner vs manager, own payment only, chat membership, permission revoked while open.
+## 038 — Проверка и публикация игры
 
-Commit: feat: add participant and organizer game details variants
+```text
+Реализуй четвёртый шаг и transactional publish.
+
+Review показывает creator actor, дату/время, место, формат, capacity, join/payment policies и предупреждения. Перед mutation сервер повторно валидирует permission, capacity model, format constraints и payment readiness. Double tap/retry использует idempotency key; при ошибке draft сохраняется.
+
+После успеха создай game, owner participant/manager relation по контракту, canonical conversation при publish policy и переход на game.details. Не создавай матчи автоматически, если формат требует отдельного действия owner.
+
+Через iOS-плагин проверь sticky CTA, loading, error retry и success navigation.
+Проверки: integration/idempotency tests и RLS.
+Commit: feat: publish validated game drafts
+```
+
+## 039 — Аудит каталога и создания игры
+
+```text
+Audit-only. Не добавляй новые форматы или поля.
+
+Проверь 030–038: schema/RLS, public/participating/managing queries, invitation block, archive gesture, draft lifecycle, четыре шага, forbidden seasons, payment readiness и transactional publish. Создай smoke seed и пройди создание public free game, private invite-only game и Tunisian ladder draft.
+
+Через iOS-плагин проверь каталог, management gesture, мастер на 320/430 pt, native date/time, keyboard и offline error.
+
+Исправляй только доказанные дефекты категории. Отчёт отдельно перечисляет backend, UI и manual provider blockers.
+Проверки: full block integration, validators и secret scan.
+Commit: test: audit games catalog and creation flow
 ```

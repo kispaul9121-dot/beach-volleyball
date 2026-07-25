@@ -1,163 +1,141 @@
-# Блок 5 — управление игрой и игровые форматы
+# Блок 5 — страница игры, управление и форматы
 
-## 033 — Manage shell и обзор игры
+## 040 — Game details shell и обзор
 
 ```text
-Реализуй game.manage shell и вкладку Обзор.
+Подключи game.details к Supabase projection и сохрани канонический route /games/:gameId.
 
-Прочитай game-manage.md, GAME_MVP.yaml, CAPABILITIES.yaml и ENTITY_SECTIONS.yaml.
+Собери hybrid navigation: Обзор, Участники, Матчи, Чат. Верхняя часть показывает title, format, organizer, date/time, place/court, capacity и price. Role resolver выбирает guest, invited/requested/waitlisted, participant и organizer presentation без создания отдельных экранов.
 
-Сделай:
-1. Server permission guard для entity_manager.
-2. Верхнюю панель: back в management catalog, статус, actor-владелец, preview participant page, overflow actions по правам.
-3. Ровно четыре раздела: Обзор, Участники, Матчи, Чат.
-4. Overview показывает readiness, дату/время, место, формат, заполненность, policies и состояние матчей.
-5. Для Тунисской лестницы — площадки, игроков, матчи/цикл, текущий цикл и pending movements.
-6. Редактирование общих параметров открывается отдельным action/flow; не превращай overview в форму.
-7. Delegated manager видит manage shell, но это не даёт owner-only score commands.
+Обзор может содержать previews, но не дублирует полные списки. Loading/removed/cancelled/rescheduled/error/offline имеют явные состояния. Публичная страница остаётся read-only даже для owner; управление открывается отдельным action.
 
-Тесты: owner/manager/no permission, cancelled/completed, stale capability и preview link.
-
-Commit: feat: implement game management overview
+Через iOS-плагин проверь tabs, sticky CTA, safe area и deep link.
+Проверки: role projection tests и canonical route invariant.
+Commit: feat: connect canonical game details shell
 ```
 
-## 034 — Управление участниками игры
+## 041 — Game details для гостя
 
 ```text
-Реализуй вкладку Участники game.manage.
+Реализуй guest variant game.details по JOIN_FLOW.yaml.
 
-Сделай:
-1. Списки confirmed, requests, waitlist и invitations в соответствии со статусами.
-2. Имя, фамилия, participation status, payment display и назначение pair/team/court.
-3. Add/remove через единый player picker и permission entity_inviter.
-4. Approve/decline requests с capacity revalidation.
-5. Promote from waitlist authoritative command.
-6. Организатор не меняет online payment status вручную.
-7. Другие строки показывают только Оплачено/Не оплачено/Бесплатно; чужой Pay action отсутствует.
-8. Удаление игрока после генерации матчей показывает impact и следует утверждённой lifecycle policy; не перестраивает матчи молча.
+Покажи public preview, формат и правила, свободные места, цену, organizer и единое основное действие «Вступить». Resolver после нажатия определяет immediate/request/payment/waitlist/unavailable. Не показывай полный participant payment status, закрытые данные, chat messages или owner controls.
 
-Тесты: duplicate participant, full capacity race, remove with matches, permission loss и payment immutability.
+Для invitation-only без active invitation действие скрыто или заменено понятным статусом. Capacity и policy повторно проверяются сервером перед mutation; offline не подтверждает участие оптимистично.
 
-Commit: feat: implement game participant management
+Через iOS-плагин проверь CTA, no-places/registration-closed states и VoiceOver.
+Проверки: join resolver component/integration tests и RLS.
+Commit: feat: implement guest game details and join entry
 ```
 
-## 035 — Общая таблица матчей и owner-only ввод счёта
+## 042 — Game details для приглашённого
 
 ```text
-Реализуй reusable GameMatchTable и вкладку Матчи · Статистика без логики конкретного генератора.
+Реализуй состояние active unresolved invitation на game.details.
 
-Сделай:
-1. Mobile compact rows и wide table по контракту.
-2. Поля: №, площадка/время, сторона A, счёт, сторона B, статус.
-3. Participant, captain и delegated manager получают read-only view.
-4. Только entity_owner_actor получает inline score fields, Save, Correct, Generate games и Add game.
-5. Save идемпотентен; correction требует причины и audit event.
-6. Result status не определяется только цветом.
-7. При offline сохранение не показывается как успешное; можно сохранить local draft ввода с явной маркировкой, если архитектура storage это поддерживает.
-8. Не реализуй pairing algorithms здесь.
+В верхней части покажи restrained success/green block с label ПРИГЛАШЕНИЕ, inviter/organizer и действием «Открыть приглашение». Оно ведёт на invitation.details; accept/decline на game.details запрещены. До принятия пользователь не считается participant, не появляется в Profile activity и не получает chat access.
 
-Тесты: permission matrix, validation счёта, double submit, correction audit и 200% text scaling.
+Invitation details использует authoritative status, expiry и separate accept/decline mutations. Принятие не означает оплату автоматически; после accept resolver применяет payment policy.
 
-Commit: feat: add owner controlled game match table
+Через iOS-плагин проверь блок, expiry state, back и переход после accept.
+Проверки: invitation lifecycle и no premature participation/chat tests.
+Commit: feat: add invited game details state
 ```
 
-## 036 — Фиксированные пары 2×2
+## 043 — Game details для участника
 
 ```text
-Реализуй domain strategy standard_2x2 и её управление.
+Реализуй confirmed/payment-required participant variant.
 
-Правила продукта: пары фиксированы, по очереди играют друг с другом, результаты сохраняет владелец.
+Открой полный список участников в разрешённой проекции, матчи/статистику read-only и canonical conversation. В собственной participant row online_unpaid показывай «Оплатить»; после processing/success заменяй статус без layout jump. За другого участника платить нельзя. Чужие строки показывают только Оплачено/Не оплачено/Бесплатно.
 
-Сделай:
-1. Pair assignment из confirmed players; один игрок не может быть в двух парах.
-2. При нечётном числе игроков generation блокируется с понятной ошибкой, если запасные не утверждены контрактом.
-3. Для трёх пар пример даёт три уникальных матча.
-4. Поддержи organizer-defined one or more rounds только если GAME_FORMATS это разрешает; иначе один круг.
-5. Ручное добавление матча валидирует стороны и дубликаты, но owner может подтвердить допустимый повтор с явным reason, если контракт допускает.
-6. Statistics: played, wins, losses, points for/against/difference; tie-break order только из контракта.
+Добавь useful summary «Ваш следующий матч» при наличии данных. Для Тунисской лестницы показывай текущую площадку, цикл и confirmed movements. Editable score controls отсутствуют.
 
-Property tests: N pairs → N(N-1)/2 matches для одного круга, симметрия, уникальность, no self-match.
-
-Commit: feat: implement fixed pair 2x2 games
+Через iOS-плагин проверь participant tabs, own payment row, chat access и 200% text.
+Проверки: own-row permission tests и read-only match UI.
+Commit: feat: implement participant game details state
 ```
 
-## 037 — Фиксированные команды 4×4 и ручная серия
+## 044 — Game details для организатора
 
 ```text
-Реализуй standard_4x4/fixed_team_match без добавления новых правил замен.
+Реализуй organizer/owner presentation на публичной странице без превращения её в editor.
 
-Сделай:
-1. Team builder с уникальным membership.
-2. Для двух команд — один матч или organizer-configured series, если поле существует в контракте.
-3. Для большего количества — утверждённый ordered/round-robin match list только внутри разовой игры, не tournament entity.
-4. Неполный состав блокирует публикацию/генерацию согласно min team size.
-5. Запасные и замены: если definition_pending, сохрани typed optional roster slots и UI placeholder без фактической substitution logic.
-6. Match table и owner-only result flow переиспользуются из 035.
-7. Statistics по командам; player individual statistics не выдумывать.
+Покажи status «Вы организатор» и primary action «Управлять», ведущий на /games/:gameId/manage после permission revalidation. Preview participant view остаётся доступным из manage header. На game.details не должно быть inline score, add/remove player, regenerate или settings forms.
 
-Тесты: duplicate player, min roster, series count, manual team edit impact и no tournament bracket.
+Delegate manager также может получить manage entry согласно capability, но owner-only result distinction сохраняется. При revoked permission вернуть public details с notice.
 
-Commit: feat: implement fixed team game format
+Через iOS-плагин проверь organizer/manager variants, deep link к manage и back fallback.
+Проверки: no editable controls on public page и permission redirects.
+Commit: feat: add organizer entry to game management
 ```
 
-## 038 — Тунисская лестница: генератор одной площадки
+## 045 — Участники, заявки, waitlist и собственная оплата
 
 ```text
-Реализуй чистый domain generator rotation_five для 1 площадки и 5 игроков.
+Реализуй game.manage → Участники и соответствующий read-only participant section.
 
-Сделай:
-1. Сгенерируй все 15 уникальных match compositions: один отдыхает, остальные делятся на две пары.
-2. Для полного 15-match cycle каждый играет 12 матчей, отдыхает 3 раза и является партнёром каждого другого 3 раза.
-3. При planned count <15 выбери детерминированный balanced subset.
-4. При >15 добавляй seeded shuffled repeated cycles и возвращай warning о повторах.
-5. Генератор получает stable player IDs и seed; UI names не участвуют.
-6. Не добавляй movement, несколько площадок или сезон.
-7. Возвращай explainable metadata для preview fairness.
+Owner/разрешённый manager может approve/decline request, move from waitlist, add player через canonical picker и remove player с audit reason. Online payment status нельзя менять вручную. Participant payment action доступно только owner собственного payment record; manager видит status, но не нажимает чужую оплату.
 
-Property tests для всех перестановок пяти IDs и counts 1,14,15,16,30; никакого игрока дважды в одном матче.
+Все mutations idempotent, проверяют capacity и current status на сервере. Concurrent approval последнего места должен дать один success и корректный waitlist result.
 
-Commit: feat: implement five player tunisian generator
+Через iOS-плагин проверь длинный список, swipe/menus если используются, confirmation sheets и own payment row.
+Проверки: concurrency, RLS и audit event tests.
+Commit: feat: implement game participant and request management
 ```
 
-## 039 — Тунисская лестница: 2–3 площадки, циклы и переходы
+## 046 — Фиксированные пары 2×2
 
 ```text
-Расширь Тунисскую лестницу на 2/3 площадки, сохраняя generator 038 независимым.
+Реализуй game format fixed_pairs_2v2 как разовую игру, не как tournament round-robin format.
 
-Сделай:
-1. Конфигурации только 10→2 и 15→3, ровно 5 на площадке.
-2. Initial distribution: manual/rating/random только если перечислено в контракте; иначе manual + deterministic random foundation.
-3. Матчи генерируются отдельно по каждой пятёрке и циклу.
-4. После завершённого нефинального цикла rank 1 нижней площадки идёт вверх, rank 5 верхней вниз.
-5. Все границы рассчитываются одновременно; top leader и bottom last остаются.
-6. Owner видит preview и подтверждает movements; delegated manager read-only.
-7. Следующий цикл создаётся только после confirmation и получает новые составы.
-8. Финальный цикл показывает final positions и не создаёт новый.
-9. One date/single event window; season fields запрещены.
+Owner формирует фиксированные пары из confirmed participants, задаёт порядок матчей или генерирует «каждая пара с каждой» внутри одной игры. При трёх парах получается три матча. Пары не меняются автоматически между матчами. Нечётный/неполный состав блокирует generation с понятной ошибкой.
 
-Тесты: 2/3 courts, simultaneous swap, tie-break, correction before/after movement и no duplicate player across courts.
+Матчи сохраняются через game match repository; statistics считает played/wins/losses/points/difference по утверждённому порядку. Score editable только actor-owner.
 
-Commit: feat: implement multi court tunisian ladder
+Через iOS-плагин проверь compact match rows и score input keyboard.
+Проверки: generator invariants, duplicate match prevention и owner-only mutation.
+Commit: feat: implement fixed-pairs 2v2 game format
 ```
 
-## 040 — Статистика разовой игры
+## 047 — Тунисская лестница
 
 ```text
-Реализуй derived statistics layer для всех утверждённых игровых форматов.
+Реализуй one-off Tunisian ladder строго по GAME_TUNISIAN_LADDER.yaml.
 
-Источником являются только сохранённые result events; ручной ввод totals запрещён.
+Конфигурации: 1 площадка/5 игроков, 2/10, 3/15. Organizer задаёт positive match_count_per_court и cycle_count; default 15 матчей. Для каждой пятёрки полный цикл из 15 уникальных compositions обеспечивает 12 игр и 3 отдыха каждому, три партнёрства с каждым другим. При >15 добавляются shuffled repeated cycles с предупреждением.
 
-Сделай:
-1. Общий read model played/wins/losses/points for/against/difference.
-2. Для fixed pairs/teams — team standings.
-3. Для Тунисской лестницы — individual standings per court/cycle и итоговые positions.
-4. Tie-break order берётся из GAME contracts и отображается пользователю.
-5. Correction пересчитывает статистику детерминированно.
-6. Partial results дают provisional status.
-7. Не добавляй глобальный рейтинг игрока или сезонную статистику.
-8. Оптимизируй через memoized/read projection только после correctness tests.
+После завершения цикла одновременно вычисляй leader up и last down по каждой границе, показывай preview и требуй owner confirmation. Следующий цикл генерируется после движения; после последнего — final positions. Сезон не создаётся.
 
-Tests: empty, partial, ties, corrections, movement ranks и reproducibility.
+Через iOS-плагин проверь 1/2/3 court UI, cycle/court switchers и readable standings.
+Проверки: property tests генератора и simultaneous movement.
+Commit: feat: implement one-off Tunisian ladder engine
+```
 
-Commit: feat: derive one off game statistics
+## 048 — Owner-only результаты, correction и audit
+
+```text
+Реализуй game.manage → Матчи/Статистика и owner-only result entry.
+
+Только actor-владелец видит editable score, «Сформировать игры», «Добавить игру», save и correction. Delegate manager, captain и participant получают read-only rows. Первый сохранённый result блокирует silent regeneration; reset требует destructive confirmation и audit reason. Correction создаёт immutable result event/version с actor/user/time/reason.
+
+Server mutation повторно проверяет owner capability и match status. Concurrent save обрабатывается version check. Statistics обновляется из authoritative result events, а не локального ввода.
+
+Через iOS-плагин проверь numeric keyboard, row layout, correction sheet и disabled states.
+Проверки: permission negative tests, optimistic conflict и audit history.
+Commit: feat: enforce owner-only game results and audit trail
+```
+
+## 049 — Аудит разовых игр
+
+```text
+Audit-only. Не добавляй новые game formats.
+
+Проверь 040–048 для guest, invited, requested, waitlisted, participant, delegate manager и owner. Пройди join/payment visibility, canonical chat, participant management, fixed pairs, Tunisian 1/2/3 courts, owner-only results, correction/reset и offline behavior.
+
+Запусти property tests: fixed pair combinations; Tunisian 15 unique matches, balanced rests/partners, repeated cycles, simultaneous movements. Проверь запрет сезонов и отсутствие tournament bracket на one-off game.
+
+Через iOS-плагин выполни сквозной game flow и screenshot key states.
+Проверки: RLS, format validators, navigation/action validators и regression report.
+Commit: test: audit one-off game flows and formats
 ```

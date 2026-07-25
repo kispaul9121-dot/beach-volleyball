@@ -1,164 +1,141 @@
-# Блок 3 — оболочка, профиль и каталог
+# Блок 3 — профиль и личные разделы
 
-## 017 — Профиль как корневая вкладка
+## 020 — Profile repository на Supabase
 
 ```text
-Реализуй home.main как компактный корневой экран active actor.
+Подключи базовый home.main из промта 001 к реальным Supabase read models.
 
-Прочитай PROFILE_ACTIVITY.yaml, PROFILE_CONNECTIONS.yaml и home/main.md.
+Создай ProfileRepository и один агрегированный query/view для active actor: header, counts, ближайшая активность и доступные переходы. Не выполняй много независимых запросов из каждого компонента. Fixtures сохрани только для tests/Storybook/dev fallback и никогда не смешивай их с production response.
 
-Сделай:
-1. Header active actor с открытием actor.switcher.
-2. Ближайшие подтверждённые участия и переход ко всей активности.
-3. Компактные связи: мои игроки, тренерские/организационные контексты только когда разрешены.
-4. Никакой кнопки +, создания или управления событиями.
-5. Не показывай нерешённое приглашение как участие.
-6. Для trainer/organization адаптируй данные, но не меняй структуру нижней навигации.
-7. Состояния empty, loading, error, offline cached и actor unavailable.
+Проверь RLS: account видит собственный private projection и только разрешённые public данные других actors. Добавь loading, stale, empty, error и offline read-only state.
 
-Тесты: no create action, canonical entity link, actor switch preservation и invitation exclusion.
-
-Commit: feat: implement profile home tab
+Через iOS-плагин проверь переход от skeleton к данным, длинные имена и refresh.
+Проверки: repository integration tests, query count, RLS negatives.
+Commit: feat: connect profile home to Supabase read model
 ```
 
-## 018 — Единая личная активность и совместимые фильтры
+## 021 — Шапка профиля и actor context
 
 ```text
-Реализуй profile.activity и совместимые route views profile.my_games, competitions, trainings и trips без копирования четырёх отдельных списков.
+Доработай ProfileHeaderCard без изменения маршрутов.
 
-Сделай один ActivityFeed engine с параметрами type/status/timeframe. Root показывает Предстоящие/Прошедшие; совместимые маршруты передают preset и сохраняют back_fallback.
+Покажи avatar, display name, actor type, verification/status badge и безопасный вход в actor.switcher. Для player/trainer/organization используй общий компонент и разные read projections, а не три копии. Privacy-sensitive поля не выводятся без разрешения.
 
-Правила:
-- участие, заявка, payment_required и waitlist отображаются с разными status labels;
-- unresolved invitation не входит в activity;
-- управление здесь отсутствует;
-- завершённые события открывают canonical details/archive state;
-- фильтры восстанавливаются после возврата;
-- пагинация не смешивает active actor ownership с личным участием человека.
+Avatar upload пока использует Storage adapter interface; если UX crop/upload не утверждён, оставь display-only placeholder и отдельное future action. Поддержи длинные русские названия, отсутствие фото и 200% text.
 
-Тесты: presets, empty per filter, duplicate suppression, timezone/date boundaries и deep links.
+Через iOS-плагин проверь VoiceOver order, touch target switcher и light/dark.
+Проверки: component variants и privacy projection tests.
+Commit: feat: refine profile header and actor context
+```
 
+## 022 — Лента личной активности
+
+```text
+Реализуй profile.activity как единую личную ленту участий, заявок, ожидания и завершённых событий.
+
+Создай Supabase view/query с cursor pagination и фильтрами по типу/периоду. Экран не показывает управление: карточка ведёт на канонический detail screen. Unresolved invitation отображается в утверждённом месте и не считается participation до принятия.
+
+Сохрани разделение Предстоящие/Прошедшие, loading/empty/error/offline и stable sorting. Не создавай отдельные copies game/training/tournament rows.
+
+Через iOS-плагин проверь длинный список, filters, scroll restoration и deep link.
+Проверки: pagination, status mapping и no-manage-controls tests.
 Commit: feat: implement unified personal activity feed
 ```
 
-## 019 — Настройки root и appearance preference
+## 023 — Раздел «Мои игроки»
 
 ```text
-Реализуй profile.main и минимальную навигацию настроек.
+Реализуй profile.players и общий player picker на основе PLAYER_DIRECTORY.yaml.
 
-Область: account summary, actor profiles link, payments link, security/privacy placeholders и appearance selector light/dark/system.
+Мои игроки — односторонний сохранённый список active actor; добавление не требует подтверждения и не создаёт участие. В player.picker доступны Мои игроки, Недавние и Поиск, обязательны entity/draft context и returnTo. Не создавай сущности друзья, подписчики, ученики или социальные группы.
 
-Не реализуй глубокие security или notification settings без соответствующего отдельного промта/контракта. Для definition_pending разделов используй строки с честным статусом «Будет доступно позже», но только если маршрут зарегистрирован; иначе не показывай кликабельность.
+Добавь Supabase tables/indexes/RLS только если их нет. Search должен быть debounced, paginated и privacy-safe. Full-screen modal скрывает bottom tabs.
 
-Appearance изменяет runtime theme из промта 006 и сохраняется. Основной default — light.
-
-Тесты: theme persistence, unavailable route has no press action, actor-specific finance visibility и no archives in Settings.
-
-Commit: feat: implement settings root and appearance
+Через iOS-плагин проверь search keyboard, selection, dismiss и returnTo.
+Проверки: duplicate save, unauthorized private fields и picker context tests.
+Commit: feat: implement player directory and canonical picker
 ```
 
-## 020 — Управление actor-профилями
+## 024 — Мой календарь
 
 ```text
-Реализуй profile.actor_profiles поверх actor service промта 015.
+Реализуй profile.calendar как read-only agenda из личных участий и управляемых событий account.
 
-Сделай:
-1. Список player/trainer/organization profiles со статусами.
-2. Добавление optional actor через onboarding continuation.
-3. Редактирование только утверждённых полей.
-4. Отключение optional actor с impact preview; player удалить нельзя.
-5. Нельзя отключить actor при незавершённых обязательствах без authoritative server resolution.
-6. После изменения active actor корректно пересчитывается.
-7. Не добавляй staff membership в этот экран: это не actor profile.
+Сначала сделай список по датам с timezone-safe boundaries; month grid и системная Calendar integration остаются definition_pending, если не утверждены. Одна сущность не должна дублироваться из-за нескольких actor relations. Tap открывает канонический detail route.
 
-Тесты: player protection, active actor removal fallback, pending obligations и stale response.
+Подключи Supabase query/view, pagination по диапазону дат и offline cached last-success snapshot. Не сохраняй события в системный календарь без отдельного разрешения пользователя.
 
-Commit: feat: implement actor profile management
+Через iOS-плагин проверь locale ru-RU, timezone change, Dynamic Type и date navigation.
+Проверки: date boundary/unit tests и duplicate suppression.
+Commit: feat: add personal agenda calendar
 ```
 
-## 021 — Мои игроки и единый player picker
+## 025 — Фильтры «Мои игры/тренировки/турниры/кэмпы»
 
 ```text
-Реализуй profile.players и инфраструктуру player.picker.
+Реализуй profile.my_games, profile.trainings, profile.competitions и profile.trips как совместимые filtered views поверх profile.activity repository.
 
-Прочитай PLAYER_DIRECTORY.yaml и shared/player-picker.md.
+Не создавай отдельные таблицы данных и не копируй карточки. Каждый экран задаёт только тип фильтра, пользовательские подписи и back_fallback. Управление здесь запрещено; manage routes остаются в контекстном management mode соответствующего каталога.
 
-Profile screen:
-- односторонний список сохранённых игроков active actor;
-- поиск/добавление без подтверждения дружбы;
-- открытие public player profile;
-- trainer requests показывай только по утверждённому контракту.
+Поддержи Предстоящие/Прошедшие или утверждённые статусы, empty/error/offline и direct deep links.
 
-Picker modal:
-- вкладки Мои игроки, Недавние, Поиск;
-- single/multi select по контексту;
-- обязательные entity/draft context и returnTo;
-- не даёт доступ к закрытым данным;
-- не создаёт участие до подтверждённого действия вызывающего сценария.
-
-Тесты: duplicate selection, context isolation, permission revoked, cancel preserves draft.
-
-Commit: feat: implement player directory and picker
+Через iOS-плагин проверь четыре экрана, back gesture и сохранение filter state.
+Проверки: shared repository tests и отсутствие manage actions.
+Commit: feat: add typed personal activity filters
 ```
 
-## 022 — Каталог Игры: discovery, категории и приглашения
+## 026 — Публичный профиль игрока
 
 ```text
-Реализуй discovery-состояние play.main.
+Реализуй player.public_profile по privacy policy и relationship variant stranger/saved_player/owner.
 
-Сделай:
-1. Категории Игры, Тренировки, Турниры.
-2. Публичный каталог с сортировкой ближайшее сначала.
-3. Приоритетный блок `Вас пригласили · N` над категориями, максимум две карточки.
-4. Invitation card: semantic green emphasis, badge ПРИГЛАШЕНИЕ, action только Открыть.
-5. Accept/decline внутри invitation.details, не inline.
-6. Турниры имеют только Все · Классика и два формата.
-7. `Король пляжа` в поиске ведёт к разовой Тунисской лестнице.
-8. Search/filter shell использует зарегистрированные actions; сложные фильтры могут остаться placeholder при definition_pending.
+Покажи только разрешённые спортивные данные, общие события/статистику если контракт позволяет, и действие сохранить/убрать из Моих игроков. Закрытые контакты, платежи, memberships и private activity не должны попадать даже в client response.
 
-Тесты: invitation count, public visibility, search alias, category restoration и guest access.
+Создай отдельный public Supabase projection/view с RLS, а не фильтрацию полной private модели в UI. Owner получает переход к настройкам, но не второй профильный экран.
 
-Commit: feat: implement play discovery catalog
+Через iOS-плагин проверь variants, длинный контент, VoiceOver и deep link.
+Проверки: public/private field leakage tests.
+Commit: feat: implement privacy-safe public player profile
 ```
 
-## 023 — Режим управления и pull-down архив
+## 027 — Публичный профиль тренера как безопасная основа
 
 ```text
-Реализуй management mode play.main по MANAGEMENT_CENTER.yaml.
+Реализуй trainer.public_profile только в объёме утверждённой спецификации.
 
-Сделай:
-1. Явное переключение `Режим управления`.
-2. Категории games/trainings/tournaments и фильтры Все, Черновики, Требуют действий, Опубликованы, Идут.
-3. Показывай только сущности, которыми active actor реально может управлять.
-4. Creation entry находится здесь, а не в Профиле.
-5. Archive открывается overscroll pull-down: reveal 24dp, armed 72dp, утверждённые подписи.
-6. Pull-to-refresh в management mode отключён; accessibility action `Открыть архив` обязателен.
-7. Reduce Motion использует статичную индикацию.
-8. Route `/play?mode=archive` read-only и не показывает create controls.
+Покажи identity, verification state, краткую professional information и канонические переходы. Расписание, reviews и request-to-trainer используют typed placeholders/feature flags, если схемы или moderation rules definition_pending. Не создавай фиктивные оценки и доступность.
 
-Тесты: gesture thresholds, refresh conflict, permission loss fallback, category preserved, completed excluded from active.
+Supabase public projection не раскрывает private trainer/account data. Organization manager variant получает только разрешённые действия.
 
-Commit: feat: implement contextual management and archive
+Через iOS-плагин проверь guest/authenticated/owner/organization variants и accessibility.
+Проверки: role projection tests и no invented data.
+Commit: feat: add safe trainer public profile foundation
 ```
 
-## 024 — Контрольный аудит оболочки, профиля и каталога
+## 028 — Статистика и платежи профиля — каркас
 
 ```text
-Audit-only. Проверь промты 017–023 и не добавляй новые разделы.
+Подключи profile.statistics и profile.payments к typed read model boundaries без изобретения финансовой аналитики.
 
-Проверь:
-- ровно одна нижняя навигация;
-- Профиль не содержит create/manage;
-- Settings не содержит личные архивы;
-- activity не содержит unresolved invitations;
-- invitation block не принимает приглашение inline;
-- player picker не создаёт участие;
-- management mode фильтруется capabilities;
-- archive не имеет постоянной кнопки и доступен screen reader;
-- возврат восстанавливает category/filter/scroll;
-- 320px и 200% text scaling не ломают chips/header/tab bar.
+Статистика показывает только метрики, уже определённые контрактами и доступные из данных; неизвестные графики остаются definition_pending. Платежи разделяют личные orders/refunds и organization payouts по active actor permissions. Не смешивай собственную оплату участия с ручным управлением чужими платежами.
 
-Добавь navigation integration tests и исправь только дефекты блока. Обнови IMPLEMENTATION_STATUS.
+Добавь loading/empty/error/offline и deep links к payment.details. Реальный provider будет подключаться в блоке платежей.
 
-Commit: test: audit shell profile and catalog flows
+Через iOS-плагин проверь tables/cards, ru-RU currency formatting и 200% text.
+Проверки: permission projections и no fabricated totals.
+Commit: feat: scaffold profile statistics and payments views
+```
+
+## 029 — Аудит категории профиля
+
+```text
+Audit-only. Не добавляй новые секции профиля.
+
+Проверь 020–028: количество запросов home, activity pagination, player directory, picker returnTo, calendar date boundaries, filtered views, public privacy projections, trainer placeholders, statistics/payments permissions. Убедись, что Профиль не содержит создание/управление событиями, а Настройки не подменяют личную активность.
+
+Через iOS-плагин пройди root Profile и все вложенные routes при light/dark, 320/430 pt, 200% text и VoiceOver. Запусти RLS negative tests на public/private fields.
+
+Исправляй только доказанные ошибки категории.
+Проверки: integration suite, navigation validators, privacy report.
+Commit: test: audit profile and personal activity category
 ```

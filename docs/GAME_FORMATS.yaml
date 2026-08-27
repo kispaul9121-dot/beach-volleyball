@@ -1,0 +1,235 @@
+version: 10
+
+formats:
+  standard_2x2:
+    title: 2×2
+    participant_unit: individual_or_fixed_pair
+    players_on_court: 4
+    team_size: 2
+    capacity:
+      organizer_enters_participant_capacity: true
+      minimum_players_per_court: 4
+      may_exceed_active_players_for_rotation_or_reserve: true
+      must_not_exceed_venue_limit: true
+    lineup_modes:
+      fixed_pairs:
+        organizer_assigns_pairs: true
+        auto_pairing_optional: true
+        default_match_generation: round_robin
+        example_six_players:
+          players: 6
+          pairs: 3
+          matches: 3
+          explanation: Каждая из трёх пар играет с двумя другими парами.
+      manual:
+        organizer_adds_matches_one_by_one: true
+    configuration:
+      sets_or_single_score: configurable
+      points_per_set_or_match: configurable
+      fixed_pairs: configurable
+      rating_effect: configurable
+    one_off_game_view:
+      primary: match_table
+      each_row:
+      - match_number
+      - pair_a
+      - score
+      - pair_b
+      - result_status
+      score_entry_permission: entity_owner_actor
+      delegated_manager_score_view: read_only
+      participant_score_view: read_only
+      statistics:
+      - played
+      - wins
+      - losses
+      - points_for
+      - points_against
+      - point_difference
+
+  standard_4x4:
+    title: 4×4
+    participant_unit: individual_or_fixed_team
+    players_on_court: 8
+    team_size: 4
+    capacity:
+      organizer_enters_participant_capacity: true
+      minimum_players_per_court: 8
+      may_exceed_active_players_for_substitutions_or_reserve: true
+      must_not_exceed_venue_limit: true
+    lineup_modes:
+      fixed_teams:
+        organizer_assigns_teams: true
+        default_match_generation: round_robin_when_more_than_two_teams
+        two_teams_generate_one_match: true
+      manual:
+        organizer_adds_matches_one_by_one: true
+    configuration:
+      sets_or_single_score: configurable
+      points_per_set_or_match: configurable
+      substitutions: configurable
+      rating_effect: configurable
+    one_off_game_view:
+      primary: match_table
+      each_row:
+      - match_number
+      - team_a
+      - score
+      - team_b
+      - result_status
+      score_entry_permission: entity_owner_actor
+      delegated_manager_score_view: read_only
+      participant_score_view: read_only
+      statistics:
+      - played
+      - wins
+      - losses
+      - points_for
+      - points_against
+      - point_difference
+
+  rotation_five:
+    title: Тунисская лестница
+    aliases:
+    - Тунисский формат
+    - Смешанные пары
+    participant_unit: individual
+    entity_type: game
+    event_duration: one_off_single_date
+    contract: docs/GAME_TUNISIAN_LADDER.yaml
+    players_on_court: 4
+    team_size: 2
+    resting_players_per_match_per_court: 1
+    capacity:
+      organizer_selects_court_count: true
+      court_count_allowed:
+      - 1
+      - 2
+      - 3
+      players_per_court: 5
+      participant_count_formula: court_count_times_5
+      supported_participant_counts:
+      - 5
+      - 10
+      - 15
+      participant_count_editable_independently: false
+      must_not_exceed_venue_limit: true
+      reserved_courts_must_cover_selected_count: true
+    match_count_per_court:
+      entered_by_organizer: true
+      input: positive_integer
+      default: 15
+      minimum: 1
+      hard_maximum: none
+    cycle_count:
+      entered_by_organizer: true
+      input: positive_integer
+      default: 1
+      minimum: 1
+      all_cycles_same_event_date: true
+    unique_five_player_cycle:
+      unique_match_compositions: 15
+      formula: five_resting_player_choices_times_three_pair_splits
+      full_cycle:
+        matches_per_court: 15
+        appearances_per_player: 12
+        rests_per_player: 3
+        partner_occurrences_per_pair: 3
+    generation:
+      rows_per_court_equal_entered_match_count: true
+      fewer_than_fifteen: balanced_unique_subset
+      exactly_fifteen: all_unique_compositions_once
+      more_than_fifteen: repeat_new_shuffled_cycles
+      warn_about_repeats_after: 15
+      balance_waiting_time: true
+    movement_between_courts:
+      applies_when_more_than_one_court_and_another_cycle_remains: true
+      leader_of_lower_court_moves_up: true
+      last_of_higher_court_moves_down: true
+      simultaneous_across_boundaries: true
+      organizer_confirmation_required: true
+      final_cycle_creates_no_new_cycle: true
+    purpose: Разовая игра на одну дату с одной, двумя или тремя площадками по пять игроков; количество матчей на площадку и циклов задаёт организатор.
+    one_off_game_view:
+      primary: match_table
+      group_by:
+      - cycle
+      - court
+      each_row:
+      - match_number
+      - pair_a
+      - score
+      - pair_b
+      - resting_player
+      - result_status
+      score_entry_permission: entity_owner_actor
+      delegated_manager_score_view: read_only
+      participant_score_view: read_only
+      aggregate: individual_statistics_table_per_court
+      statistics:
+      - played
+      - wins
+      - points_for
+      - points_against
+      - point_difference
+      - total_personal_points
+      - rank
+    seasonal_mode_forbidden: true
+    tournament_entity_forbidden: true
+
+  fixed_team_match:
+    title: Матч фиксированных команд
+    participant_unit: pair_or_team
+    capacity:
+      organizer_enters_participant_capacity: true
+      minimum_teams: 2
+      derived_from_team_size_and_team_count: true
+      organizer_confirms_final_capacity: true
+      must_not_exceed_venue_limit: true
+    lineup_modes:
+      fixed_teams:
+        organizer_assigns_players: true
+        two_teams_generate_one_match: true
+        multiple_teams_default_match_generation: round_robin
+      manual:
+        organizer_adds_matches_one_by_one: true
+    configuration:
+      sets_or_single_score: configurable
+      points_per_set_or_match: configurable
+      deciding_set_points: configurable
+      side_change_rules: configurable
+    one_off_game_view:
+      primary: match_table
+      each_row:
+      - match_number
+      - fixed_team_a
+      - score
+      - fixed_team_b
+      - result_status
+      score_entry_permission: entity_owner_actor
+      delegated_manager_score_view: read_only
+      participant_score_view: read_only
+      statistics:
+      - played
+      - wins
+      - losses
+      - points_for
+      - points_against
+      - point_difference
+
+format_engine_rules:
+- game_format controls one playable one-off event, not a season.
+- every one-off game uses docs/GAME_MATCH_TABLE.yaml and displays a simple ordered match table.
+- tournaments may use brackets, groups, schedules and rich visual maps through tournament-specific contracts.
+- seasonal entities, modes, recurring game days and cumulative season standings are forbidden.
+- participant_capacity is entered by the organizer except for the Tunisian ladder, where it is derived as court_count × 5.
+- fixed pairs or teams generate a round-robin list by default when more than two sides exist.
+- rotation_five is the technical id of the one-off Tunisian ladder on one to three courts.
+- each Tunisian court always contains exactly five players; supported totals are 5, 10 and 15.
+- a complete non-repeating five-player court cycle contains fifteen unique match compositions.
+- movements between courts occur only between cycles inside the same one-day game.
+- only the owner actor that created the game can enter, change or publish scores in a one-off game.
+- delegated managers, captains and participants can view published match rows and statistics but never receive score inputs.
+- published lineups cannot be silently regenerated.
+- every lineup change after publication creates a notification and audit record.
+- one-off game statistics are derived from owner-organizer-saved rows in the match table.

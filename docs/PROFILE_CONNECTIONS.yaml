@@ -1,0 +1,121 @@
+version: 1
+status: approved_product_structure
+scope: profile_connections
+source_of_truth_for:
+- compact social and working relationships on home.main
+- player trainers preview
+- saved players preview
+- followed organizations preview
+naming:
+  section_title: null
+  accessible_group_label: Мои связи
+  forbidden_section_titles:
+  - Подписки
+  - Друзья
+  - Моё окружение
+  rationale:
+  - the rail is part of the profile summary rather than a separate content section
+  - trainer relationship is not a subscription
+  - saved player is not mutual friendship
+  - following an organization is not necessarily paid
+placement:
+  screen: home.main
+  position: after_profile_header_before_upcoming_timeline
+  component: ConnectionRail
+  layout: single_horizontal_connection_rail
+  full_lists_are_not_rendered_on_home: true
+player_variant:
+  cards:
+    trainers:
+      title: Мои тренеры
+      preview_items: 2
+      preview_fields:
+      - avatar
+      - display_name
+      - relationship_status
+      count_parts:
+      - active_count
+      - pending_count
+      status_examples:
+      - Тренируется у
+      - Запрос отправлен
+      empty_label: Без тренера
+      empty_action: Найти тренера
+      item_action_id: profile.open_linked_trainer
+      empty_action_id: profile.open_trainer_search
+      source_of_truth: docs/TRAINER_RELATIONSHIPS.yaml
+    players:
+      title: Мои игроки
+      preview_items: 4
+      preview_style: avatar_stack
+      count_field: saved_players_count
+      secondary_text: Сохранённые игроки
+      empty_label: Игроки ещё не добавлены
+      empty_action: Добавить игроков
+      destination: profile.players
+      source_of_truth: docs/PLAYER_DIRECTORY.yaml
+    organizations:
+      title: Организации
+      preview_items: 4
+      preview_style: logo_stack
+      count_field: followed_organizations_count
+      secondary_text: Отслеживаю
+      optional_category_summary:
+      - games
+      - trainings
+      - tournaments
+      - camps
+      empty_label: Организации не отслеживаются
+      empty_action: Найти организации
+      destination: play.main
+      destination_context:
+        scope: organizers
+        followed: true
+      source_of_truth: docs/GAMES_CATALOG.yaml
+trainer_variant:
+  new_player_requests:
+    title: Новые игроки
+    badge_field: pending_trainer_requests_count
+    destination: profile.players
+    destination_context:
+      tab: new
+  note: personal linked trainers remain part of the player's profile context, not the trainer actor dashboard
+  default_cards:
+  - new_player_requests
+  - my_players
+  - followed_organizations
+organization_variant:
+  note: detailed organization administration remains outside this compact block
+  default_cards:
+  - employees
+  - my_players
+  - followed_organizations
+row_ui:
+  presentation: three_compact_cards_in_one_horizontal_rail
+  card_min_width: 112
+  card_max_width: 144
+  minimum_touch_height: 72
+  leading: avatar_or_logo_stack
+  center: short_title_and_count
+  trailing: chevron_optional
+  horizontal_scroll_when_needed: true
+  full_width_stacked_rows_forbidden: true
+  nested_primary_buttons_forbidden: true
+rules:
+- counts must be textual and cannot rely on color alone
+- pending trainer requests must be distinguishable from active trainers
+- saved players do not imply mutual friendship or access to private data
+- organization following only affects discovery and notification preferences
+- organization following never creates participation or private-event access
+- empty state is local to its row and does not hide the other rows
+- render one compact rail rather than three vertical home sections
+- the rail must not push the upcoming timeline below the first meaningful viewport
+states:
+- loading_skeleton_per_row
+- partially_loaded
+- trainers_empty
+- players_empty
+- organizations_empty
+- pending_trainer_request
+- offline_cached
+- permission_changed

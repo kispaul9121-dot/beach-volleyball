@@ -1,0 +1,120 @@
+version: 2
+
+account_model:
+  entity: user_account
+  description: Единственная учётная запись для входа, безопасности и владения профилями.
+  required_fields:
+    - id
+    - auth_provider
+    - email
+    - email_verified
+    - status
+  owns_many:
+    - actor_profiles
+
+actor_profiles:
+  player:
+    title: Игрок
+    required: true
+    identity_type: person
+    public_fields:
+      - display_name
+      - avatar
+      - city
+      - playing_level
+      - dominant_side
+      - rating
+    private_fields:
+      - legal_name
+      - birth_date
+      - phone
+
+  trainer:
+    title: Тренер
+    required: false
+    identity_type: person_professional
+    extends: player
+    onboarding_fields:
+      - trainer_name
+      - bio
+      - specializations
+      - experience
+      - cities
+      - verification_documents
+      - payout_profile
+    verification_states:
+      - draft
+      - submitted
+      - verified
+      - rejected
+
+  organization:
+    title: Компания / клуб
+    required: false
+    identity_type: organization
+    onboarding_fields:
+      - legal_or_public_name
+      - logo
+      - description
+      - contacts
+      - city
+      - organization_type
+      - venues
+      - staff_invites
+      - legal_details
+      - payout_profile
+    organization_types:
+      - club
+      - company
+      - school
+      - event_project
+
+active_actor:
+  storage:
+    server: last_active_actor_id
+    client: active_actor_id
+  switch_entry_points:
+    - global_header_avatar
+    - profile_header
+    - create_as_field
+  effects:
+    - changes_home_variant
+    - changes_profile_variant
+    - changes_quick_actions
+    - changes_default_creator
+    - changes_management_permissions
+    - changes_branding
+  invariant: Переключение профиля не меняет user_account и не требует повторного входа.
+
+creation_identity:
+  required_fields:
+    - created_by_user_id
+    - created_by_actor_id
+    - created_by_actor_type
+  editable_until: published
+  display_rules:
+    - Показывать имя и аватар активного профиля в мастере создания.
+    - Перед публикацией явно подтверждать, от чьего имени создаётся сущность.
+    - После публикации смена создателя требует переноса владения, а не обычного редактирования.
+
+organization_membership:
+  roles:
+    owner:
+      - all_permissions
+    admin:
+      - manage_profile
+      - manage_staff
+      - manage_entities
+      - manage_finance
+    event_manager:
+      - create_entities
+      - manage_assigned_entities
+    trainer:
+      - manage_assigned_trainings
+      - manage_attendance
+    finance:
+      - view_payments
+      - manage_refunds
+      - view_payouts
+    viewer:
+      - view_internal_dashboards

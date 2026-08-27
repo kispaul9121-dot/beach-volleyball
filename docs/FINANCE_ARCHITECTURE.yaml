@@ -1,0 +1,173 @@
+version: 1
+
+scope: finance
+model: organizer_is_merchant
+
+principle:
+  description: Деньги принимает подключённый организатор; VolleyPlay удерживает комиссию платформы.
+  platform_is_merchant_of_record: false
+  one_order_one_seller: true
+  multiple_sellers_per_order: false
+  platform_fee_supported: true
+  manual_payment_fallback_supported: true
+
+regions:
+  ru:
+    market: Russia
+    currency_defaults: [RUB]
+    provider_adapter: YooKassaAdapter
+    seller_types: [trainer, organization]
+    payment_modes:
+      - embedded_provider_checkout
+      - external_payment_link
+      - pay_on_site
+      - manual_external_mark
+    requirements:
+      - seller_provider_account_connected
+      - seller_verification_completed
+      - receipt_policy_configured
+      - refund_policy_published
+    receipt_model:
+      required_when_applicable: true
+      seller_is_receipt_owner: true
+      store_receipt_status: true
+      store_receipt_url: true
+      fiscal_data_is_provider_managed: true
+    restrictions:
+      - Частный player-профиль без подключённого merchant account не принимает встроенные платежи.
+      - Доступные способы оплаты определяются провайдером и договором продавца.
+      - Ручная отметка внешней оплаты требует права и audit event.
+  international:
+    market: International
+    currency_defaults: [EUR, USD, GBP]
+    provider_adapter: StripeConnectAdapter
+    charge_model: destination_charge
+    seller_types: [trainer, organization]
+    requirements:
+      - connected_account_created
+      - onboarding_completed
+      - charges_enabled
+      - payouts_enabled
+      - settlement_currency_supported
+    restrictions:
+      - Страна продавца и валюта должны поддерживаться провайдером.
+      - Cross-border операции разрешаются только по provider capability.
+      - Несколько получателей в одном order не входят в MVP.
+
+manual_adapter:
+  id: ManualPaymentAdapter
+  modes: [free, pay_on_site, external_link, bank_transfer]
+  rules:
+    - Не подтверждает оплату автоматически.
+    - Не создаёт provider payout.
+    - Ручное подтверждение хранит acting_user_id, acting_actor_id, reason и evidence.
+
+money:
+  storage:
+    amount_field: amount_minor
+    currency_field: currency
+    floating_point_forbidden: true
+  immutable_order_price: true
+  price_change_does_not_rewrite_existing_orders: true
+
+entities:
+  seller_accounts:
+    fields: [id, actor_id, region, provider, provider_account_id, status, charges_enabled, payouts_enabled, settlement_currency, verification_status]
+  orders:
+    fields: [id, buyer_user_id, seller_actor_id, source_type, source_id, participation_id, status, amount_minor, currency, platform_fee_minor, created_at]
+  order_items:
+    fields: [id, order_id, title, quantity, unit_amount_minor, tax_code, metadata]
+  payment_intents:
+    fields: [id, order_id, provider, provider_intent_id, status, amount_minor, currency, expires_at]
+  payments:
+    fields: [id, order_id, provider, provider_payment_id, status, paid_at, payment_method_type]
+  payment_transactions:
+    fields: [id, payment_id, type, amount_minor, currency, provider_fee_minor, platform_fee_minor, seller_net_minor, occurred_at]
+  refunds:
+    fields: [id, payment_id, amount_minor, currency, reason, status, requested_by_user_id, approved_by_actor_id]
+  receipts:
+    fields: [id, payment_id, seller_actor_id, type, status, provider_receipt_id, receipt_url, fiscal_payload]
+  payouts:
+    fields: [id, seller_account_id, provider_payout_id, amount_minor, currency, status, expected_at, paid_at]
+  ledger_entries:
+    fields: [id, account_type, account_id, transaction_type, debit_minor, credit_minor, currency, reference_type, reference_id, created_at]
+  disputes:
+    fields: [id, payment_id, provider_dispute_id, amount_minor, currency, status, reason, due_at]
+
+status_models:
+  order: [draft, awaiting_payment, paid, cancelled, expired, partially_refunded, refunded]
+  payment: [created, pending, requires_action, succeeded, failed, cancelled]
+  refund: [requested, under_review, approved, submitted, succeeded, failed, rejected]
+  seller_account: [not_connected, onboarding, under_review, active, restricted, disabled]
+  payout: [pending, in_transit, paid, failed, cancelled]
+
+payment_flow:
+  - Create immutable order for one seller actor.
+  - Verify seller account capability for region and currency.
+  - Create provider checkout with platform fee.
+  - Confirm only from verified provider webhook or reconciliation.
+  - Update payment and append ledger entries atomically.
+  - Confirm participation according to event payment policy.
+  - Generate or attach receipt where required.
+
+refund_flow:
+  - Evaluate published refund policy and event state.
+  - Create refund request; never mutate original payment.
+  - Require permission for organizer-initiated refund.
+  - Submit provider refund idempotently.
+  - Append refund transaction and ledger entries.
+  - Update order and participation separately.
+
+fees:
+  platform_fee:
+    configurable_by: region_and_product
+    disclosed_before_payment: true
+    fixed_on_order_creation: true
+  provider_fee:
+    source: provider_reconciliation
+    not_estimated_as_source_of_truth: true
+  seller_net:
+    formula: payment_amount - refunds - platform_fee - provider_fee
+
+permissions:
+  buyer:
+    - view_own_order
+    - pay_own_order
+    - request_refund_when_policy_allows
+    - view_own_receipt
+  seller_manager:
+    - view_entity_payment_status
+    - remind_buyer
+  finance_view:
+    - view_financial_reports
+    - view_transactions
+    - view_payouts
+  finance_manage:
+    - approve_refund
+    - mark_external_payment
+    - manage_payout_settings
+  owner_only:
+    - change_legal_seller
+    - disconnect_provider_account
+
+ui:
+  player_tabs: [К оплате, Оплачено, Возвраты, Все]
+  trainer_tabs: [Мои оплаты, Поступления, Выплаты, Возвраты]
+  organization_sections: [Сводка, Платежи, Задолженности, Возвраты, Выплаты, Отчёты]
+  checkout_must_show: [seller_name, item, amount, currency, platform_fee_when_charged_to_buyer, refund_policy, payment_method, final_total]
+
+security:
+  - VolleyPlay не хранит данные банковских карт.
+  - Webhook проверяется подписью, idempotency key и provider event id.
+  - Финансовый статус не устанавливается только клиентским redirect.
+  - Ledger является внутренним источником истины для сверки.
+  - Все возвраты, ручные оплаты и изменения payout account создают audit event.
+  - Секреты провайдеров разделены по региону и окружению.
+
+mvp_exclusions:
+  - split_between_multiple_sellers
+  - escrow
+  - team_payment_split
+  - subscriptions_with_automatic_recurring_charge
+  - wallet_balance
+  - peer_to_peer_transfers

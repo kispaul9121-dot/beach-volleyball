@@ -1,100 +1,412 @@
-version: 1
-
+version: 4
+route_rules:
+- unauthenticated users are redirected to /auth except public deep links that may show a preview
+- authenticated users with incomplete onboarding are redirected to the next onboarding step
+- tab routes preserve their own navigation stacks
+- entity detail routes are canonical and shared by all entry points
+- create routes accept returnTo and optional actorId
+- manage routes require relationship or organization permission
+- deep links use back_fallback when navigation history is empty
 routes:
-  - path: /
-    screen: home.main
-    navigator: tab
-
-  - path: /play
-    screen: play.main
-    navigator: tab
-
-  - path: /chats
-    screen: chats.main
-    navigator: tab
-
-  - path: /clubs
-    screen: clubs.main
-    navigator: tab
-
-  - path: /profile
-    screen: profile.main
-    navigator: tab
-
-  - path: /profile/calendar
-    screen: profile.calendar
-    navigator: profile_stack
-    parent: /profile
-    back_fallback: /profile
-
-  - path: /profile/games
-    screen: profile.my_games
-    navigator: profile_stack
-    parent: /profile
-    back_fallback: /profile
-
-  - path: /profile/competitions
-    screen: profile.competitions
-    navigator: profile_stack
-    parent: /profile
-    back_fallback: /profile
-
-  - path: /profile/trainings
-    screen: profile.trainings
-    navigator: profile_stack
-    parent: /profile
-    back_fallback: /profile
-
-  - path: /profile/trips
-    screen: profile.trips
-    navigator: profile_stack
-    parent: /profile
-    back_fallback: /profile
-
-  - path: /games/create
-    screen: game.create
-    navigator: modal_stack
-    accepts_query:
-      - returnTo
-    back_fallback: /play?category=games
-
-  - path: /games/:gameId
-    screen: game.details
-    navigator: entity_stack
-    back_fallback: /play?category=games
-
-  - path: /games/:gameId/manage
-    screen: game.manage
-    navigator: entity_stack
-    permission: game_organizer
-    back_fallback: /profile/games?tab=created
-
-  - path: /trainings/:trainingId
-    screen: training.details
-    navigator: entity_stack
-    back_fallback: /play?category=trainings
-
-  - path: /tournaments/:tournamentId
-    screen: tournament.details
-    navigator: entity_stack
-    back_fallback: /play?category=tournaments
-
-  - path: /seasons/:seasonId
-    screen: season.details
-    navigator: entity_stack
-    back_fallback: /play?category=seasons
-
-  - path: /tours/:tourId
-    screen: tour.details
-    navigator: entity_stack
-    back_fallback: /clubs?category=tours
-
-  - path: /clubs/:clubId
-    screen: club.details
-    navigator: entity_stack
-    back_fallback: /clubs
-
-  - path: /chats/:chatId
-    screen: chat.details
-    navigator: chats_stack
-    back_fallback: /chats
+- path: /auth
+  screen: auth.welcome
+  navigator: auth_stack
+  access: signed_out
+- path: /auth/sign-in
+  screen: auth.sign_in
+  navigator: auth_stack
+  access: signed_out
+  back_fallback: /auth
+- path: /auth/register
+  screen: auth.email_registration
+  navigator: auth_stack
+  access: signed_out
+  back_fallback: /auth
+- path: /auth/verify
+  screen: auth.verify_email
+  navigator: auth_stack
+  access: pending_email_verification
+  back_fallback: /auth
+- path: /auth/reset-password
+  screen: auth.reset_password
+  navigator: auth_stack
+  access: signed_out
+  back_fallback: /auth/sign-in
+- path: /onboarding/profiles
+  screen: onboarding.profile_selection
+  navigator: onboarding_stack
+  access: authenticated_incomplete_onboarding
+- path: /onboarding/player
+  screen: onboarding.player
+  navigator: onboarding_stack
+  access: authenticated_incomplete_onboarding
+  back_fallback: /onboarding/profiles
+- path: /onboarding/trainer
+  screen: onboarding.trainer
+  navigator: onboarding_stack
+  access: authenticated
+  back_fallback: /onboarding/player
+- path: /onboarding/organization
+  screen: onboarding.organization
+  navigator: onboarding_stack
+  access: authenticated
+  back_fallback: /onboarding/player
+- path: /onboarding/permissions
+  screen: onboarding.permissions
+  navigator: onboarding_stack
+  access: authenticated
+  back_fallback: /onboarding/player
+- path: /notifications
+  screen: global.notifications
+  navigator: global_stack
+  access: authenticated
+  back_fallback: /
+- path: system://actor-switcher
+  screen: actor.switcher
+  navigator: bottom_sheet
+  access: authenticated
+  back_fallback: system://dismiss
+- path: system://player-picker
+  screen: player.picker
+  navigator: modal_stack
+  access: authenticated
+  permission: entity_inviter
+  accepts_query:
+  - entityType
+  - entityId
+  - draftId
+  - actorId
+  - returnTo
+  back_fallback: system://dismiss
+- path: /
+  screen: home.main
+  navigator: tab
+  access: authenticated_onboarded
+  accepts_query:
+  - highlightEntityType
+  - highlightEntityId
+- path: /activity
+  screen: profile.activity
+  navigator: home_stack
+  parent: /
+  access: authenticated_onboarded
+  accepts_query:
+  - tab
+  - type
+  - status
+  - actorId
+  - highlightEntityType
+  - highlightEntityId
+  back_fallback: /
+- path: /play
+  screen: play.main
+  navigator: tab
+  access: authenticated_onboarded
+  accepts_query:
+  - category
+  - tournamentMode
+  - date
+  - sort
+  - distance
+  - level
+  - price
+  - freePlaces
+  - source
+  - scope
+  - organizerId
+  - playerId
+  - trainerId
+  - followed
+  - mode
+  - manageStatus
+  - actorId
+- path: /chats
+  screen: chats.main
+  navigator: tab
+  access: authenticated_onboarded
+  accepts_query:
+  - category
+  - unread
+  - actorId
+- path: /camps
+  screen: camps.main
+  navigator: tab
+  access: public_preview_or_authenticated
+  accepts_query:
+  - type
+  - date
+  - sort
+  - destination
+  - level
+  - price
+  - mode
+  - manageStatus
+  - actorId
+- path: /profile
+  screen: profile.main
+  navigator: tab
+  access: authenticated_onboarded
+  accepts_query:
+  - actorId
+- path: /profile/actors
+  screen: profile.actor_profiles
+  navigator: profile_stack
+  parent: /profile
+  back_fallback: /profile
+- path: /profile/calendar
+  screen: profile.calendar
+  navigator: home_stack
+  parent: /
+  accepts_query:
+  - view
+  - date
+  - scope
+  - actorId
+  back_fallback: /
+- path: /profile/games
+  screen: profile.my_games
+  navigator: home_stack
+  parent: /
+  accepts_query:
+  - tab
+  - actorId
+  back_fallback: /activity
+- path: /profile/competitions
+  screen: profile.competitions
+  navigator: home_stack
+  parent: /
+  accepts_query:
+  - tab
+  - actorId
+  back_fallback: /activity
+- path: /profile/trainings
+  screen: profile.trainings
+  navigator: home_stack
+  parent: /
+  accepts_query:
+  - tab
+  - actorId
+  back_fallback: /activity
+- path: /profile/players
+  screen: profile.players
+  navigator: home_stack
+  parent: /
+  accepts_query:
+  - tab
+  - mode
+  - entityType
+  - entityId
+  - actorId
+  back_fallback: /
+- path: /profile/trips
+  screen: profile.trips
+  navigator: home_stack
+  parent: /
+  accepts_query:
+  - tab
+  - actorId
+  back_fallback: /activity
+- path: /profile/statistics
+  screen: profile.statistics
+  navigator: profile_stack
+  parent: /profile
+  accepts_query:
+  - period
+  - actorId
+  back_fallback: /profile
+- path: /profile/payments
+  screen: profile.payments
+  navigator: profile_stack
+  parent: /profile
+  accepts_query:
+  - tab
+  - status
+  - actorId
+  back_fallback: /profile
+- path: /profile/settings
+  screen: profile.settings
+  navigator: profile_stack
+  parent: /profile
+  accepts_query:
+  - section
+  - actorId
+  back_fallback: /profile
+- path: /games/create
+  screen: game.create
+  navigator: modal_stack
+  access: authenticated_onboarded
+  accepts_query:
+  - returnTo
+  - actorId
+  - draftId
+  - templateId
+  back_fallback: /play?mode=manage&category=games
+- path: /games/:gameId
+  screen: game.details
+  navigator: entity_stack
+  access: public_preview_or_authenticated
+  back_fallback: /play?category=games
+- path: /games/:gameId/manage
+  screen: game.manage
+  navigator: entity_stack
+  permission: entity_manager
+  accepts_query:
+  - tab
+  back_fallback: /play?mode=manage&category=games
+- path: /trainings/create
+  screen: training.create
+  navigator: modal_stack
+  permission: trainer_or_organization
+  accepts_query:
+  - returnTo
+  - actorId
+  - draftId
+  - templateId
+  back_fallback: /play?mode=manage&category=trainings
+- path: /trainings/:trainingId
+  screen: training.details
+  navigator: entity_stack
+  access: public_preview_or_authenticated
+  back_fallback: /play?category=trainings
+- path: /trainings/:trainingId/manage
+  screen: training.manage
+  navigator: entity_stack
+  permission: entity_manager
+  accepts_query:
+  - tab
+  back_fallback: /play?mode=manage&category=trainings
+- path: /trainings/:trainingId/attendance
+  screen: training.attendance
+  navigator: entity_stack
+  permission: training_manager
+  back_fallback: /trainings/:trainingId/manage?tab=attendance
+- path: /tournaments/create
+  screen: tournament.create
+  navigator: modal_stack
+  access: authenticated_onboarded
+  accepts_query:
+  - returnTo
+  - actorId
+  - draftId
+  - templateId
+  back_fallback: /play?mode=manage&category=tournaments
+- path: /tournaments/:tournamentId
+  screen: tournament.details
+  navigator: entity_stack
+  access: public_preview_or_authenticated
+  accepts_query:
+  - tab
+  - dayId
+  - round
+  - mode
+  back_fallback: /play?category=tournaments
+- path: /tournaments/:tournamentId/manage
+  screen: tournament.manage
+  navigator: entity_stack
+  permission: entity_manager
+  accepts_query:
+  - tab
+  - dayId
+  - round
+  - mode
+  back_fallback: /play?mode=manage&category=tournaments
+- path: /matches/:matchId
+  screen: competition.match
+  navigator: entity_stack
+  access: public_preview_or_authenticated
+  back_fallback: /play
+- path: /tours/create
+  screen: tour.create
+  navigator: modal_stack
+  access: authenticated_onboarded
+  accepts_query:
+  - returnTo
+  - actorId
+  - draftId
+  - mode
+  back_fallback: /camps?mode=manage
+- path: /tours/:tourId
+  screen: tour.details
+  navigator: entity_stack
+  access: public_preview_or_authenticated
+  accepts_query:
+  - tab
+  back_fallback: /camps
+- path: /tours/:tourId/manage
+  screen: tour.manage
+  navigator: entity_stack
+  permission: entity_manager
+  accepts_query:
+  - tab
+  back_fallback: /camps?mode=manage
+- path: /tours/:tourId/booking
+  screen: tour.booking
+  navigator: modal_stack
+  access: authenticated_onboarded
+  back_fallback: /tours/:tourId
+- path: /clubs/:clubId
+  screen: club.details
+  navigator: entity_stack
+  access: public_preview_or_authenticated
+  accepts_query:
+  - tab
+  back_fallback: /play?scope=organizers
+- path: /clubs/:clubId/manage
+  screen: club.manage
+  navigator: entity_stack
+  permission: organization_member
+  accepts_query:
+  - tab
+  back_fallback: /profile
+- path: /venues/:venueId
+  screen: venue.details
+  navigator: entity_stack
+  access: public_preview_or_authenticated
+  back_fallback: /play?scope=venues
+- path: /players/:playerId
+  screen: player.public_profile
+  navigator: entity_stack
+  access: public_preview_or_authenticated
+  back_fallback: /profile/players
+- path: /trainers/:trainerId
+  screen: trainer.public_profile
+  navigator: entity_stack
+  access: public_preview_or_authenticated
+  back_fallback: /trainers/search
+- path: /trainers/search
+  screen: trainer.search
+  navigator: home_stack
+  parent: /
+  access: authenticated_onboarded
+  permission: authenticated_player
+  accepts_query:
+  - city
+  - distance
+  - specialization
+  - level
+  - language
+  - format
+  - availability
+  back_fallback: /
+- path: /chats/:chatId
+  screen: chat.details
+  navigator: chats_stack
+  permission: conversation_member
+  accepts_query:
+  - messageId
+  back_fallback: /chats
+- path: /payments/checkout/:orderId
+  screen: payment.checkout
+  navigator: modal_stack
+  access: authenticated
+  back_fallback: /profile/payments
+- path: /payments/:paymentId
+  screen: payment.details
+  navigator: entity_stack
+  permission: payment_owner_or_finance_manager
+  back_fallback: /profile/payments
+- path: /invitations/:invitationId
+  screen: invitation.details
+  navigator: modal_stack
+  access: authenticated
+  back_fallback: /

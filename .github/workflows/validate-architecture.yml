@@ -1,0 +1,76 @@
+name: Validate architecture
+
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "README.md"
+      - "docs/**"
+      - "scripts/validate_architecture.py"
+      - "scripts/validate_navigation.py"
+      - "scripts/validate_design_system.py"
+      - "scripts/validate_profile_activity.py"
+      - "scripts/validate_tunisian_format.py"
+      - "scripts/validate_implementation_prompts.py"
+      - "scripts/generate_screen_readiness.py"
+      - "scripts/requirements.txt"
+      - ".github/workflows/validate-architecture.yml"
+  push:
+    branches:
+      - main
+      - "architecture/**"
+    paths:
+      - "AGENTS.md"
+      - "README.md"
+      - "docs/**"
+      - "scripts/validate_architecture.py"
+      - "scripts/validate_navigation.py"
+      - "scripts/validate_design_system.py"
+      - "scripts/validate_profile_activity.py"
+      - "scripts/validate_tunisian_format.py"
+      - "scripts/validate_implementation_prompts.py"
+      - "scripts/generate_screen_readiness.py"
+      - "scripts/requirements.txt"
+      - ".github/workflows/validate-architecture.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check -r scripts/requirements.txt
+
+      - name: Validate screens, routes and actions
+        run: python scripts/validate_architecture.py
+
+      - name: Validate navigation graph and immutable bottom tabs
+        run: python scripts/validate_navigation.py
+
+      - name: Validate dark-first cross-platform design system
+        run: python scripts/validate_design_system.py
+
+      - name: Validate Profile activity and discovery boundaries
+        run: python scripts/validate_profile_activity.py
+
+      - name: Validate one-off Tunisian ladder game
+        run: python scripts/validate_tunisian_format.py
+
+      - name: Validate ordered implementation prompt pack
+        run: python scripts/validate_implementation_prompts.py
+
+      - name: Verify screen readiness table is current
+        run: python scripts/generate_screen_readiness.py --check

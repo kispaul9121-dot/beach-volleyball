@@ -1,0 +1,136 @@
+version: 2
+bottom_navigation:
+  immutable: true
+  rules:
+  - Набор, порядок, screen_id и пользовательские названия не меняются между player, trainer и organization actor.
+  - Вложенные кабинеты не создают вторую нижнюю навигацию.
+  - Модальные экраны могут временно скрывать нижнее меню, но не заменяют его другим набором вкладок.
+  - Изменение списка, порядка, названия или маршрута нижних вкладок является breaking change и блокируется CI.
+  items:
+  - id: home
+    title: Профиль
+    screen: home.main
+    route: /
+  - id: play
+    title: Игры
+    screen: play.main
+    route: /play
+  - id: chats
+    title: Чаты
+    screen: chats.main
+    route: /chats
+  - id: camps
+    title: Кэмпы
+    screen: camps.main
+    route: /camps
+  - id: profile
+    title: Настройки
+    screen: profile.main
+    route: /profile
+dynamic_sources:
+- global.header
+- dynamic.onboarding_optional_profile
+- dynamic.create_wizard
+- dynamic.entity_create_or_manage
+- dynamic.entity_details
+- dynamic.entity_manage
+dynamic_destinations:
+- id: dynamic.next_selected_profile_or_permissions
+  requires_context:
+  - selectedProfiles
+  - completedProfiles
+  resolves_to:
+  - onboarding.trainer
+  - onboarding.organization
+  - onboarding.permissions
+- id: dynamic.entity_details
+  requires_context:
+  - entityType
+  - entityId
+  resolves_to:
+  - game.details
+  - training.details
+  - tournament.details
+  - tour.details
+  - club.details
+  - venue.details
+  - trainer.public_profile
+  - player.public_profile
+- id: dynamic.catalog_entity_entry
+  requires_context:
+  - entityType
+  - entityId
+  - activeActorId
+  - canManageHint
+  decision:
+    authorized_after_server_check: dynamic.entity_manage
+    not_authorized: dynamic.entity_details
+    permission_revoked: dynamic.entity_details
+  resolves_to:
+  - game.details
+  - training.details
+  - tournament.details
+  - tour.details
+  - game.manage
+  - training.manage
+  - tournament.manage
+  - tour.manage
+- id: dynamic.entity_manage
+  requires_context:
+  - entityType
+  - entityId
+  resolves_to:
+  - game.manage
+  - training.manage
+  - tournament.manage
+  - tour.manage
+  - club.manage
+- id: dynamic.competition_details
+  requires_context:
+  - entityType
+  - entityId
+  resolves_to:
+  - tournament.details
+- id: dynamic.competition_manage
+  requires_context:
+  - entityType
+  - entityId
+  resolves_to:
+  - tournament.manage
+- id: dynamic.calendar_entity
+  requires_context:
+  - entityType
+  - entityId
+  resolves_to:
+  - game.details
+  - training.details
+  - tournament.details
+  - tour.details
+- id: dynamic.context_entity
+  requires_context:
+  - entityType
+  - entityId
+  resolves_to:
+  - game.details
+  - training.details
+  - tournament.details
+  - tour.details
+  - club.details
+- id: dynamic.notification_target
+  requires_context:
+  - targetType
+  - targetId
+  resolves_to:
+  - game.details
+  - training.details
+  - tournament.details
+  - tour.details
+  - club.details
+  - chat.details
+  - invitation.details
+  - payment.details
+success_resolvers:
+- id: onboarding.profile_selection_or_home
+  resolves_to:
+  - onboarding.profile_selection
+  - home.main

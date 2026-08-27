@@ -1,0 +1,223 @@
+version: 10
+scope: entity_sections
+source_of_truth_for:
+- public entity navigation
+- participant entity navigation
+- mandatory event chat
+- type-specific sections
+- single chat identity across entity screen and global Chats
+- participant-list payment visibility and self-service action
+- strict owner-organizer-only result entry for one-off games
+common_rules:
+- У каждого опубликованного события есть канонический экран и один связанный чат события.
+- Черновик не создаёт доступный участникам чат.
+- Гость не видит сообщения чата, даже если публичный preview события доступен.
+- Подтверждённый участник, организатор и уполномоченный сотрудник получают доступ согласно политике чата.
+- Приглашённый или подавший заявку пользователь не получает доступ к чату до подтверждения участия.
+- Удаление из события или потеря права пересчитывает доступ на сервере.
+- Чат не заменяет карточку события, состав, матчи, результаты или статистику.
+- Системные изменения события публикуются в чат как системные сообщения с action_id.
+- Встроенный раздел чата и карточка в глобальной вкладке Чаты всегда используют один conversationId.
+- Сезонная сущность, сезонный режим и накопительные игровые дни не поддерживаются.
+common_sections:
+  required:
+  - overview
+  - participants
+  - chat
+  labels:
+    overview: Обзор
+    participants_individual: Игроки
+    participants_pairs: Пары
+    participants_teams: Команды
+    matches: Матчи
+    statistics: Статистика
+    chat: Чат
+  optional_by_state:
+  - announcements
+  - documents
+  - results
+  - statistics
+chat:
+  mandatory_for_mvp: true
+  creation: on_publish_or_first_confirmed_participant
+  canonical_identity:
+    one_conversation_per_entity: true
+    embedded_entity_chat_and_global_chats_are_same_conversation: true
+    duplicate_conversation_for_manage_screen_forbidden: true
+  context_types:
+  - game
+  - training
+  - tournament
+  - tour
+  members:
+  - confirmed_participants
+  - entity_owner_actor
+  - authorized_entity_staff
+  moderators:
+  - entity_owner
+  - entity_manager
+  - explicitly_assigned_moderator
+  system_events:
+  - schedule_changed
+  - venue_changed
+  - participant_added
+  - participant_removed
+  - registration_changed
+  - payment_required
+  - match_list_generated
+  - court_movement_confirmed
+  - result_saved
+  - result_corrected
+  - entity_cancelled
+  completed_behavior: read_only_or_writable_by_entity_policy
+  archived_behavior: read_only
+entity_types:
+  game:
+    mvp_contract: docs/GAME_MVP.yaml
+    match_contract: docs/GAME_MATCH_TABLE.yaml
+    tunisian_contract: docs/GAME_TUNISIAN_LADDER.yaml
+    participant_sections:
+    - overview
+    - participants
+    - matches
+    - chat
+    manager_sections:
+    - overview
+    - participants
+    - matches
+    - chat
+    separate_manager_sections_forbidden:
+    - payments
+    - settings
+    - tournament_bracket
+    - season
+    - game_days
+    matches:
+      required_in_mvp: true
+      always_present: true
+      presentation: simple_ordered_match_table
+      local_views:
+      - matches
+      - statistics
+      generation_by_format:
+        standard_2x2: fixed_pairs_round_robin_or_manual
+        standard_4x4: fixed_teams_round_robin_or_manual
+        fixed_team_match: fixed_teams_round_robin_or_manual
+        rotation_five: one_to_three_court_tunisian_ladder
+      tunisian_rules:
+        entity_type: game
+        event_duration: one_off_single_date
+        court_count_allowed:
+        - 1
+        - 2
+        - 3
+        participant_count_formula: court_count_times_5
+        supported_participant_counts:
+        - 5
+        - 10
+        - 15
+        match_count_per_court_entered_by_organizer: true
+        default_match_count_per_court: 15
+        cycle_count_entered_by_organizer: true
+        movements_only_between_cycles_inside_same_event: true
+        user_facing_aliases:
+        - Король пляжа
+        - Тунисский формат
+        season_mode_forbidden: true
+      score_entry:
+        entity_owner_actor: editable
+        delegated_event_manager: read_only
+        confirmed_participant: read_only
+        guest: read_only_when_public
+        participant_confirmation_required: false
+        delegated_manager_entry_forbidden: true
+      statistics_derived_from_owner_saved_results: true
+    participants:
+      identity_fields:
+      - first_name
+      - last_name
+      payment_status_visible_to:
+      - confirmed_participants
+      - entity_managers
+      payment_cell:
+        other_rows_show:
+        - Оплачено
+        - Не оплачено
+        - Бесплатно
+        other_rows_actions_forbidden: true
+        own_unpaid_online_row:
+          button: Оплатить
+          action_id: entity.open_payment
+        own_paid_row:
+          status: Оплачено
+        successful_payment_replaces_button_with_status: true
+        paying_for_another_participant_forbidden: true
+      manager_edit_mode_actions:
+      - add
+      - remove
+      payment_editing_forbidden: true
+      pending_request_actions:
+      - approve
+      - decline
+  training:
+    base_sections:
+    - overview
+    - participants
+    - chat
+    conditional_sections:
+      program: program_available
+      attendance: manager_or_post_event_participant_view
+      payments: payment_context_available
+      materials: materials_available
+  tournament:
+    base_sections:
+    - overview
+    - participants
+    - chat
+    supported_formats:
+    - single_elimination
+    - full_placement
+    conditional_sections:
+      matches: always
+      bracket: single_elimination
+      rounds: full_placement
+      competition_map: always
+      placements: full_placement_or_completed
+      statistics: statistics_available
+    forbidden_formats_and_sections:
+    - round_robin
+    - swiss
+    - seasonal
+    - tournament_days
+    - tunisian_court_ladder
+    - king_of_the_beach
+    - groups_then_playoff
+    visual_direction:
+      rich_competition_map_allowed: true
+      bracket_and_placement_cards_allowed: true
+  tour:
+    base_sections:
+    - overview
+    - participants
+    - chat
+    conditional_sections:
+      program: always
+      accommodation: accommodation_available
+      payments: commercial_or_payment_schedule
+      documents: documents_required_or_available
+      transport: transport_available
+implementation_rules:
+- Не создавать отдельные социальные группы вокруг события.
+- Не создавать отдельный чат для таблицы, матча или списка игроков без явного продуктового решения.
+- Внутренние разделы зависят от типа, формата, статуса и роли пользователя.
+- На мобильном допускается горизонтальный tab bar или меню разделов, но глобальная нижняя навигация не заменяется.
+- Тунисская лестница является разовой игрой на одну дату с одной, двумя или тремя площадками по пять игроков.
+- Король пляжа является пользовательским синонимом Тунисской лестницы, а не отдельным турниром.
+- Количество матчей на площадку и количество циклов задаются отдельно.
+- Переходы между площадками происходят только между циклами внутри этой же игры.
+- Сезоны, повторяющиеся игровые дни и накопительная сезонная таблица запрещены.
+- Турниры поддерживают только плей-офф на выбывание и полное распределение мест.
+- Круговая, швейцарская и система Группы + плей-офф не поддерживаются.
+- Поля счёта разовой игры показываются только actor-владельцу.
+- Делегированный менеджер, капитан и участник видят результаты только для чтения.
+- Кнопка оплаты показывается только владельцу собственного payment record.
